@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lore — Pato em Fradelos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/lore.css">
+</head>
+<body>
+
+  <!-- ── NAVBAR ── -->
+  <nav class="navbar">
+    <a href="../index.html" class="navbar__logo">PATO <span>//</span> FRADELOS</a>
+    <ul class="navbar__links">
+      <li><a href="../index.html">Início</a></li>
+      <li><a href="maps.html">Mapas</a></li>
+      <li><a href="entities.html">Entidades</a></li>
+      <li><a href="lore.html" class="active">Lore</a></li>
+      <li><a href="video.html">Vídeo</a></li>
+      <li><a href="team.html">Equipa</a></li>
+    </ul>
+    <button class="navbar__hamburger" aria-label="Abrir menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+  <div class="navbar__mobile-menu">
+    <a href="../index.html">Início</a>
+    <a href="maps.html">Mapas</a>
+    <a href="entities.html">Entidades</a>
+    <a href="lore.html" class="active">Lore</a>
+    <a href="video.html">Vídeo</a>
+    <a href="team.html">Equipa</a>
+  </div>
+
+  <div class="page-content">
+    <div class="lore-page">
+
+      <!-- ── CABEÇALHO ── -->
+      <header class="lore-header">
+        <div class="lore-header__eyebrow">Projecto ORBIS // Arquivos Classificados</div>
+        <h1 class="lore-header__title">Registos dos Cientistas</h1>
+        <p class="lore-header__desc">
+          Documentos recuperados da instalação de investigação.
+          Alguns ficheiros encontram-se corrompidos. Outros nunca deviam ter sido escritos.
+        </p>
+      </header>
+
+      <!-- ── FILTROS ── -->
+      <div class="lore-filters">
+        <button class="filter-btn active" data-filter="all">Todos</button>
+        <button class="filter-btn" data-filter="discovery">Descoberta</button>
+        <button class="filter-btn" data-filter="creatures">Criaturas</button>
+        <button class="filter-btn" data-filter="incident">Incidente</button>
+        <button class="filter-btn" data-filter="orbis">Projecto ORBIS</button>
+      </div>
+
+      <!-- ── TERMINAL 1 — PRIMEIROS REGISTOS ── -->
+      <div data-category="discovery">
+        <div class="terminal">
+          <div class="terminal__titlebar">
+            <div class="terminal__dots">
+              <div class="terminal__dot terminal__dot--red"></div>
+              <div class="terminal__dot terminal__dot--yellow"></div>
+              <div class="terminal__dot terminal__dot--green"></div>
+            </div>
+            <span class="terminal__filename">orbis_log_001.txt — Expedição Inicial</span>
+          </div>
+          <div class="terminal__body">
+            <div class="terminal__separator">// REGISTO #001 — DIA 1</div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="Satélite detectou anomalias ópticas na ilha. Manchas pretas que não constam de nenhuma carta geográfica."></span>
+            </div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="Equipa de oito pessoas enviada para reconhecimento. Equipamento padrão de campo."></span>
+            </div>
+
+            <div class="terminal__separator">// REGISTO #003 — DIA 4</div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="Encontrámos o lago. A superfície é completamente negra. Não reflecte luz. Não faz ondas."></span>
+            </div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="Atirei uma pedra. Não ouvi o impacto. Não vi qualquer perturbação. Como se a pedra simplesmente tivesse deixado de existir."></span>
+            </div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="O Gorobi disse que a superfície parece sólida quando olhamos directamente para ela. Quando desviei o olhar, ouvi-o gritar."></span>
+            </div>
+
+            <div class="terminal__separator">// REGISTO #004 — DIA 4 (cont.)</div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="O Gorobi caiu para dentro do lago. Resgatámo-lo 40 minutos depois — estava em pé no interior, num espaço vazio e escuro."></span>
+            </div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="Disse que lá dentro o tempo não passa. Para ele, foram apenas segundos."></span>
+            </div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="Hipótese de trabalho: se não conseguimos ver algo, esse algo não existe."></span>
+            </div>
+            <span class="terminal__cursor"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── LOGS — CRIATURAS ── -->
+      <div data-category="creatures">
+        <div class="log-section">
+          <div class="log-section__title">// Ficheiro: Fauna Afectada</div>
+
+          <div class="log-card">
+            <div class="log-card__meta">
+              <span class="log-card__id">Registo #12 — Anglerfish</span>
+              <span class="log-card__author">Investigadora Marta V.</span>
+            </div>
+            <p class="log-card__text">"A criatura usa uma flor luminosa como isco — idêntica às glowvines que encontrámos nas paredes da gruta. Só percebemos a diferença quando o Gorobi tentou tocar numa. O corpo inteiro está oculto na matéria negra. Não faz qualquer som ao mover-se. Só o isco é visível. Nunca há raízes onde o isco aparece — essa é a única forma de distinguir o falso do real."</p>
+          </div>
+
+          <div class="log-card">
+            <div class="log-card__meta">
+              <span class="log-card__id">Registo #18 — Medusas</span>
+              <span class="log-card__author">Dr. Ramos</span>
+            </div>
+            <p class="log-card__text">"As medusas nadam na matéria negra como se fosse água. Não há explicação para isto — a matéria negra não é líquida. Parece que qualquer criatura suficientemente adaptada consegue mover-se dentro dela livremente. Os tentáculos ficam visíveis quando a observamos directamente. Quando desviamos o olhar, a criatura desaparece juntamente com a matéria que a rodeia."</p>
+          </div>
+
+          <div class="log-card">
+            <div class="log-card__meta">
+              <span class="log-card__id">Registo #23 — Glowvines</span>
+              <span class="log-card__author">Investigadora Marta V.</span>
+            </div>
+            <p class="log-card__text">"As plantas crescem sempre a partir de tectos de matéria negra. As raízes são invisíveis — rodeadas por matéria negra que as oculta. Mas ao iluminarmos com o núcleo, as raízes tornam-se visíveis. Descoberta mais estranha: a região entre as raízes e a flor parece sólida visualmente, mas não existe fisicamente. Atravessa-se como se fosse ar. A planta cria uma ilusão de solidez."</p>
+          </div>
+
+          <div class="log-card">
+            <div class="log-card__meta">
+              <span class="log-card__id">Registo #31 — Camaleões</span>
+              <span class="log-card__author">Dr. Ferreira — CONFIDENCIAL</span>
+            </div>
+            <p class="log-card__text">"Os camaleões negros são diferentes de tudo o que vimos até agora. São inteligentes. Observam-nos. Quando iluminados com o núcleo, ficam imóveis — sabem que foram detectados. Fazem sons que não consigo descrever. Graves, irregulares. Não são sons de animal. Recomendo contenção imediata no Piso 3. Não devem sair dali em circunstância alguma."</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TERMINAL 2 — INCIDENTE PISO 3 ── -->
+      <div data-category="incident">
+        <div class="terminal">
+          <div class="terminal__titlebar">
+            <div class="terminal__dots">
+              <div class="terminal__dot terminal__dot--red"></div>
+              <div class="terminal__dot terminal__dot--yellow"></div>
+              <div class="terminal__dot terminal__dot--green"></div>
+            </div>
+            <span class="terminal__filename">orbis_incident_P3.txt — ENCRIPTADO PARCIALMENTE</span>
+          </div>
+          <div class="terminal__body">
+            <div class="terminal__separator">// ALERTA DE CONTENÇÃO — PISO 3</div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">!</span>
+              <span class="terminal__text" data-type="[FICHEIRO CORROMPIDO — RECUPERAÇÃO PARCIAL]"></span>
+            </div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="Os camaleões escaparam. Não sabemos como. As câmeras mostram a sala vazia — mas as câmeras só registam o que olham directamente."></span>
+            </div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="Três membros da equipa foram atacados. O sangue deles... está a mudar. Fica preto nas bordas das feridas."></span>
+            </div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="O Piso 3 está permanentemente fechado. Não entrem. Não abram a porta."></span>
+            </div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="[RESTO DO FICHEIRO INACESSÍVEL]"></span>
+            </div>
+            <span class="terminal__cursor"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── LOGS — PROJECTO ORBIS ── -->
+      <div data-category="orbis">
+        <div class="log-section">
+          <div class="log-section__title">// Ficheiro: Projecto ORBIS — Classificado</div>
+
+          <div class="log-card">
+            <div class="log-card__meta">
+              <span class="log-card__id">Registo #47 — Entidade Secreta</span>
+              <span class="log-card__author">Director do Projecto</span>
+            </div>
+            <p class="log-card__text">"Capturámos uma. Completamente negra, abre e fecha um único olho. Quando fecha o olho, desaparece — ganha as propriedades da matéria negra que a rodeia. Só conseguimos capturá-la projectando luz directa de forma contínua. Enquanto iluminada, não consegue desaparecer. Parece... frustrada. Não com medo. Frustrada. Como se soubesse que estamos a estudá-la e não aprovasse."</p>
+          </div>
+
+          <div class="log-card">
+            <div class="log-card__meta">
+              <span class="log-card__id">Registo #52 — O Observer</span>
+              <span class="log-card__author">Director do Projecto</span>
+            </div>
+            <p class="log-card__text">"Criámos o Observer inspirados na Entidade Secreta. Uma esfera artificial com consciência — capaz de observar continuamente sem necessitar de um operador humano. Teoricamente, pode desaparecer na matéria negra quando fecha o olho, tal como a entidade original. O primeiro teste foi... perturbador. Quando o ligámos, a primeira coisa que fez foi procurar a câmara de contenção da Entidade Secreta e olhar para ela durante oito minutos sem desviar o olhar."</p>
+          </div>
+
+          <div class="log-card">
+            <div class="log-card__meta">
+              <span class="log-card__id">Registo #61 — Teleporter</span>
+              <span class="log-card__author">Investigadora Marta V.</span>
+            </div>
+            <p class="log-card__text">"Baseámo-nos no princípio da desaparição para construir o teleporter. Quando estás dentro da esfera e não consegues ver o exterior, o exterior deixa de te poder observar. Entras na outra dimensão — o lugar para onde vai toda a matéria negra quando não é observada. O problema é sair. Precisas de algo que te observe de volta para regressares. Por enquanto, usamos o Observer como âncora."</p>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- fim lore-page -->
+  </div><!-- fim page-content -->
+
+  <script src="../js/main.js"></script>
+  <script src="../js/lore.js"></script>
+</body>
+</html>
