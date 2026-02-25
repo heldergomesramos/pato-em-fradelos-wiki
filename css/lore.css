@@ -1,0 +1,318 @@
+/* ============================================================
+   LORE.CSS — Estilos da página de Lore (logs estilo terminal)
+   ============================================================ */
+
+/* ── LAYOUT PRINCIPAL ── */
+.lore-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 24px 80px;
+}
+
+/* ── CABEÇALHO DA PÁGINA ── */
+.lore-header {
+  text-align: center;
+  margin-bottom: 60px;
+  animation: fadeInUp 0.6s ease both;
+}
+
+.lore-header__eyebrow {
+  font-size: 0.55rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  opacity: 0.7;
+  margin-bottom: 10px;
+}
+
+.lore-header__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+}
+
+.lore-header__desc {
+  font-size: 0.75rem;
+  line-height: 1.8;
+  color: var(--text-muted);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* ── FILTROS DE SECÇÃO ── */
+.lore-filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+  justify-content: center;
+}
+
+/* Botão de filtro individual */
+.filter-btn {
+  padding: 5px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.filter-btn:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+.filter-btn.active {
+  background: rgba(0, 204, 255, 0.08);
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+/* ── TIMELINE DE EVENTOS ── */
+.timeline {
+  position: relative;
+  margin-bottom: 60px;
+}
+
+/* Linha vertical da timeline */
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, var(--border) 10%, var(--border) 90%, transparent);
+}
+
+/* Item individual da timeline */
+.timeline-item {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+  padding-left: 8px;
+  animation: fadeInUp 0.4s ease both;
+}
+
+/* Ponto na linha da timeline */
+.timeline-item__dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  position: relative;
+  z-index: 1;
+  margin-top: 4px;
+}
+
+.timeline-item__body { flex: 1; }
+
+.timeline-item__label {
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.timeline-item__title {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.timeline-item__desc {
+  font-size: 0.75rem;
+  line-height: 1.8;
+  color: var(--text-muted);
+}
+
+/* ── TERMINAL DE LOGS ── */
+.terminal {
+  background: #020406;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 32px;
+}
+
+/* Barra de título do terminal */
+.terminal__titlebar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--border);
+}
+
+.terminal__dots {
+  display: flex;
+  gap: 5px;
+}
+.terminal__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.terminal__dot--red    { background: #ff5f57; }
+.terminal__dot--yellow { background: #febc2e; }
+.terminal__dot--green  { background: #28c840; }
+
+.terminal__filename {
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  color: var(--text-dim);
+  margin-left: 4px;
+}
+
+/* Conteúdo do terminal */
+.terminal__body {
+  padding: 20px 24px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.85;
+  color: #8aff8a;
+}
+
+/* Linha do terminal com prompt */
+.terminal__line {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.terminal__prompt {
+  color: var(--cyan);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.terminal__text { color: rgba(200, 216, 232, 0.75); }
+
+/* Separador de log (número do registo) */
+.terminal__separator {
+  color: var(--text-dim);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  margin: 16px 0 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+/* Cursor piscante no final do terminal */
+.terminal__cursor {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  background: #8aff8a;
+  animation: blink 1s step-end infinite;
+  vertical-align: middle;
+  margin-left: 2px;
+}
+
+/* ── LOG CARDS (alternativa ao terminal) ── */
+.log-section {
+  margin-bottom: 48px;
+}
+
+.log-section__title {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Card de log individual */
+.log-card {
+  padding: 16px 20px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  margin-bottom: 10px;
+  transition: border-color var(--transition);
+  animation: fadeInUp 0.3s ease both;
+}
+.log-card:hover {
+  border-left-color: var(--cyan);
+}
+
+.log-card__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.log-card__id {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--cyan);
+  text-transform: uppercase;
+}
+
+.log-card__author {
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.log-card__text {
+  font-size: 0.75rem;
+  line-height: 1.85;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── MEDIA QUERIES ── */
+@media (max-width: 600px) {
+  .lore-page {
+    padding: 40px 16px 60px;
+  }
+
+  .timeline::before {
+    left: 12px;
+  }
+
+  .timeline-item {
+    gap: 14px;
+  }
+
+  .terminal__body {
+    padding: 14px 16px;
+    font-size: 0.72rem;
+  }
+
+  .lore-filters {
+    gap: 4px;
+  }
+
+  .filter-btn {
+    font-size: 0.55rem;
+    padding: 4px 10px;
+  }
+}

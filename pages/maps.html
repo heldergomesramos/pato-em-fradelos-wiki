@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapas — Pato em Fradelos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/pages.css">
+</head>
+<body>
+
+  <!-- ── NAVBAR ── -->
+  <nav class="navbar">
+    <a href="../index.html" class="navbar__logo">PATO <span>//</span> FRADELOS</a>
+    <ul class="navbar__links">
+      <li><a href="../index.html">Início</a></li>
+      <li><a href="maps.html" class="active">Mapas</a></li>
+      <li><a href="entities.html">Entidades</a></li>
+      <li><a href="skills.html">Skills</a></li>
+      <li><a href="lore.html">Lore</a></li>
+      <li><a href="video.html">Vídeo</a></li>
+      <li><a href="team.html">Equipa</a></li>
+    </ul>
+    <button class="navbar__hamburger" aria-label="Abrir menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+  <div class="navbar__mobile-menu">
+    <a href="../index.html">Início</a>
+    <a href="maps.html" class="active">Mapas</a>
+    <a href="entities.html">Entidades</a>
+    <a href="skills.html">Skills</a>
+    <a href="lore.html">Lore</a>
+    <a href="video.html">Vídeo</a>
+    <a href="team.html">Equipa</a>
+  </div>
+
+  <div class="page-content">
+    <div class="inner-page">
+
+      <!-- ── CABEÇALHO ── -->
+      <header class="page-header">
+        <div class="page-header__eyebrow">Instalação ORBIS // Zonas Conhecidas</div>
+        <h1 class="page-header__title">Mapas</h1>
+        <p class="page-header__desc">Atmosfera e características de cada zona da instalação. Selecciona uma zona para explorar.</p>
+      </header>
+
+      <!-- ── TABS DE ZONA (sticky, atualizam com scroll) ── -->
+      <div class="map-tabs-sticky">
+        <div class="map-tabs">
+          <button class="map-tab active" data-target="map-aquarium">Aquário</button>
+          <button class="map-tab" data-target="map-depths">Depths</button>
+          <button class="map-tab" data-target="map-nature">Natureza</button>
+          <button class="map-tab" data-target="map-mines">Minas</button>
+          <button class="map-tab" data-target="map-facility">Facility</button>
+          <button class="map-tab" data-target="map-lab">Laboratório</button>
+          <button class="map-tab" data-target="map-corridor">Corredor</button>
+          <button class="map-tab" data-target="map-geysers">Geysers</button>
+          <button class="map-tab" data-target="map-transport">Transporte</button>
+          <button class="map-tab" data-target="map-wind">Vento</button>
+        </div>
+      </div>
+
+      <!-- ══════════ AQUÁRIO ══════════ -->
+      <div class="map-panel" id="map-aquarium">
+        <div class="atmosphere-container atm-aquarium">
+          <div class="atm-aquarium__bg"></div>
+          <div class="atm-aquarium__grid"></div>
+          <div class="map-info">
+            <div class="map-info__tag" style="border-color:rgba(77,217,217,0.2);color:rgba(77,217,217,0.6);">
+              <span style="width:5px;height:5px;border-radius:50%;background:#4dd9d9;display:inline-block;"></span>
+              Zona Controlada — Piso B2
+            </div>
+            <h2 class="map-info__title" style="color:#4dd9d9;text-shadow:0 0 40px rgba(77,217,217,0.4);">The Aquarium</h2>
+            <p class="map-info__desc">Câmara de observação principal. Construída pelos cientistas para estudar as criaturas afectadas pela matéria negra num ambiente controlado e iluminado. O vidro mantém tudo separado. A luz mantém tudo visível. O Observer mantém tudo vigiado.</p>
+            <div class="map-stats">
+              <span class="map-stat">Iluminação Artificial</span>
+              <span class="map-stat">Câmeras Activas</span>
+              <span class="map-stat">Ambiente Contido</span>
+              <span class="map-stat">Matéria Negra Estabilizada</span>
+            </div>
+            <div class="zone-creatures">
+              <div class="zone-creature"><span class="zone-creature__icon">🪼</span><span class="zone-creature__name">Medusa</span></div>
+              <div class="zone-creature"><span class="zone-creature__icon">🐟</span><span class="zone-creature__name">Anglerfish</span></div>
+              <div class="zone-creature"><span class="zone-creature__icon">🌿</span><span class="zone-creature__name">Glowvine</span></div>
+              <div class="zone-creature"><span class="zone-creature__icon">👁️</span><span class="zone-creature__name">Observer</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ DEPTHS ══════════ -->
+      <div class="map-panel" id="map-depths">
+        <div class="atmosphere-container atm-depths">
+          <div class="atm-depths__bg"></div>
+          <div class="depths-eye"><div class="depths-eye__iris"></div></div>
+          <div class="black-water"><div class="black-water__surface"></div></div>
+          <div class="map-info">
+            <div class="map-info__tag" style="border-color:rgba(255,26,74,0.2);color:rgba(255,80,100,0.6);animation:dangerBlink 3s ease-in-out infinite;">
+              <span style="width:5px;height:5px;border-radius:50%;background:#ff1a4a;display:inline-block;animation:blink 1s infinite;"></span>
+              Zona Não Documentada — Acesso Restrito
+            </div>
+            <h2 class="map-info__title" style="color:#ddd;text-shadow:0 0 40px rgba(139,47,201,0.35);">Depths Chamber</h2>
+            <p class="map-info__desc">Ninguém sabe ao certo o que existe aqui. Os cientistas chegaram até à entrada e pararam. O chão é água negra. A escuridão não é vazia, ela pulsa. E algures lá dentro, algo que não devia existir está a observar de volta.</p>
+            <div class="map-stats">
+              <span class="map-stat">Luz Mínima</span>
+              <span class="map-stat">Água Negra</span>
+              <span class="map-stat">Entidades Não Catalogadas</span>
+              <span class="map-stat">Pulso Activo</span>
+            </div>
+            <div class="zone-creatures">
+              <div class="zone-creature"><span class="zone-creature__icon">🕷️</span><span class="zone-creature__name">Lurker</span></div>
+              <div class="zone-creature"><span class="zone-creature__icon">🌫️</span><span class="zone-creature__name">Shadow Wisp</span></div>
+              <div class="zone-creature"><span class="zone-creature__icon">👁️</span><span class="zone-creature__name">Ent. Secreta</span></div>
+              <div class="zone-creature"><span class="zone-creature__icon">🌑</span><span class="zone-creature__name">The Shadow</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ NATUREZA ══════════ -->
+      <div class="map-panel" id="map-nature">
+        <div class="atmosphere-container atm-nature">
+          <div class="atm-nature__bg"></div>
+          <div class="map-info">
+            <div class="map-info__tag" style="border-color:rgba(100,220,80,0.2);color:rgba(100,220,80,0.6);">
+              <span style="width:5px;height:5px;border-radius:50%;background:#64dc50;display:inline-block;animation:blink 2.5s infinite;"></span>
+              Zona Exterior — Ilha de Fradelos
+            </div>
+            <h2 class="map-info__title" style="color:#9dff6a;text-shadow:0 0 40px rgba(100,220,80,0.3);">Natureza</h2>
+            <p class="map-info__desc">A superfície da ilha antes de qualquer intervenção humana. A vegetação cresceu em torno da matéria negra durante décadas, adaptando-se a ela. As Glowvines florescem aqui em abundância. O som é diferente — abafado, como se a ilha absorvesse o ruído.</p>
+            <div class="map-stats">
+              <span class="map-stat">Luz Natural</span>
+              <span class="map-stat">Glowvines Abundantes</span>
+              <span class="map-stat">Matéria Negra Difusa</span>
+              <span class="map-stat">Terreno Irregular</span>
+            </div>
+            <div class="zone-creatures">
+              <div class="zone-creature"><span class="zone-creature__icon">🌿</span><span class="zone-creature__name">Glowvine</span></div>
+              <div class="zone-creature"><span class="zone-creature__icon">🦎</span><span class="zone-creature__name">Camaleão</span></div>
+              <div class="zone-creature"><span class="zone-creature__icon">🕷️</span><span class="zone-creature__name">Lurker</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ MINAS ══════════ -->
+      <div class="map-panel" id="map-mines">
+        <div class="atmosphere-container atm-mines">
+          <div class="atm-mines__bg"></div>
+          <div class="map-info">
+            <div class="map-info__tag" style="border-color:rgba(180,140,80,0.2);color:rgba(180,140,80,0.6);">
+              <span style="width:5px;height:5px;border-radius:50%;background:#b48c50;display:inline-block;animation:blink 1.8s infinite;"></span>
+              Zona Subterrânea — Piso B4
+            </div>
+            <h2 class="map-info__title" style="color:#d4a853;text-shadow:0 0 40px rgba(180,140,80,0.3);">Minas</h2>
+            <p class="map-info__desc">Túneis escavados nos primeiros anos da expedição para aceder aos depósitos de matéria negra em estado sólido. O ar é denso, a rocha absorve som. Alguns túneis foram selados depois do Incidente do Piso 3. Outros simplesmente desapareceram.</p>
+            <div class="map-stats">
+              <span class="map-stat">Ar Denso</span>
+              <span class="map-stat">Rocha Saturada</span>
+              <span class="map-stat">Túneis Selados</span>
+              <span class="map-stat">Matéria Negra Sólida</span>
+            </div>
+            <div class="zone-creatures">
+              <div class="zone-creature"><span class="zone-creature__icon">🕷️</span><span class="zone-creature__name">Lurker</span></div>
+              <div class="zone-creature"><span class="zone-creature__icon">🌑</span><span class="zone-creature__name">The Shadow</span></div>
+              <div class="zone-creature"><span class="zone-creature__icon">🌿</span><span class="zone-creature__name">Glowvine</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ FACILITY ══════════ -->
+      <div class="map-panel" id="map-facility">
+        <div class="atmosphere-container atm-facility">
+          <div class="atm-facility__bg"></div>
+          <div class="atm-facility__grid"></div>
+          <div class="map-info">
+            <div class="map-info__tag" style="border-color:rgba(0,180,255,0.2);color:rgba(0,180,255,0.6);">
+              <span style="width:5px;height:5px;border-radius:50%;background:#00b4ff;display:inline-block;animation:blink 2s infinite;"></span>
+              Instalação Principal — Piso B1
+            </div>
+            <h2 class="map-info__title" style="color:#66ccff;text-shadow:0 0 40px rgba(0,180,255,0.3);">The Facility</h2>
+            <p class="map-info__desc">O coração operacional da instalação ORBIS. Corredores brancos, portas com código, câmeras em cada canto. Tudo foi desenhado para parecer seguro. Tudo foi desenhado para controlar. Metade das portas já não abre. A outra metade não devia abrir.</p>
+            <div class="map-stats">
+              <span class="map-stat">Iluminação Fluorescente</span>
+              <span class="map-stat">Segurança Comprometida</span>
+              <span class="map-stat">Câmeras Parciais</span>
+              <span class="map-stat">Contenção Activa</span>
+            </div>
+            <div class="zone-creatures">
+              <div class="zone-creature"><span class="zone-creature__icon">👁️</span><span class="zone-creature__name">Observer</span></div>
+              <div class="zone-creature"><span class="zone-creature__icon">🦎</span><span class="zone-creature__name">Camaleão</span></div>
+              <div class="zone-creature"><span class="zone-creature__icon">🌫️</span><span class="zone-creature__name">Shadow Wisp</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ LABORATÓRIO ══════════ -->
+      <div class="map-panel" id="map-lab">
+        <div class="atmosphere-container atm-lab">
+          <div class="atm-lab__bg"></div>
+          <div class="atm-lab__scan"></div>
+          <div class="map-info">
+            <div class="map-info__tag" style="border-color:rgba(180,60,255,0.2);color:rgba(180,60,255,0.6);">
+              <span style="width:5px;height:5px;border-radius:50%;background:#b43cff;display:inline-block;animation:blink 1.4s infinite;"></span>
+              Zona Classificada — Piso B3
+            </div>
+            <h2 class="map-info__title" style="color:#c880ff;text-shadow:0 0 40px rgba(180,60,255,0.35);">Laboratório</h2>
+            <p class="map-info__desc">Onde tudo começou. Onde o Observer foi construído. Onde a Entidade Secreta foi capturada e estudada. Os equipamentos ainda funcionam — mas ninguém os está a usar. As notas na bancada foram escritas em duas caliografias diferentes. A segunda não é humana.</p>
+            <div class="map-stats">
+              <span class="map-stat">Equipamento Activo</span>
+              <span class="map-stat">Contenção Máxima</span>
+              <span class="map-stat">Radiação de M. Negra</span>
+              <span class="map-stat">Registos Corrompidos</span>
+            </div>
+            <div class="zone-creatures">
+              <div class="zone-creature"><span class="zone-creature__icon">👁️</span><span class="zone-creature__name">Ent. Secreta</span></div>
+              <div class="zone-creature"><span class="zone-creature__icon">👁️</span><span class="zone-creature__name">Observer</span></div>
+              <div class="zone-creature"><span class="zone-creature__icon">🦎</span><span class="zone-creature__name">Camaleão</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ CORREDOR ══════════ -->
+      <div class="map-panel" id="map-corridor">
+        <div class="atmosphere-container atm-corridor">
+          <div class="atm-corridor__bg"></div>
+          <div class="atm-corridor__flicker"></div>
+          <div class="map-info">
+            <div class="map-info__tag" style="border-color:rgba(255,200,50,0.2);color:rgba(255,200,50,0.5);animation:dangerBlink 4s ease-in-out infinite;">
+              <span style="width:5px;height:5px;border-radius:50%;background:#ffc832;display:inline-block;animation:blink 0.8s infinite;"></span>
+              Zona de Transição — Piso B1/B2
+            </div>
+            <h2 class="map-info__title" style="color:#ffe080;text-shadow:0 0 40px rgba(255,200,50,0.25);">Corredor</h2>
+            <p class="map-info__desc">O corredor que liga todas as zonas da instalação. As luzes piscam em intervalos irregulares. Nos momentos de escuridão total, coisas movem-se. Os cientistas aprenderam a não parar aqui. A andar rápido. A não olhar para os lados.</p>
+            <div class="map-stats">
+              <span class="map-stat">Iluminação Instável</span>
+              <span class="map-stat">Alta Circulação</span>
+              <span class="map-stat">Zonas de Sombra</span>
+              <span class="map-stat">Sem Contenção</span>
+            </div>
+            <div class="zone-creatures">
+              <div class="zone-creature"><span class="zone-creature__icon">🌫️</span><span class="zone-creature__name">Shadow Wisp</span></div>
+              <div class="zone-creature"><span class="zone-creature__icon">🦎</span><span class="zone-creature__name">Camaleão</span></div>
+              <div class="zone-creature"><span class="zone-creature__icon">🕷️</span><span class="zone-creature__name">Lurker</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ GEYSERS ══════════ -->
+      <div class="map-panel" id="map-geysers">
+        <div class="atmosphere-container atm-geysers">
+          <div class="atm-geysers__bg"></div>
+          <div class="map-info">
+            <div class="map-info__tag" style="border-color:rgba(255,100,30,0.2);color:rgba(255,100,30,0.6);">
+              <span style="width:5px;height:5px;border-radius:50%;background:#ff641e;display:inline-block;animation:blink 1.2s infinite;"></span>
+              Zona Geotérmica — Piso B5
+            </div>
+            <h2 class="map-info__title" style="color:#ff9955;text-shadow:0 0 40px rgba(255,100,30,0.35);">Campo dos Geysers</h2>
+            <p class="map-info__desc">Cavernas subterrâneas com actividade geotérmica intensa. Os geysers libertam vapor a temperaturas extremas em intervalos imprevisíveis. A matéria negra aqui comporta-se de forma estranha — expande com o calor, contrai com o vapor. Timing é tudo.</p>
+            <div class="map-stats">
+              <span class="map-stat">Temperatura Extrema</span>
+              <span class="map-stat">Vapor Periódico</span>
+              <span class="map-stat">Matéria Negra Instável</span>
+              <span class="map-stat">Terreno Volátil</span>
+            </div>
+            <div class="zone-creatures">
+              <div class="zone-creature"><span class="zone-creature__icon">🌑</span><span class="zone-creature__name">The Shadow</span></div>
+              <div class="zone-creature"><span class="zone-creature__icon">🕷️</span><span class="zone-creature__name">Lurker</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ CORREDOR DE TRANSPORTE ══════════ -->
+      <div class="map-panel" id="map-transport">
+        <div class="atmosphere-container atm-transport">
+          <div class="atm-transport__bg"></div>
+          <div class="atm-transport__rail"></div>
+          <div class="map-info">
+            <div class="map-info__tag" style="border-color:rgba(80,160,255,0.2);color:rgba(80,160,255,0.6);">
+              <span style="width:5px;height:5px;border-radius:50%;background:#50a0ff;display:inline-block;animation:blink 2s infinite;"></span>
+              Logística — Piso B1/B4
+            </div>
+            <h2 class="map-info__title" style="color:#88bbff;text-shadow:0 0 40px rgba(80,160,255,0.3);">Corredor de Transporte</h2>
+            <p class="map-info__desc">Sistema de carris usado para mover equipamento entre pisos. Os carris percorrem toda a instalação vertical e horizontalmente. Os vagões ainda se movem — mas ninguém os programou para isso. Algo os está a usar.</p>
+            <div class="map-stats">
+              <span class="map-stat">Carris Activos</span>
+              <span class="map-stat">Movimento Autónomo</span>
+              <span class="map-stat">Piso a Piso</span>
+              <span class="map-stat">Sem Operador</span>
+            </div>
+            <div class="zone-creatures">
+              <div class="zone-creature"><span class="zone-creature__icon">🌫️</span><span class="zone-creature__name">Shadow Wisp</span></div>
+              <div class="zone-creature"><span class="zone-creature__icon">🌑</span><span class="zone-creature__name">The Shadow</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ ZONA DO VENTO ══════════ -->
+      <div class="map-panel" id="map-wind">
+        <div class="atmosphere-container atm-wind">
+          <div class="atm-wind__bg"></div>
+          <div class="map-info">
+            <div class="map-info__tag" style="border-color:rgba(180,220,255,0.2);color:rgba(180,220,255,0.5);">
+              <span style="width:5px;height:5px;border-radius:50%;background:#b4dcff;display:inline-block;animation:blink 3s infinite;"></span>
+              Zona Aberta — Topo da Instalação
+            </div>
+            <h2 class="map-info__title" style="color:#cce8ff;text-shadow:0 0 40px rgba(180,220,255,0.25);">Zona do Vento</h2>
+            <p class="map-info__desc">O topo exposto da instalação. O vento aqui não segue direcções normais — muda de forma imprevisível, como se algo o estivesse a guiar. A matéria negra fica suspensa no ar, carregada pelas correntes. Plataformas movem-se. O horizonte não existe.</p>
+            <div class="map-stats">
+              <span class="map-stat">Correntes Imprevisíveis</span>
+              <span class="map-stat">Matéria Negra Suspensa</span>
+              <span class="map-stat">Plataformas Móveis</span>
+              <span class="map-stat">Sem Cobertura</span>
+            </div>
+            <div class="zone-creatures">
+              <div class="zone-creature"><span class="zone-creature__icon">🌫️</span><span class="zone-creature__name">Shadow Wisp</span></div>
+              <div class="zone-creature"><span class="zone-creature__icon">🪼</span><span class="zone-creature__name">Medusa</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- fim inner-page -->
+  </div><!-- fim page-content -->
+
+  <script src="../js/main.js"></script>
+  <script src="../js/maps.js"></script>
+</body>
+</html>
