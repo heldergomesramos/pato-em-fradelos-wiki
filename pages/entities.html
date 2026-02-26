@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <link rel="icon" type="image/png" href="../favicon.ico">
+  <link rel="shortcut icon" href="../favicon.ico">
+  <meta charset="UTF-8">  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entidades — Pato em Fradelos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/global.css">
+  <style>
+    /* ── RESET & BASE ── */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --nav-h: 56px;
+      --sidebar-w: 270px;
+      --bg: #060a0f;
+      --bg-panel: #0a1018;
+      --border: #1a2a3a;
+      --text: #c8d8e8;
+      --dim: #4a6070;
+      --muted: rgba(200,216,232,0.65);
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    /* scanlines */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      height: var(--nav-h);
+      background: rgba(6,10,15,0.97);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar__logo {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: 0.85rem;
+      letter-spacing: 0.25em;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .navbar__logo span { color: #00ccff; }
+
+    .navbar__links {
+      display: flex;
+      list-style: none;
+      gap: 2px;
+    }
+
+    .navbar__links a {
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--dim);
+      text-decoration: none;
+      position: relative;
+      padding: 8px 14px;
+      display: block;
+      transition: color 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .navbar__links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 14px; right: 14px;
+      height: 2px;
+      background: #00ccff;
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 1px;
+    }
+
+    .navbar__links a:hover,
+    .navbar__links a.active { color: #fff; }
+
+    .navbar__links a.active::after,
+    .navbar__links a:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+
+    .navbar__hamburger {
+      display: none;
+      flex-direction: column;
+      background: none;
+      border: none;
+      cursor: pointer;
+      gap: 6px;
+    }
+
+    .navbar__hamburger span {
+      width: 25px; height: 2px;
+      background: #00ccff;
+      transition: all 0.3s;
+    }
+
+    .navbar__mobile-menu {
+      display: none;
+      position: fixed;
+      top: var(--nav-h);
+      left: 0; right: 0;
+      background: rgba(6,10,15,0.99);
+      border-bottom: 1px solid var(--border);
+      z-index: 999;
+      flex-direction: column;
+    }
+
+    .navbar__mobile-menu.open { display: flex; }
+
+    .navbar__mobile-menu a {
+      padding: 14px 20px;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--dim);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+
+    .navbar__mobile-menu a:hover,
+    .navbar__mobile-menu a.active {
+      background: rgba(0,204,255,0.08);
+      color: #00ccff;
+    }
+
+    /* ── POKEDEX LAYOUT ── */
+    .pokedex {
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+      height: calc(100vh - var(--nav-h));
+      margin-top: var(--nav-h);
+      overflow: hidden;
+    }
+
+    /* ── SIDEBAR ── */
+    .pokedex__sidebar {
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      background: rgba(6,8,12,0.95);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pokedex__sidebar::-webkit-scrollbar { width: 4px; }
+    .pokedex__sidebar::-webkit-scrollbar-track { background: transparent; }
+    .pokedex__sidebar::-webkit-scrollbar-thumb { background: rgba(0,204,255,0.3); border-radius: 2px; }
+
+    /* Sidebar header */
+    .sidebar-header {
+      padding: 18px 20px 12px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .sidebar-header__title {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .sidebar-header__sub {
+      font-size: 0.55rem;
+      letter-spacing: 0.15em;
+      color: var(--dim);
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: #00ff88;
+      margin-right: 5px;
+      animation: blink 2s infinite;
+    }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+    /* Sidebar section label */
+    .sidebar-section {
+      padding: 12px 20px 5px;
+      font-size: 0.5rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--dim);
+      border-bottom: 1px solid rgba(26,42,58,0.5);
+    }
+
+    /* Entity row */
+    .entity-row {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: background 0.15s;
+      border-left: 2px solid transparent;
+      position: relative;
+    }
+
+    .entity-row:hover { background: rgba(255,255,255,0.03); }
+
+    .entity-row.active {
+      background: rgba(255,255,255,0.05);
+      border-left-color: currentColor;
+    }
+
+    .entity-row__num {
+      font-size: 0.58rem;
+      color: var(--dim);
+      width: 26px;
+      flex-shrink: 0;
+    }
+
+    .entity-row__sprite {
+      width: 38px; height: 38px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .entity-row__info { flex: 1; min-width: 0; }
+
+    .entity-row__name {
+      font-size: 0.72rem;
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: currentColor;
+    }
+
+    .entity-row__type {
+      font-size: 0.52rem;
+      letter-spacing: 0.08em;
+      color: var(--dim);
+      margin-top: 2px;
+    }
+
+    /* ── DETAIL AREA ── */
+    .pokedex__detail-wrapper {
+      overflow-y: auto;
+      height: 100%;
+      background: var(--bg);
+    }
+
+    .pokedex__detail-wrapper::-webkit-scrollbar { width: 6px; }
+    .pokedex__detail-wrapper::-webkit-scrollbar-track { background: transparent; }
+    .pokedex__detail-wrapper::-webkit-scrollbar-thumb { background: rgba(0,204,255,0.2); border-radius: 3px; }
+
+    /* Empty state */
+    .detail-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 16px;
+      opacity: 0.3;
+    }
+
+    .detail-empty__icon { font-size: 3rem; }
+
+    .detail-empty__text {
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    /* Detail panel */
+    .detail-panel {
+      display: none;
+      padding: 36px 40px 60px;
+      animation: fadeInUp 0.2s ease both;
+    }
+
+    .detail-panel.active { display: block; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Detail header */
+    .detail-header {
+      display: flex;
+      gap: 36px;
+      margin-bottom: 36px;
+      align-items: flex-start;
+    }
+
+    .sprite-box {
+      width: 190px; height: 190px;
+      flex-shrink: 0;
+      border: 1px solid currentColor;
+      opacity: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .sprite-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0,200,255,0.015);
+    }
+
+    .corner {
+      position: absolute;
+      width: 12px; height: 12px;
+      border-color: currentColor;
+      border-style: solid;
+      opacity: 0.6;
+    }
+    .corner.tl { top: 0; left: 0; border-width: 2px 0 0 2px; }
+    .corner.tr { top: 0; right: 0; border-width: 2px 2px 0 0; }
+    .corner.bl { bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+    .corner.br { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+    .scan-line {
+      position: absolute;
+      left: 0; right: 0;
+      height: 2px;
+      background: currentColor;
+      opacity: 0.12;
+      animation: scan 3s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes scan {
+      0% { top: 0; }
+      100% { top: 100%; }
+    }
+
+    .sprite-canvas {
+      width: 120px; height: 120px;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    /* Meta */
+    .detail-meta { flex: 1; }
+
+    .entity-number {
+      font-size: 0.58rem;
+      letter-spacing: 0.25em;
+      color: var(--dim);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .entity-name {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: clamp(1.6rem, 2.8vw, 2.6rem);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .entity-subtitle {
+      font-size: 0.7rem;
+      color: var(--dim);
+      letter-spacing: 0.08em;
+      margin-bottom: 16px;
+    }
+
+    .type-badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .badge {
+      padding: 3px 10px;
+      font-size: 0.58rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border: 1px solid currentColor;
+      border-radius: 2px;
+      opacity: 0.9;
+    }
+
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+
+    .qstat {
+      padding: 8px 10px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+    }
+
+    .qstat-label {
+      font-size: 0.48rem;
+      letter-spacing: 0.2em;
+      color: var(--dim);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .qstat-val {
+      font-family: 'VT323', monospace;
+      font-size: 1.05rem;
+    }
+
+    .danger-level {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .danger-label {
+      font-size: 0.48rem;
+      letter-spacing: 0.2em;
+      color: var(--dim);
+      text-transform: uppercase;
+    }
+
+    .danger-pips { display: flex; gap: 3px; }
+
+    .pip {
+      width: 12px; height: 4px;
+      border-radius: 1px;
+      background: var(--border);
+    }
+
+    .pip.filled { background: currentColor; }
+
+    .location-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      font-size: 0.58rem;
+      letter-spacing: 0.07em;
+      color: var(--dim);
+      margin-top: 10px;
+    }
+
+    /* Sections grid */
+    .sections-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .section-full { grid-column: 1 / -1; }
+
+    .info-block {
+      border: 1px solid var(--border);
+      padding: 20px;
+      position: relative;
+      background: rgba(10,16,24,0.6);
+    }
+
+    .info-block-title {
+      position: absolute;
+      top: 0; left: 14px;
+      transform: translateY(-50%);
+      background: var(--bg);
+      padding: 0 7px;
+      font-size: 0.48rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+
+    .info-block p {
+      font-size: 0.76rem;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+
+    /* States */
+    .states { display: flex; flex-direction: column; gap: 7px; }
+
+    .state-item {
+      display: flex;
+      gap: 11px;
+      align-items: flex-start;
+      padding: 9px 11px;
+      background: rgba(255,255,255,0.02);
+      border-left: 2px solid currentColor;
+    }
+
+    .state-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+
+    .state-name {
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+      color: #fff;
+    }
+
+    .state-desc {
+      font-size: 0.7rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* Stat bars */
+    .stat-bars { display: flex; flex-direction: column; gap: 9px; }
+
+    .stat-row { display: flex; align-items: center; gap: 11px; }
+
+    .stat-name {
+      font-size: 0.56rem;
+      letter-spacing: 0.08em;
+      color: var(--dim);
+      width: 82px;
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+
+    .stat-bar {
+      flex: 1;
+      height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .stat-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: currentColor;
+      animation: fillIn 0.8s ease-out forwards;
+      transform-origin: left;
+    }
+
+    @keyframes fillIn {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+
+    .stat-num {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      width: 28px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* Interaction tags */
+    .interaction-grid { display: flex; flex-wrap: wrap; gap: 5px; }
+
+    .itag {
+      padding: 3px 9px;
+      font-size: 0.56rem;
+      letter-spacing: 0.07em;
+      border-radius: 2px;
+    }
+
+    .itag.weak {
+      background: rgba(255,60,60,0.08);
+      border: 1px solid rgba(255,60,60,0.25);
+      color: #ff6060;
+    }
+
+    .itag.immune {
+      background: rgba(100,100,100,0.08);
+      border: 1px solid rgba(100,100,100,0.25);
+      color: #888;
+    }
+
+    .itag.strong {
+      background: rgba(0,255,136,0.06);
+      border: 1px solid rgba(0,255,136,0.2);
+      color: #00ff88;
+    }
+
+    /* Log entry */
+    .log-entry {
+      padding: 12px 15px;
+      background: rgba(255,255,255,0.015);
+      border-left: 2px solid var(--border);
+      margin-bottom: 7px;
+    }
+
+    .log-author {
+      font-size: 0.52rem;
+      letter-spacing: 0.15em;
+      color: var(--dim);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+    .log-entry p {
+      font-size: 0.7rem;
+      line-height: 1.75;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* ── ENTITY COLORS ── */
+    .entity-row[data-e="lurker"]       { color: #8b2fc9; }
+    .entity-row[data-e="shadow-wisp"]  { color: #5a7ab8; }
+    .entity-row[data-e="the-shadow"]   { color: #ff1a4a; }
+    .entity-row[data-e="anglerfish"]   { color: #00ccff; }
+    .entity-row[data-e="observer"]     { color: #ffcc00; }
+    .entity-row[data-e="gloamvine"]    { color: #9dff6a; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 900px) {
+      body { overflow: auto; height: auto; }
+
+      .pokedex {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        height: auto;
+        overflow: visible;
+      }
+
+      .pokedex__sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        height: auto;
+      }
+
+      .sidebar-header { display: none; }
+      .sidebar-section { display: none; }
+
+      .entity-row {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        flex-shrink: 0;
+        width: 90px;
+        border-left: none;
+        border-bottom: 2px solid transparent;
+        padding: 10px 6px;
+        gap: 5px;
+      }
+
+      .entity-row.active {
+        border-left-color: transparent;
+        border-bottom-color: currentColor;
+      }
+
+      .entity-row__num { display: none; }
+      .entity-row__name { font-size: 0.55rem; }
+      .entity-row__type { display: none; }
+
+      .pokedex__detail-wrapper {
+        height: auto;
+        overflow: visible;
+      }
+
+      .detail-panel { padding: 24px 20px 40px; }
+
+      .detail-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 20px;
+      }
+
+      .type-badges { justify-content: center; }
+      .quick-stats { grid-template-columns: repeat(2, 1fr); }
+      .danger-level { justify-content: center; }
+      .sections-grid { grid-template-columns: 1fr; }
+
+      .navbar { padding: 0 20px; }
+      .navbar__links { display: none; }
+      .navbar__hamburger { display: flex; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAVBAR ── -->
+  <nav class="navbar">
+    <a href="../index.html" class="navbar__logo">PATO <span>//</span> FRADELOS</a>
+    <ul class="navbar__links">
+      <li><a href="../index.html">Início</a></li>
+      <li><a href="maps.html">Mapas</a></li>
+      <li><a href="entities.html" class="active">Entidades</a></li>
+      <li><a href="skills.html">Skills</a></li>
+      <li><a href="lore.html">Lore</a></li>
+      <li><a href="video.html">Vídeo</a></li>
+      <li><a href="team.html">Equipa</a></li>
+    </ul>
+    <button class="navbar__hamburger" aria-label="Abrir menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+  <div class="navbar__mobile-menu">
+    <a href="../index.html">Início</a>
+    <a href="maps.html">Mapas</a>
+    <a href="entities.html" class="active">Entidades</a>
+    <a href="skills.html">Skills</a>
+    <a href="lore.html">Lore</a>
+    <a href="video.html">Vídeo</a>
+    <a href="team.html">Equipa</a>
+  </div>
+
+  <!-- ── POKÉDEX ── -->
+  <div class="pokedex">
+
+    <!-- SIDEBAR -->
+    <nav class="pokedex__sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-header__title">ORBIS // ÍNDICE DE CAMPO</div>
+        <div class="sidebar-header__sub">
+          <span class="status-dot"></span>ENTIDADES: 006 CATALOGADAS
+        </div>
+      </div>
+
+      <div class="sidebar-section">Câmara das Profundezas</div>
+
+      <div class="entity-row active" data-e="lurker" tabindex="0">
+        <div class="entity-row__num">#001</div>
+        <div class="entity-row__sprite" style="background:rgba(139,47,201,0.1);">
+          <canvas id="mini-lurker" width="36" height="36" style="image-rendering:pixelated;"></canvas>
+        </div>
+        <div class="entity-row__info">
+          <div class="entity-row__name">Lurker</div>
+          <div class="entity-row__type">Parasita de Superfície</div>
+        </div>
+      </div>
+
+      <div class="entity-row" data-e="shadow-wisp" tabindex="0">
+        <div class="entity-row__num">#002</div>
+        <div class="entity-row__sprite" style="background:rgba(50,80,140,0.15);">
+          <canvas id="mini-shadow-wisp" width="36" height="36" style="image-rendering:pixelated;"></canvas>
+        </div>
+        <div class="entity-row__info">
+          <div class="entity-row__name">Shadow Wisp</div>
+          <div class="entity-row__type">Forma Difusa</div>
+        </div>
+      </div>
+
+      <div class="entity-row" data-e="the-shadow" tabindex="0">
+        <div class="entity-row__num">#003</div>
+        <div class="entity-row__sprite" style="background:rgba(255,26,74,0.07);">
+          <canvas id="mini-the-shadow" width="36" height="36" style="image-rendering:pixelated;"></canvas>
+        </div>
+        <div class="entity-row__info">
+          <div class="entity-row__name">The Shadow</div>
+          <div class="entity-row__type">Ápice / Chefe</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">Aquário</div>
+
+      <div class="entity-row" data-e="anglerfish" tabindex="0">
+        <div class="entity-row__num">#004</div>
+        <div class="entity-row__sprite" style="background:rgba(0,150,200,0.1);">
+          <canvas id="mini-anglerfish" width="36" height="36" style="image-rendering:pixelated;"></canvas>
+        </div>
+        <div class="entity-row__info">
+          <div class="entity-row__name">Anglerfish</div>
+          <div class="entity-row__type">Predador de Emboscada</div>
+        </div>
+      </div>
+
+      <div class="entity-row" data-e="observer" tabindex="0">
+        <div class="entity-row__num">#005</div>
+        <div class="entity-row__sprite" style="background:rgba(255,200,0,0.06);">
+          <canvas id="mini-observer" width="36" height="36" style="image-rendering:pixelated;"></canvas>
+        </div>
+        <div class="entity-row__info">
+          <div class="entity-row__name">Observer</div>
+          <div class="entity-row__type">Artificial / ORBIS</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">Flora</div>
+
+      <div class="entity-row" data-e="gloamvine" tabindex="0">
+        <div class="entity-row__num">#006</div>
+        <div class="entity-row__sprite" style="background:rgba(100,255,100,0.06);">
+          <canvas id="mini-gloamvine" width="36" height="36" style="image-rendering:pixelated;"></canvas>
+        </div>
+        <div class="entity-row__info">
+          <div class="entity-row__name">Gloamvine</div>
+          <div class="entity-row__type">Flora-Entidade</div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- DETAIL PANELS -->
+    <div class="pokedex__detail-wrapper">
+
+      <!-- ══ LURKER ══ -->
+      <div class="detail-panel active" id="dp-lurker" style="color:#8b2fc9;">
+        <div class="detail-header">
+          <div class="sprite-box" style="border-color:rgba(139,47,201,0.4);">
+            <div class="corner tl"></div><div class="corner tr"></div>
+            <div class="corner bl"></div><div class="corner br"></div>
+            <canvas id="sprite-lurker" width="120" height="120" class="sprite-canvas"></canvas>
+            <div class="scan-line"></div>
+          </div>
+          <div class="detail-meta">
+            <div class="entity-number">#001 — CÂMARA DAS PROFUNDEZAS</div>
+            <div class="entity-name" style="color:#8b2fc9;">Lurker</div>
+            <div class="entity-subtitle">Parasita de Superfície / Dreno Silencioso</div>
+            <div class="type-badges">
+              <span class="badge" style="color:#8b2fc9;border-color:rgba(139,47,201,0.4);">Matéria Negra</span>
+              <span class="badge" style="color:#8b2fc9;border-color:rgba(139,47,201,0.4);">Invisível</span>
+              <span class="badge" style="color:#8b2fc9;border-color:rgba(139,47,201,0.4);">Passivo</span>
+            </div>
+            <div class="quick-stats">
+              <div class="qstat"><div class="qstat-label">Movimento</div><div class="qstat-val" style="color:#8b2fc9;">Nenhum</div></div>
+              <div class="qstat"><div class="qstat-label">Dano</div><div class="qstat-val" style="color:#8b2fc9;">Indirecto</div></div>
+              <div class="qstat"><div class="qstat-label">Detecção</div><div class="qstat-val" style="color:#8b2fc9;">Luz</div></div>
+            </div>
+            <div class="danger-level">
+              <span class="danger-label">Perigo</span>
+              <div class="danger-pips">
+                <div class="pip filled"></div><div class="pip filled"></div><div class="pip filled"></div><div class="pip"></div><div class="pip"></div>
+              </div>
+            </div>
+            <div class="location-tag">📍 Câmara das Profundezas — Paredes e Tectos</div>
+          </div>
+        </div>
+        <div class="sections-grid">
+          <div class="info-block section-full"><div class="info-block-title">Descrição</div>
+            <p>Criatura completamente bidimensional que existe exclusivamente em superfícies sólidas. No seu estado habitual é totalmente invisível, confundindo-se com a escuridão. Não possui comportamento de perseguição nem intenção predatória aparente — o seu perigo é puramente passivo e situacional. Ainda não há certeza se possui consciência própria ou se é apenas uma propriedade emergente da matéria negra em superfícies antigas.</p>
+          </div>
+          <div class="info-block"><div class="info-block-title">Estados de Comportamento</div>
+            <div class="states" style="color:#8b2fc9;">
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Repouso / Oculto</div><div class="state-desc">Completamente invisível na superfície. Não reage ao jogador nem a luz fraca.</div></div></div>
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Revelado</div><div class="state-desc">A luz intensa do Núcleo de Glowvine revela o seu contorno roxo na superfície.</div></div></div>
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Dreno</div><div class="state-desc">Quando o jogador entra no seu raio, absorve instantaneamente a carga de Núcleo de Glowvine mais próxima.</div></div></div>
+            </div>
+          </div>
+          <div class="info-block"><div class="info-block-title">Stats</div>
+            <div class="stat-bars" style="color:#8b2fc9;">
+              <div class="stat-row"><div class="stat-name">Agressividade</div><div class="stat-bar"><div class="stat-fill" style="width:5%;"></div></div><div class="stat-num">5</div></div>
+              <div class="stat-row"><div class="stat-name">Perigo Situac.</div><div class="stat-bar"><div class="stat-fill" style="width:80%;"></div></div><div class="stat-num">80</div></div>
+              <div class="stat-row"><div class="stat-name">Visibilidade</div><div class="stat-bar"><div class="stat-fill" style="width:10%;"></div></div><div class="stat-num">10</div></div>
+              <div class="stat-row"><div class="stat-name">Mobilidade</div><div class="stat-bar"><div class="stat-fill" style="width:0%;"></div></div><div class="stat-num">0</div></div>
+            </div>
+          </div>
+          <div class="info-block section-full"><div class="info-block-title">Interações</div>
+            <div style="margin-bottom:10px;"><div style="font-size:0.5rem;letter-spacing:0.2em;color:var(--dim);margin-bottom:5px;">FRAQUEZAS</div><div class="interaction-grid"><span class="itag weak">Núcleo de Glowvine</span><span class="itag weak">Luz Intensa</span></div></div>
+            <div style="margin-bottom:10px;"><div style="font-size:0.5rem;letter-spacing:0.2em;color:var(--dim);margin-bottom:5px;">IMUNE A</div><div class="interaction-grid"><span class="itag immune">Corrida</span><span class="itag immune">Luz Fraca</span><span class="itag immune">Colisão Física</span></div></div>
+            <div><div style="font-size:0.5rem;letter-spacing:0.2em;color:var(--dim);margin-bottom:5px;">MECÂNICA ESPECIAL</div><div class="interaction-grid"><span class="itag strong">Drena cargas do Núcleo</span></div></div>
+          </div>
+          <div class="info-block section-full"><div class="info-block-title">Field Log</div>
+            <div class="log-entry"><div class="log-author">— Registo #47-B, Investigador Desconhecido</div><p>"Reparei em manchas nas paredes que não estavam presentes ontem. Apontei a lanterna e vi... algo. Plano. Como se a parede tivesse uma sombra que não devia existir. Quando me aproximei, a minha fonte de luz piscou e apagou."</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SHADOW WISP ══ -->
+      <div class="detail-panel" id="dp-shadow-wisp" style="color:#5a7ab8;">
+        <div class="detail-header">
+          <div class="sprite-box" style="border-color:rgba(90,122,184,0.4);">
+            <div class="corner tl"></div><div class="corner tr"></div>
+            <div class="corner bl"></div><div class="corner br"></div>
+            <canvas id="sprite-shadow-wisp" width="120" height="120" class="sprite-canvas"></canvas>
+            <div class="scan-line"></div>
+          </div>
+          <div class="detail-meta">
+            <div class="entity-number">#002 — CÂMARA DAS PROFUNDEZAS</div>
+            <div class="entity-name" style="color:#5a7ab8;">Shadow Wisp</div>
+            <div class="entity-subtitle">Forma Difusa / Entidade de Aprendizagem</div>
+            <div class="type-badges">
+              <span class="badge" style="color:#5a7ab8;border-color:rgba(90,122,184,0.4);">Sombra</span>
+              <span class="badge" style="color:#5a7ab8;border-color:rgba(90,122,184,0.4);">Difuso</span>
+              <span class="badge" style="color:#5a7ab8;border-color:rgba(90,122,184,0.4);">Errático</span>
+            </div>
+            <div class="quick-stats">
+              <div class="qstat"><div class="qstat-label">Movimento</div><div class="qstat-val" style="color:#5a7ab8;">Aleatório</div></div>
+              <div class="qstat"><div class="qstat-label">Dano</div><div class="qstat-val" style="color:#5a7ab8;">Mortal</div></div>
+              <div class="qstat"><div class="qstat-label">Contra</div><div class="qstat-val" style="color:#5a7ab8;">Escuridão</div></div>
+            </div>
+            <div class="danger-level">
+              <span class="danger-label">Perigo</span>
+              <div class="danger-pips">
+                <div class="pip filled"></div><div class="pip filled"></div><div class="pip"></div><div class="pip"></div><div class="pip"></div>
+              </div>
+            </div>
+            <div class="location-tag">📍 Câmara das Profundezas — Zona Central</div>
+          </div>
+        </div>
+        <div class="sections-grid">
+          <div class="info-block section-full"><div class="info-block-title">Descrição</div>
+            <p>Forma menor e menos desenvolvida da mesma entidade que constitui a Sombra. Apresenta-se como uma massa difusa de escuridão concentrada, sem membros, sem olhos visíveis, sem forma definida. Move-se de modo errático sem reagir à presença do jogador enquanto este emitir luz. A sua função no design é ensinar ao jogador que a escuridão pode ser usada como protecção.</p>
+          </div>
+          <div class="info-block"><div class="info-block-title">Estados</div>
+            <div class="states" style="color:#5a7ab8;">
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Deambulação</div><div class="state-desc">Movimento errático e aleatório. Ignora completamente o jogador.</div></div></div>
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Recuo</div><div class="state-desc">Qualquer fonte de luz provoca recuo imediato por cerca de um segundo.</div></div></div>
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Cego</div><div class="state-desc">Se o jogador apagar toda a luz, o Wisp passa por ele como se não existisse.</div></div></div>
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Abate</div><div class="state-desc">Colisão directa com o jogador enquanto este emite luz — morte instantânea.</div></div></div>
+            </div>
+          </div>
+          <div class="info-block"><div class="info-block-title">Stats</div>
+            <div class="stat-bars" style="color:#5a7ab8;">
+              <div class="stat-row"><div class="stat-name">Agressividade</div><div class="stat-bar"><div class="stat-fill" style="width:0%;"></div></div><div class="stat-num">0</div></div>
+              <div class="stat-row"><div class="stat-name">Perigo Situac.</div><div class="stat-bar"><div class="stat-fill" style="width:45%;"></div></div><div class="stat-num">45</div></div>
+              <div class="stat-row"><div class="stat-name">Visibilidade</div><div class="stat-bar"><div class="stat-fill" style="width:30%;"></div></div><div class="stat-num">30</div></div>
+              <div class="stat-row"><div class="stat-name">Mobilidade</div><div class="stat-bar"><div class="stat-fill" style="width:55%;"></div></div><div class="stat-num">55</div></div>
+            </div>
+          </div>
+          <div class="info-block section-full"><div class="info-block-title">Interações</div>
+            <div style="margin-bottom:10px;"><div style="font-size:0.5rem;letter-spacing:0.2em;color:var(--dim);margin-bottom:5px;">FRAQUEZAS</div><div class="interaction-grid"><span class="itag weak">Qualquer Luz (recuo)</span><span class="itag weak">Núcleo de Glowvine</span></div></div>
+            <div><div style="font-size:0.5rem;letter-spacing:0.2em;color:var(--dim);margin-bottom:5px;">MECÂNICA ESPECIAL</div><div class="interaction-grid"><span class="itag strong">Ignorado pela escuridão voluntária</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ THE SHADOW ══ -->
+      <div class="detail-panel" id="dp-the-shadow" style="color:#ff1a4a;">
+        <div class="detail-header">
+          <div class="sprite-box" style="border-color:rgba(255,26,74,0.4);">
+            <div class="corner tl"></div><div class="corner tr"></div>
+            <div class="corner bl"></div><div class="corner br"></div>
+            <canvas id="sprite-the-shadow" width="120" height="120" class="sprite-canvas"></canvas>
+            <div class="scan-line"></div>
+          </div>
+          <div class="detail-meta">
+            <div class="entity-number">#003 — CÂMARA DAS PROFUNDEZAS / CHEFE</div>
+            <div class="entity-name" style="color:#ff1a4a;">The Shadow</div>
+            <div class="entity-subtitle">Predador Ápice / Chefe de Perseguição</div>
+            <div class="type-badges">
+              <span class="badge" style="color:#ff1a4a;border-color:rgba(255,26,74,0.4);">Chefe</span>
+              <span class="badge" style="color:#ff1a4a;border-color:rgba(255,26,74,0.4);">Difuso</span>
+              <span class="badge" style="color:#ff1a4a;border-color:rgba(255,26,74,0.4);">Perseguição</span>
+              <span class="badge" style="color:#ff1a4a;border-color:rgba(255,26,74,0.4);">Devorador de Luz</span>
+            </div>
+            <div class="quick-stats">
+              <div class="qstat"><div class="qstat-label">Fase</div><div class="qstat-val" style="color:#ff1a4a;">Fuga</div></div>
+              <div class="qstat"><div class="qstat-label">Abate</div><div class="qstat-val" style="color:#ff1a4a;">1 Toque</div></div>
+              <div class="qstat"><div class="qstat-label">Contra</div><div class="qstat-val" style="color:#ff1a4a;">Núcleo BM</div></div>
+            </div>
+            <div class="danger-level">
+              <span class="danger-label">Perigo</span>
+              <div class="danger-pips">
+                <div class="pip filled"></div><div class="pip filled"></div><div class="pip filled"></div><div class="pip filled"></div><div class="pip filled"></div>
+              </div>
+            </div>
+            <div class="location-tag">📍 Câmara das Profundezas — Secção Final</div>
+          </div>
+        </div>
+        <div class="sections-grid">
+          <div class="info-block section-full"><div class="info-block-title">Descrição</div>
+            <p>Entidade difusa de escuridão pura, sem forma física compacta. Não pode ser bloqueada, apenas atrasada. A luz normal é consumida por ela — pára brevemente para absorver qualquer fonte de luz que encontre no caminho. Esta hesitação é o único mecanismo de sobrevivência durante a perseguição. Morre exclusivamente ao contacto com luz de origem em matéria negra — uma frequência que não consegue processar nem consumir.</p>
+          </div>
+          <div class="info-block section-full"><div class="info-block-title">Fases da Encounter</div>
+            <div class="states" style="color:#ff1a4a;">
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Fase 1 — Presença</div><div class="state-desc">Não é visível. As fontes de luz ambiente apagam-se sequencialmente na direcção de onde o jogador veio.</div></div></div>
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Fase 2 — Perseguição</div><div class="state-desc">Perseguição activa. Ao encontrar uma carga do Núcleo lançada, imobiliza-se 1–2 segundos para a consumir — janela de fuga.</div></div></div>
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Fase 3 — Sala Final</div><div class="state-desc">Começa a consumir a luz ambiente, revelando involuntariamente o mecanismo da glowvine gigante.</div></div></div>
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Morte</div><div class="state-desc">O pulso de luz de matéria negra da glowvine gigante. A Sombra desintegra-se completamente.</div></div></div>
+            </div>
+          </div>
+          <div class="info-block"><div class="info-block-title">Stats</div>
+            <div class="stat-bars" style="color:#ff1a4a;">
+              <div class="stat-row"><div class="stat-name">Agressividade</div><div class="stat-bar"><div class="stat-fill" style="width:95%;"></div></div><div class="stat-num">95</div></div>
+              <div class="stat-row"><div class="stat-name">Perigo</div><div class="stat-bar"><div class="stat-fill" style="width:100%;"></div></div><div class="stat-num">100</div></div>
+              <div class="stat-row"><div class="stat-name">Visibilidade</div><div class="stat-bar"><div class="stat-fill" style="width:60%;"></div></div><div class="stat-num">60</div></div>
+              <div class="stat-row"><div class="stat-name">Mobilidade</div><div class="stat-bar"><div class="stat-fill" style="width:85%;"></div></div><div class="stat-num">85</div></div>
+            </div>
+          </div>
+          <div class="info-block"><div class="info-block-title">Interações</div>
+            <div style="margin-bottom:10px;"><div style="font-size:0.5rem;letter-spacing:0.2em;color:var(--dim);margin-bottom:5px;">FRAQUEZAS</div><div class="interaction-grid"><span class="itag weak">Luz de Matéria Negra (abate)</span><span class="itag weak">Núcleo de Glowvine (atraso)</span></div></div>
+            <div><div style="font-size:0.5rem;letter-spacing:0.2em;color:var(--dim);margin-bottom:5px;">IMUNE A</div><div class="interaction-grid"><span class="itag immune">Luz Normal</span><span class="itag immune">Paredes</span><span class="itag immune">Matéria Negra</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ ANGLERFISH ══ -->
+      <div class="detail-panel" id="dp-anglerfish" style="color:#00ccff;">
+        <div class="detail-header">
+          <div class="sprite-box" style="border-color:rgba(0,204,255,0.4);">
+            <div class="corner tl"></div><div class="corner tr"></div>
+            <div class="corner bl"></div><div class="corner br"></div>
+            <canvas id="sprite-anglerfish" width="120" height="120" class="sprite-canvas"></canvas>
+            <div class="scan-line"></div>
+          </div>
+          <div class="detail-meta">
+            <div class="entity-number">#004 — AQUÁRIO</div>
+            <div class="entity-name" style="color:#00ccff;">Anglerfish</div>
+            <div class="entity-subtitle">Predador de Emboscada / Armadilha de Isco</div>
+            <div class="type-badges">
+              <span class="badge" style="color:#00ccff;border-color:rgba(0,204,255,0.4);">Aquático</span>
+              <span class="badge" style="color:#00ccff;border-color:rgba(0,204,255,0.4);">Emboscada</span>
+              <span class="badge" style="color:#00ccff;border-color:rgba(0,204,255,0.4);">Estacionário</span>
+            </div>
+            <div class="quick-stats">
+              <div class="qstat"><div class="qstat-label">Movimento</div><div class="qstat-val" style="color:#00ccff;">Mínimo</div></div>
+              <div class="qstat"><div class="qstat-label">Dano</div><div class="qstat-val" style="color:#00ccff;">1 Toque</div></div>
+              <div class="qstat"><div class="qstat-label">Detecta</div><div class="qstat-val" style="color:#00ccff;">Proximidade</div></div>
+            </div>
+            <div class="danger-level">
+              <span class="danger-label">Perigo</span>
+              <div class="danger-pips">
+                <div class="pip filled"></div><div class="pip filled"></div><div class="pip filled"></div><div class="pip filled"></div><div class="pip"></div>
+              </div>
+            </div>
+            <div class="location-tag">📍 Aquário — Matéria Negra Densa</div>
+          </div>
+        </div>
+        <div class="sections-grid">
+          <div class="info-block section-full"><div class="info-block-title">Descrição</div>
+            <p>Completamente oculto dentro de matéria negra densa. O único elemento visível é o seu isco — uma flor luminosa idêntica às glowvines normais, usada para atrair presas. O corpo permanece invisível até ao momento do ataque. As flores do Peixe-Lanterna nunca surgem fora de matéria negra e nunca possuem raízes visíveis.</p>
+          </div>
+          <div class="info-block"><div class="info-block-title">Estados</div>
+            <div class="states" style="color:#00ccff;">
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Isco</div><div class="state-desc">A flor-isco flutua suavemente dentro da matéria negra. Corpo completamente oculto.</div></div></div>
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Alerta</div><div class="state-desc">Ao detectar o jogador, o isco brilha com maior intensidade. Aviso subtil.</div></div></div>
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Bote</div><div class="state-desc">Movimento instantâneo para o jogador. Corpo visível por ~0.3s durante o bote.</div></div></div>
+            </div>
+          </div>
+          <div class="info-block"><div class="info-block-title">Stats</div>
+            <div class="stat-bars" style="color:#00ccff;">
+              <div class="stat-row"><div class="stat-name">Agressividade</div><div class="stat-bar"><div class="stat-fill" style="width:60%;"></div></div><div class="stat-num">60</div></div>
+              <div class="stat-row"><div class="stat-name">Perigo Situac.</div><div class="stat-bar"><div class="stat-fill" style="width:80%;"></div></div><div class="stat-num">80</div></div>
+              <div class="stat-row"><div class="stat-name">Visibilidade</div><div class="stat-bar"><div class="stat-fill" style="width:15%;"></div></div><div class="stat-num">15</div></div>
+              <div class="stat-row"><div class="stat-name">Mobilidade</div><div class="stat-bar"><div class="stat-fill" style="width:20%;"></div></div><div class="stat-num">20</div></div>
+            </div>
+          </div>
+          <div class="info-block section-full"><div class="info-block-title">Interações</div>
+            <div style="margin-bottom:10px;"><div style="font-size:0.5rem;letter-spacing:0.2em;color:var(--dim);margin-bottom:5px;">FRAQUEZAS</div><div class="interaction-grid"><span class="itag weak">Núcleo de Glowvine (distingue do real)</span></div></div>
+            <div><div style="font-size:0.5rem;letter-spacing:0.2em;color:var(--dim);margin-bottom:5px;">MECÂNICA ESPECIAL</div><div class="interaction-grid"><span class="itag strong">Isco imita glowvine</span><span class="itag strong">Sem raízes visíveis</span></div></div>
+          </div>
+          <div class="info-block section-full"><div class="info-block-title">Field Log</div>
+            <div class="log-entry"><div class="log-author">— Registo #2, Expedição ao Lago</div><p>"O Gorobi tentou tocar numa flor que lhe pareceu familiar e ficámos espantados quando uma criatura oculta tentou morder-lhe a mão. Pobre Gorobi..."</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ OBSERVER ══ -->
+      <div class="detail-panel" id="dp-observer" style="color:#ffcc00;">
+        <div class="detail-header">
+          <div class="sprite-box" style="border-color:rgba(255,204,0,0.4);">
+            <div class="corner tl"></div><div class="corner tr"></div>
+            <div class="corner bl"></div><div class="corner br"></div>
+            <canvas id="sprite-observer" width="120" height="120" class="sprite-canvas"></canvas>
+            <div class="scan-line"></div>
+          </div>
+          <div class="detail-meta">
+            <div class="entity-number">#005 — AQUÁRIO / PROJECTO ORBIS</div>
+            <div class="entity-name" style="color:#ffcc00;">Observer</div>
+            <div class="entity-subtitle">Entidade Artificial / Sequência de Fuga</div>
+            <div class="type-badges">
+              <span class="badge" style="color:#ffcc00;border-color:rgba(255,204,0,0.4);">Artificial</span>
+              <span class="badge" style="color:#ffcc00;border-color:rgba(255,204,0,0.4);">Consciente</span>
+              <span class="badge" style="color:#ffcc00;border-color:rgba(255,204,0,0.4);">Radiação</span>
+            </div>
+            <div class="quick-stats">
+              <div class="qstat"><div class="qstat-label">Origem</div><div class="qstat-val" style="color:#ffcc00;">ORBIS</div></div>
+              <div class="qstat"><div class="qstat-label">Abate em</div><div class="qstat-val" style="color:#ffcc00;">4 seg</div></div>
+              <div class="qstat"><div class="qstat-label">Contra</div><div class="qstat-val" style="color:#ffcc00;">Esconder</div></div>
+            </div>
+            <div class="danger-level">
+              <span class="danger-label">Perigo</span>
+              <div class="danger-pips">
+                <div class="pip filled"></div><div class="pip filled"></div><div class="pip filled"></div><div class="pip filled"></div><div class="pip"></div>
+              </div>
+            </div>
+            <div class="location-tag">📍 Aquário — Câmara Principal</div>
+          </div>
+        </div>
+        <div class="sections-grid">
+          <div class="info-block section-full"><div class="info-block-title">Descrição</div>
+            <p>Criado artificialmente pelo Projecto ORBIS para simular as propriedades das Entidades — possui consciência para observar e é capaz de ficar 100% negro. Forma esférica perfeita com um único olho. Quando o olho está fechado é completamente invisível na matéria negra. Ataca o jogador por o reconhecer como uma criatura de matéria negra intrusa — não catalogada no sistema.</p>
+          </div>
+          <div class="info-block"><div class="info-block-title">Estados</div>
+            <div class="states" style="color:#ffcc00;">
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Repouso</div><div class="state-desc">Flutua lentamente com o olho aberto, a vigiar as câmeras. Ignora o jogador sem linha de visão directa.</div></div></div>
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Mira</div><div class="state-desc">Ao detectar o jogador, começa a segui-lo. A visão começa a ficar ligeiramente avermelhada.</div></div></div>
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Irradiação</div><div class="state-desc">Após 4s de exposição, visão do jogador completamente distorcida. Morte se a linha de visão não for interrompida.</div></div></div>
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Perda de Alvo</div><div class="state-desc">Se o jogador se esconder atrás de matéria negra, o Observer regressa ao repouso.</div></div></div>
+            </div>
+          </div>
+          <div class="info-block"><div class="info-block-title">Stats</div>
+            <div class="stat-bars" style="color:#ffcc00;">
+              <div class="stat-row"><div class="stat-name">Agressividade</div><div class="stat-bar"><div class="stat-fill" style="width:70%;"></div></div><div class="stat-num">70</div></div>
+              <div class="stat-row"><div class="stat-name">Perigo</div><div class="stat-bar"><div class="stat-fill" style="width:75%;"></div></div><div class="stat-num">75</div></div>
+              <div class="stat-row"><div class="stat-name">Visibilidade</div><div class="stat-bar"><div class="stat-fill" style="width:100%;"></div></div><div class="stat-num">100</div></div>
+              <div class="stat-row"><div class="stat-name">Mobilidade</div><div class="stat-bar"><div class="stat-fill" style="width:50%;"></div></div><div class="stat-num">50</div></div>
+            </div>
+          </div>
+          <div class="info-block section-full"><div class="info-block-title">Lore Note</div>
+            <p>O Observer ataca o pato porque este é uma criatura de matéria negra não catalogada no sistema — um intruso. Os mini-observadores funcionam como câmeras controladas pelo Observer principal. Desligar o Observer desliga todos os mini-observadores. Foi a primeira tentativa de criar um ser artificial consciente capaz de observar continuamente.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ GLOAMVINE ══ -->
+      <div class="detail-panel" id="dp-gloamvine" style="color:#9dff6a;">
+        <div class="detail-header">
+          <div class="sprite-box" style="border-color:rgba(157,255,106,0.3);">
+            <div class="corner tl"></div><div class="corner tr"></div>
+            <div class="corner bl"></div><div class="corner br"></div>
+            <canvas id="sprite-gloamvine" width="120" height="120" class="sprite-canvas"></canvas>
+            <div class="scan-line"></div>
+          </div>
+          <div class="detail-meta">
+            <div class="entity-number">#006 — FLORA / TODAS AS ZONAS</div>
+            <div class="entity-name" style="color:#9dff6a;">Gloamvine</div>
+            <div class="entity-subtitle">Flora-Entidade / Recurso do Jogador</div>
+            <div class="type-badges">
+              <span class="badge" style="color:#9dff6a;border-color:rgba(157,255,106,0.3);">Flora</span>
+              <span class="badge" style="color:#9dff6a;border-color:rgba(157,255,106,0.3);">Bioluminescente</span>
+              <span class="badge" style="color:#9dff6a;border-color:rgba(157,255,106,0.3);">Não Hostil</span>
+            </div>
+            <div class="quick-stats">
+              <div class="qstat"><div class="qstat-label">Perigo</div><div class="qstat-val" style="color:#9dff6a;">Nenhum</div></div>
+              <div class="qstat"><div class="qstat-label">Função</div><div class="qstat-val" style="color:#9dff6a;">Recurso</div></div>
+              <div class="qstat"><div class="qstat-label">Emite</div><div class="qstat-val" style="color:#9dff6a;">Luz BM</div></div>
+            </div>
+            <div class="danger-level">
+              <span class="danger-label">Perigo</span>
+              <div class="danger-pips">
+                <div class="pip"></div><div class="pip"></div><div class="pip"></div><div class="pip"></div><div class="pip"></div>
+              </div>
+            </div>
+            <div class="location-tag">📍 Todas as Zonas — Regiões com Black Matter</div>
+          </div>
+        </div>
+        <div class="sections-grid">
+          <div class="info-block section-full"><div class="info-block-title">Descrição</div>
+            <p>Planta luminescente que só cresce em ambientes com concentração de Black Matter. Os seus núcleos emitem luz de origem em matéria negra — a única frequência que a Sombra não consegue consumir. Serve simultaneamente como recurso de iluminação, projectil do jogador, e mecanismo de progressão. Identificável pelas raízes visíveis na base da flor — ao contrário das imitações do Anglerfish.</p>
+          </div>
+          <div class="info-block"><div class="info-block-title">Propriedades</div>
+            <div class="states" style="color:#9dff6a;">
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Iluminação Passiva</div><div class="state-desc">Ilumina a matéria negra próxima, revelando criaturas ocultas num raio limitado.</div></div></div>
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Núcleo Colectável</div><div class="state-desc">O jogador pode colher o núcleo para usar como projectil. A planta regenera após algum tempo.</div></div></div>
+              <div class="state-item"><div class="state-dot"></div><div><div class="state-name">Revelação de Lurkers</div><div class="state-desc">A luz de matéria negra revela Lurkers em superfícies que seriam invisíveis com luz normal.</div></div></div>
+            </div>
+          </div>
+          <div class="info-block"><div class="info-block-title">Stats</div>
+            <div class="stat-bars" style="color:#9dff6a;">
+              <div class="stat-row"><div class="stat-name">Utilidade</div><div class="stat-bar"><div class="stat-fill" style="width:100%;"></div></div><div class="stat-num">100</div></div>
+              <div class="stat-row"><div class="stat-name">Raridade</div><div class="stat-bar"><div class="stat-fill" style="width:40%;"></div></div><div class="stat-num">40</div></div>
+              <div class="stat-row"><div class="stat-name">Alcance Luz</div><div class="stat-bar"><div class="stat-fill" style="width:55%;"></div></div><div class="stat-num">55</div></div>
+            </div>
+          </div>
+          <div class="info-block section-full"><div class="info-block-title">Design Note</div>
+            <p>A Gloamvine é o eixo central do sistema de recursos do jogo. Gere a tensão entre exploração e combate — o jogador precisa de núcleos para revelar Lurkers, atrasar a Sombra, e activar mecanismos, mas colhê-los requer aproximação a zonas com maior concentração de matéria negra. A sua distinção visual relativamente às imitações do Anglerfish é o primeiro teste de leitura visual do jogo.</p>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end detail wrapper -->
+  </div><!-- end pokedex -->
+
+  <script src="../js/main.js"></script>
+  <script>
+  /* ── PIXEL ART SPRITES ── */
+  function drawSprite(id, pixels, scale) {
+    const c = document.getElementById(id);
+    if (!c) return;
+    const ctx = c.getContext('2d');
+    ctx.clearRect(0, 0, c.width, c.height);
+    pixels.forEach(([x, y, color]) => {
+      ctx.fillStyle = color;
+      ctx.fillRect(x * scale, y * scale, scale, scale);
+    });
+  }
+
+  /* LURKER */
+  const lurker = [
+    [2,4],[3,4],[4,4],[5,4],[6,4],[7,4],[8,4],[9,4],
+    [1,5],[2,5],[3,5],[4,5],[5,5],[6,5],[7,5],[8,5],[9,5],[10,5],
+    [1,6],[2,6],[3,6],[4,6],[5,6],[6,6],[7,6],[8,6],[9,6],[10,6],
+    [2,7],[3,7],[4,7],[5,7],[6,7],[7,7],[8,7],[9,7],
+    [3,8],[4,8],[5,8],[6,8],[7,8],[8,8],
+  ].map(([x,y]) => [x, y, 'rgba(139,47,201,0.9)'])
+  .concat([[4,5,'rgba(200,100,255,1)'],[7,5,'rgba(200,100,255,1)']]);
+
+  /* SHADOW WISP */
+  const wisp = [
+    [3,2],[4,2],[5,2],[6,2],[7,2],[8,2],
+    [2,3],[3,3],[4,3],[5,3],[6,3],[7,3],[8,3],[9,3],
+    [2,4],[3,4],[4,4],[5,4],[6,4],[7,4],[8,4],[9,4],
+    [1,5],[2,5],[3,5],[4,5],[5,5],[6,5],[7,5],[8,5],[9,5],[10,5],
+    [2,6],[3,6],[4,6],[5,6],[6,6],[7,6],[8,6],[9,6],
+    [3,7],[4,7],[5,7],[6,7],[7,7],[8,7],
+    [4,8],[5,8],[6,8],[7,8],
+    [3,9],[4,9],[7,9],[8,9],
+    [2,10],[3,10],[8,10],[9,10],
+  ].map(([x,y]) => [x, y, 'rgba(80,100,140,0.85)']);
+
+  /* THE SHADOW */
+  const shadow = [
+    [4,1],[5,1],[6,1],[7,1],
+    [3,2],[4,2],[5,2],[6,2],[7,2],[8,2],
+    [2,3],[3,3],[4,3],[5,3],[6,3],[7,3],[8,3],[9,3],
+    [1,4],[2,4],[3,4],[4,4],[5,4],[6,4],[7,4],[8,4],[9,4],[10,4],
+    [1,5],[2,5],[3,5],[4,5],[5,5],[6,5],[7,5],[8,5],[9,5],[10,5],
+    [0,6],[1,6],[2,6],[3,6],[4,6],[5,6],[6,6],[7,6],[8,6],[9,6],[10,6],[11,6],
+    [0,7],[1,7],[2,7],[3,7],[4,7],[5,7],[6,7],[7,7],[8,7],[9,7],[10,7],[11,7],
+    [1,8],[2,8],[3,8],[4,8],[5,8],[6,8],[7,8],[8,8],[9,8],[10,8],
+    [2,9],[3,9],[4,9],[5,9],[6,9],[7,9],[8,9],[9,9],
+    [3,10],[4,10],[7,10],[8,10],
+    [2,11],[3,11],[8,11],[9,11],
+    [1,12],[2,12],[9,12],[10,12],
+  ].map(([x,y]) => [x, y, 'rgba(40,5,5,0.95)'])
+  .concat([
+    [4,0,'rgba(255,26,74,0.6)'],[5,0,'rgba(255,26,74,0.6)'],
+    [6,0,'rgba(255,26,74,0.6)'],[7,0,'rgba(255,26,74,0.6)'],
+    [0,5,'rgba(255,26,74,0.6)'],[11,5,'rgba(255,26,74,0.6)'],
+    [0,6,'rgba(255,26,74,0.6)'],[11,6,'rgba(255,26,74,0.6)'],
+  ]);
+
+  /* ANGLERFISH */
+  const angler = [
+    [3,4],[4,4],[5,4],[6,4],[7,4],[8,4],[9,4],
+    [2,5],[3,5],[4,5],[5,5],[6,5],[7,5],[8,5],[9,5],[10,5],
+    [1,6],[2,6],[3,6],[4,6],[5,6],[6,6],[7,6],[8,6],[9,6],[10,6],[11,6],
+    [1,7],[2,7],[3,7],[4,7],[5,7],[6,7],[7,7],[8,7],[9,7],[10,7],[11,7],
+    [2,8],[3,8],[4,8],[5,8],[6,8],[7,8],[8,8],[9,8],[10,8],
+    [3,9],[4,9],[5,9],[6,9],[7,9],[8,9],
+    [3,10],[5,10],[7,10],[9,10],
+  ].map(([x,y]) => [x,y,'rgba(10,30,50,0.95)'])
+  .concat([
+    [4,6,'rgba(0,204,255,1)'],[5,6,'rgba(0,180,255,1)'],
+    [6,1,'rgba(100,255,200,0.9)'],[6,2,'rgba(80,220,180,0.7)'],[6,3,'rgba(60,180,150,0.5)'],
+  ]);
+
+  /* OBSERVER */
+  const observer = [
+    [4,1],[5,1],[6,1],[7,1],
+    [2,2],[3,2],[4,2],[5,2],[6,2],[7,2],[8,2],[9,2],
+    [1,3],[2,3],[3,3],[4,3],[5,3],[6,3],[7,3],[8,3],[9,3],[10,3],
+    [1,4],[2,4],[3,4],[4,4],[5,4],[6,4],[7,4],[8,4],[9,4],[10,4],
+    [0,5],[1,5],[2,5],[3,5],[4,5],[5,5],[6,5],[7,5],[8,5],[9,5],[10,5],[11,5],
+    [0,6],[1,6],[2,6],[3,6],[4,6],[5,6],[6,6],[7,6],[8,6],[9,6],[10,6],[11,6],
+    [1,7],[2,7],[3,7],[4,7],[5,7],[6,7],[7,7],[8,7],[9,7],[10,7],
+    [1,8],[2,8],[3,8],[4,8],[5,8],[6,8],[7,8],[8,8],[9,8],[10,8],
+    [2,9],[3,9],[4,9],[5,9],[6,9],[7,9],[8,9],[9,9],
+    [3,10],[4,10],[5,10],[6,10],[7,10],[8,10],
+    [4,11],[5,11],[6,11],[7,11],
+  ].map(([x,y]) => [x,y,'rgba(20,15,5,0.95)'])
+  .concat([
+    [4,5,'rgba(255,220,0,0.9)'],[5,5,'rgba(255,200,0,1)'],[6,5,'rgba(255,200,0,1)'],[7,5,'rgba(255,220,0,0.9)'],
+    [4,6,'rgba(255,180,0,0.9)'],[5,6,'rgba(255,150,0,1)'],[6,6,'rgba(255,150,0,1)'],[7,6,'rgba(255,180,0,0.9)'],
+    [5,5,'rgba(255,255,200,0.7)'],
+  ]);
+
+  /* GLOAMVINE */
+  const gloam = [
+    /* Stem */
+    [7,10],[7,9],[7,8],[7,7],[7,6],[8,5],[8,4],
+    [6,10],[6,9],[6,8],[6,7],
+    /* Leaves */
+    [3,8],[4,8],[5,8],[4,7],[3,7],
+    [9,6],[10,6],[11,6],[10,7],[11,7],
+    /* Flower petals */
+    [6,3],[7,3],[8,3],
+    [5,4],[6,4],[7,4],[8,4],[9,4],
+    [5,5],[6,5],[7,5],[8,5],[9,5],
+    [6,6],[7,6],[8,6],
+    /* Root */
+    [5,11],[6,11],[7,11],[8,11],[9,11],
+    [4,12],[5,12],[9,12],[10,12],
+  ].map(([x,y]) => [x,y,'rgba(60,160,40,0.85)'])
+  .concat([
+    /* Glow core */
+    [7,4,'rgba(180,255,100,1)'],[7,5,'rgba(157,255,106,1)'],
+    [6,4,'rgba(140,240,80,0.9)'],[8,5,'rgba(140,240,80,0.9)'],
+    [7,3,'rgba(200,255,150,0.7)'],
+  ]);
+
+  /* Draw large sprites */
+  drawSprite('sprite-lurker', lurker, 8);
+  drawSprite('sprite-shadow-wisp', wisp, 8);
+  drawSprite('sprite-the-shadow', shadow, 7);
+  drawSprite('sprite-anglerfish', angler, 8);
+  drawSprite('sprite-observer', observer, 8);
+  drawSprite('sprite-gloamvine', gloam, 7);
+
+  /* Draw mini sprites */
+  drawSprite('mini-lurker', lurker, 3);
+  drawSprite('mini-shadow-wisp', wisp, 3);
+  drawSprite('mini-the-shadow', shadow, 2.5);
+  drawSprite('mini-anglerfish', angler, 2.5);
+  drawSprite('mini-observer', observer, 2.5);
+  drawSprite('mini-gloamvine', gloam, 2.5);
+
+  /* ── NAVIGATION ── */
+  function showEntity(id) {
+    document.querySelectorAll('.entity-row').forEach(r => r.classList.remove('active'));
+    document.querySelectorAll('.detail-panel').forEach(d => d.classList.remove('active'));
+
+    const row = document.querySelector(`.entity-row[data-e="${id}"]`);
+    const panel = document.getElementById(`dp-${id}`);
+
+    if (row) row.classList.add('active');
+    if (panel) {
+      panel.classList.add('active');
+      /* Re-animate stat bars */
+      panel.querySelectorAll('.stat-fill').forEach(b => {
+        b.style.animation = 'none';
+        void b.offsetHeight;
+        b.style.animation = '';
+      });
+    }
+
+    if (window.innerWidth <= 900 && panel) {
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  /* Click delegation on sidebar */
+  document.querySelector('.pokedex__sidebar').addEventListener('click', e => {
+    const row = e.target.closest('.entity-row');
+    if (row) showEntity(row.dataset.e);
+  });
+
+  /* Keyboard navigation */
+  document.querySelector('.pokedex__sidebar').addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      const row = e.target.closest('.entity-row');
+      if (row) showEntity(row.dataset.e);
+    }
+  });
+  </script>
+</body>
+</html>

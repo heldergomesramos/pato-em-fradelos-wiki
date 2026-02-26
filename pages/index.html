@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pato em Fradelos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+
+  <!-- ── NAVBAR ── -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar__logo">PATO <span>//</span> FRADELOS</a>
+    <ul class="navbar__links">
+      <li><a href="index.html" class="active">Início</a></li>
+      <li><a href="pages/maps.html">Mapas</a></li>
+      <li><a href="pages/entities.html">Entidades</a></li>
+      <li><a href="pages/skills.html">Skills</a></li>
+      <li><a href="pages/lore.html">Lore</a></li>
+      <li><a href="pages/video.html">Vídeo</a></li>
+      <li><a href="pages/team.html">Equipa</a></li>
+    </ul>
+    <button class="navbar__hamburger" aria-label="Abrir menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+  <div class="navbar__mobile-menu">
+    <a href="index.html" class="active">Início</a>
+    <a href="pages/maps.html">Mapas</a>
+    <a href="pages/entities.html">Entidades</a>
+    <a href="pages/skills.html">Skills</a>
+    <a href="pages/lore.html">Lore</a>
+    <a href="pages/video.html">Vídeo</a>
+    <a href="pages/team.html">Equipa</a>
+  </div>
+
+  <div class="page-content">
+
+    <!-- ── HERO ── -->
+    <section class="hero">
+      <div class="hero__bg"></div>
+      <div class="hero__grid"></div>
+
+      <div class="hero__content">
+        <div class="hero__eyebrow">Projecto ORBIS // 2D Platformer</div>
+        <h1 class="hero__title">Pato em<br><span>Fradelos</span></h1>
+        <p class="hero__subtitle">Observe. Descubra. Sobreviva.</p>
+        <p class="hero__desc">
+          Um jogo de plataformas 2D onde o que vês determina o que existe.
+          A matéria negra desaparece quando não é observada — e algo lá dentro
+          está a observar de volta.
+        </p>
+        <div class="hero__cta">
+          <a href="pages/video.html" class="btn btn--primary">▶ Ver Trailer</a>
+          <a href="pages/lore.html" class="btn btn--outline">Ler a Lore</a>
+        </div>
+      </div>
+
+      <div class="hero__scroll">↓ explorar</div>
+    </section>
+
+    <!-- ── GALERIA DE SCREENSHOTS ── -->
+    <section class="gallery-section">
+      <div class="section-header">
+        <div class="section-eyebrow">Capturas de Ecrã</div>
+        <h2 class="section-title">Gameplay</h2>
+      </div>
+
+      <div class="gallery-grid">
+        <!-- Card largo — screenshot principal -->
+        <div class="gallery-card gallery-card--wide">
+          <div class="gallery-card__placeholder">
+            <span class="gallery-card__placeholder-icon">🎮</span>
+            <span class="gallery-card__placeholder-label">Screenshot Principal — 16:9</span>
+          </div>
+          <div class="gallery-card__overlay">+ ver</div>
+        </div>
+
+        <!-- Card normal -->
+        <div class="gallery-card">
+          <div class="gallery-card__placeholder">
+            <span class="gallery-card__placeholder-icon">🌑</span>
+            <span class="gallery-card__placeholder-label">Matéria Negra</span>
+          </div>
+          <div class="gallery-card__overlay">+ ver</div>
+        </div>
+
+        <!-- Card normal -->
+        <div class="gallery-card">
+          <div class="gallery-card__placeholder">
+            <span class="gallery-card__placeholder-icon">🪼</span>
+            <span class="gallery-card__placeholder-label">Aquário</span>
+          </div>
+          <div class="gallery-card__overlay">+ ver</div>
+        </div>
+
+        <!-- Card normal -->
+        <div class="gallery-card">
+          <div class="gallery-card__placeholder">
+            <span class="gallery-card__placeholder-icon">👁️</span>
+            <span class="gallery-card__placeholder-label">Observer</span>
+          </div>
+          <div class="gallery-card__overlay">+ ver</div>
+        </div>
+
+        <!-- Card largo -->
+        <div class="gallery-card gallery-card--wide">
+          <div class="gallery-card__placeholder">
+            <span class="gallery-card__placeholder-icon">🌿</span>
+            <span class="gallery-card__placeholder-label">Câmara das Profundezas — 16:9</span>
+          </div>
+          <div class="gallery-card__overlay">+ ver</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CARACTERÍSTICAS DO JOGO ── -->
+    <section class="features-section">
+      <div class="section-header">
+        <div class="section-eyebrow">Mecânicas</div>
+        <h2 class="section-title">Como Funciona</h2>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card" data-animate>
+          <span class="feature-card__icon">👁️</span>
+          <div class="feature-card__title">Observação</div>
+          <p class="feature-card__desc">
+            O que o jogador vê no ecrã determina o que existe fisicamente.
+            A matéria negra desaparece quando sai do campo de visão.
+          </p>
+        </div>
+
+        <div class="feature-card" data-animate>
+          <span class="feature-card__icon">🌑</span>
+          <div class="feature-card__title">Matéria Negra</div>
+          <p class="feature-card__desc">
+            Absorve toda a luz, não emite som, e esconde criaturas no seu interior.
+            Sólida quando observada, inexistente quando ignorada.
+          </p>
+        </div>
+
+        <div class="feature-card" data-animate>
+          <span class="feature-card__icon">💜</span>
+          <div class="feature-card__title">Núcleo de Glowvine</div>
+          <p class="feature-card__desc">
+            Bola de luz roxa e pegajosa. Ilumina a matéria negra,
+            revela criaturas ocultas e activa mecanismos.
+          </p>
+        </div>
+
+        <div class="feature-card" data-animate>
+          <span class="feature-card__icon">🌀</span>
+          <div class="feature-card__title">Teleporter</div>
+          <p class="feature-card__desc">
+            Deixa uma sombra no ar e teletransporta de volta a ela,
+            conservando o momentum do ponto de origem.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FOOTER ── -->
+    <footer class="footer">
+      <p>Pato em Fradelos &mdash; <span>Projecto ORBIS</span> &mdash; Em desenvolvimento</p>
+    </footer>
+
+  </div><!-- fim page-content -->
+
+  <script src="js/main.js"></script>
+</body>
+</html>
