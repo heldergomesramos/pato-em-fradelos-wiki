@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../favicon.ico">
+  <link rel="shortcut icon" href="../favicon.ico">
+  <meta charset="UTF-8">  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lore — Pato em Fradelos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
@@ -18,6 +19,7 @@
       <li><a href="../index.html">Início</a></li>
       <li><a href="maps.html">Mapas</a></li>
       <li><a href="entities.html">Entidades</a></li>
+      <li><a href="skills.html">Skills</a></li>
       <li><a href="lore.html" class="active">Lore</a></li>
       <li><a href="video.html">Vídeo</a></li>
       <li><a href="team.html">Equipa</a></li>
@@ -30,6 +32,7 @@
     <a href="../index.html">Início</a>
     <a href="maps.html">Mapas</a>
     <a href="entities.html">Entidades</a>
+    <a href="skills.html">Skills</a>
     <a href="lore.html" class="active">Lore</a>
     <a href="video.html">Vídeo</a>
     <a href="team.html">Equipa</a>
@@ -55,6 +58,55 @@
         <button class="filter-btn" data-filter="creatures">Criaturas</button>
         <button class="filter-btn" data-filter="incident">Incidente</button>
         <button class="filter-btn" data-filter="orbis">Projecto ORBIS</button>
+        <button class="filter-btn" data-filter="notas">Notas de Campo</button>
+      </div>
+
+      <!-- ── NOTAS DE CAMPO (Papers do JSON) ── -->
+      <div data-category="notas">
+        <div class="log-section">
+          <div class="log-section__title">// Ficheiro: Notas Manuscritas — Recuperadas</div>
+
+          <div class="log-card">
+            <div class="log-card__meta">
+              <span class="log-card__id">Perspective?</span>
+              <span class="log-card__author">EX</span>
+            </div>
+            <p class="log-card__text">"Sometimes it's all about perspective..."</p>
+          </div>
+
+          <div class="log-card">
+            <div class="log-card__meta">
+              <span class="log-card__id">Purple Sticky Material</span>
+              <span class="log-card__author">EX</span>
+            </div>
+            <p class="log-card__text">"Do not eat this purple sticky liquid! Not only does it taste awful but it gets stuck in your tongue and it's a pain to get rid of!"</p>
+          </div>
+
+          <div class="log-card">
+            <div class="log-card__meta">
+              <span class="log-card__id">Lab Door Closed</span>
+              <span class="log-card__author">EE</span>
+            </div>
+            <p class="log-card__text">"For all of you who come in here and meet the door of the lab closed, cross this bridge and go into the facility ahead. I'll probably be working on the generator and it will soon power the entire lab and future projects."</p>
+          </div>
+
+          <div class="log-card">
+            <div class="log-card__meta">
+              <span class="log-card__id">Big Eye Creature</span>
+              <span class="log-card__author">EX</span>
+            </div>
+            <p class="log-card__text">"I just came back from the aquarium. A big red eyed creature appeared in the dark out of nowhere and started quickly heating my body. This is very dangerous! Warn everyone immediately!"</p>
+          </div>
+
+          <div class="log-card">
+            <div class="log-card__meta">
+              <span class="log-card__id">Aquarium Keycard</span>
+              <span class="log-card__author">EX</span>
+            </div>
+            <p class="log-card__text">"Shaduru, could you make me another blue keycard for the aquarium? Mine fell into the middle of the black lake and it's dangerous to get it back."</p>
+          </div>
+
+        </div>
       </div>
 
       <!-- ── TERMINAL 1 — PRIMEIROS REGISTOS ── -->
@@ -109,6 +161,83 @@
             <span class="terminal__cursor"></span>
           </div>
         </div>
+
+        <!-- Black Matter terminal (do JSON) -->
+        <div class="terminal">
+          <div class="terminal__titlebar">
+            <div class="terminal__dots">
+              <div class="terminal__dot terminal__dot--red"></div>
+              <div class="terminal__dot terminal__dot--yellow"></div>
+              <div class="terminal__dot terminal__dot--green"></div>
+            </div>
+            <span class="terminal__filename">black_matter_research.db — PE</span>
+          </div>
+          <div class="terminal__body">
+            <div class="terminal__separator">// Black Matter</div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="Black Matter, distinct from Dark Matter, is a mysterious material found exclusively in this island and its surrounding waters."></span>
+            </div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="Properties: Produces no sound upon collision. Absorbs all external light, rendering it completely black. Light emanating from within can be seen from the outside."></span>
+            </div>
+
+            <div class="terminal__separator">// The Vanishing Principle</div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="One of the most fascinating aspects of Black Matter is the Vanishing Principle: If it is not seen, it does not exist."></span>
+            </div>
+
+            <div class="terminal__separator">// The Insides of Black Matter</div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="Black Matter is hollow and can harbor unpredictable creatures, plants, and materials, some of which sometimes defy the rules of our world."></span>
+            </div>
+
+            <div class="terminal__separator">// Propagation in Water</div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="We hypothesize that many black matter spots were once locations containing water, suggesting it thrives in aquatic environments and propagates much faster in them."></span>
+            </div>
+
+            <div class="terminal__separator">// Island State — Pofinho</div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="Our new satellite photos reveal an increase in the area of surface covered by Black Matter in and around the island."></span>
+            </div>
+            <span class="terminal__cursor"></span>
+          </div>
+        </div>
+
+        <!-- Vanishing difficulty / crossing BM -->
+        <div class="terminal">
+          <div class="terminal__titlebar">
+            <div class="terminal__dots">
+              <div class="terminal__dot terminal__dot--red"></div>
+              <div class="terminal__dot terminal__dot--yellow"></div>
+              <div class="terminal__dot terminal__dot--green"></div>
+            </div>
+            <span class="terminal__filename">vanishing_principle_notes.db — EX / PE</span>
+          </div>
+          <div class="terminal__body">
+            <div class="terminal__separator">// Difficulty in Crossing Black Matter</div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">EX &gt;</span>
+              <span class="terminal__text" data-type="According to the Vanishing Principle, I only need to close my eyes to make it disappear, right? But then why doesn't it work sometimes?"></span>
+            </div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">PE &gt;</span>
+              <span class="terminal__text" data-type="You have to become unaware of its existence in order for it to disappear. Some people have problems crossing it with eyes closed, be it remnants of light or something else."></span>
+            </div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">PE &gt;</span>
+              <span class="terminal__text" data-type="The best alternative is to simply fall unconscious and cross it that way, but that is hardly convenient."></span>
+            </div>
+            <span class="terminal__cursor"></span>
+          </div>
+        </div>
+
       </div>
 
       <!-- ── LOGS — CRIATURAS ── -->
@@ -148,6 +277,67 @@
             <p class="log-card__text">"Os camaleões negros são diferentes de tudo o que vimos até agora. São inteligentes. Observam-nos. Quando iluminados com o núcleo, ficam imóveis — sabem que foram detectados. Fazem sons que não consigo descrever. Graves, irregulares. Não são sons de animal. Recomendo contenção imediata no Piso 3. Não devem sair dali em circunstância alguma."</p>
           </div>
         </div>
+
+        <!-- Creatures from JSON as terminal -->
+        <div class="terminal">
+          <div class="terminal__titlebar">
+            <div class="terminal__dots">
+              <div class="terminal__dot terminal__dot--red"></div>
+              <div class="terminal__dot terminal__dot--yellow"></div>
+              <div class="terminal__dot terminal__dot--green"></div>
+            </div>
+            <span class="terminal__filename">fauna_database.db — BIO</span>
+          </div>
+          <div class="terminal__body">
+            <div class="terminal__separator">// Black Anglerfish</div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="These creatures live inside Black Matter. Their black skin grants them perfect camouflage in this environment."></span>
+            </div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="A fake black gloamvine dangles from their head, attracting unsuspecting prey to their gaping maw."></span>
+            </div>
+
+            <div class="terminal__separator">// Jellyfish</div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="These creatures seem to be immune to the effects of Black Matter. While their heads are soft and bouncy, their tentacles are extremely dangerous due to their electrical charge."></span>
+            </div>
+
+            <div class="terminal__separator">// Gloamvines</div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="Gloamvines grow in dark caves, hanging from ceilings with thin tendrils. Their sticky purple flowers glow to attract insects, which get trapped and become their food."></span>
+            </div>
+
+            <div class="terminal__separator">// Black Gloamvines</div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="Gloamvines exposed to Black Matter for long periods become Black Gloamvines. Their roots are always attached to Black Matter, remain solid even after vanishing, and are only visible under specific light sources."></span>
+            </div>
+
+            <div class="terminal__separator">// Physical Distortions</div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="Absence of Black Matter above black gloamvines hints at hidden distortions in the ceiling. Be cautious of surfaces like dirt, rock, or metal that appear solid above them."></span>
+            </div>
+            <span class="terminal__cursor"></span>
+          </div>
+        </div>
+
+        <!-- Gloamvine Core -->
+        <div class="log-section">
+          <div class="log-section__title">// Ficheiro: Ferramentas — Investigação BIO</div>
+          <div class="log-card">
+            <div class="log-card__meta">
+              <span class="log-card__id">Gloamvine Core</span>
+              <span class="log-card__author">BIO</span>
+            </div>
+            <p class="log-card__text">"We successfully created a light source capable of reflecting off materials inside black matter: The Gloamvine Core. This means we can finally see the roots of black gloamvines and distinguish them from anglerfish. I wonder what else we'll be able to see with this."</p>
+          </div>
+        </div>
+
       </div>
 
       <!-- ── TERMINAL 2 — INCIDENTE PISO 3 ── -->
@@ -217,6 +407,64 @@
             <p class="log-card__text">"Baseámo-nos no princípio da desaparição para construir o teleporter. Quando estás dentro da esfera e não consegues ver o exterior, o exterior deixa de te poder observar. Entras na outra dimensão — o lugar para onde vai toda a matéria negra quando não é observada. O problema é sair. Precisas de algo que te observe de volta para regressares. Por enquanto, usamos o Observer como âncora."</p>
           </div>
         </div>
+
+        <!-- The Stranger terminals (do JSON) -->
+        <div class="terminal">
+          <div class="terminal__titlebar">
+            <div class="terminal__dots">
+              <div class="terminal__dot terminal__dot--red"></div>
+              <div class="terminal__dot terminal__dot--yellow"></div>
+              <div class="terminal__dot terminal__dot--green"></div>
+            </div>
+            <span class="terminal__filename">stranger_classified.db — PE // ACESSO RESTRITO</span>
+          </div>
+          <div class="terminal__body">
+            <div class="terminal__separator">// The Stranger</div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="The Stranger is a large black sphere that orbits the Earth, situated between the Moon and our planet. It is estimated to be slightly larger than the Moon."></span>
+            </div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="We hypothesize that the Stranger might be composed of black matter — our attempt to land a scout on its surface failed, with the scout passing through it entirely."></span>
+            </div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="Initially we thought it might be composed of gases, but after studying black matter, we realize it exhibits similar behaviors. The direct relationship between black matter on Earth and the Stranger remains to be studied."></span>
+            </div>
+
+            <div class="terminal__separator">// The Eclipse</div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="Every three days, the Stranger emerges in front of the Moon, causing a lunar eclipse that entirely obscures the Moon and envelops the Earth in total darkness."></span>
+            </div>
+            <div class="terminal__line">
+              <span class="terminal__prompt">&gt;</span>
+              <span class="terminal__text" data-type="This event occurs around midnight, when the Moon is at its highest point in the sky."></span>
+            </div>
+            <span class="terminal__cursor"></span>
+          </div>
+        </div>
+
+        <!-- Vanishing Research -->
+        <div class="log-section" style="margin-top:16px;">
+          <div class="log-section__title">// Ficheiro: Investigação — Teleportação</div>
+          <div class="log-card">
+            <div class="log-card__meta">
+              <span class="log-card__id">Vanishing Research</span>
+              <span class="log-card__author">PE</span>
+            </div>
+            <p class="log-card__text">"Shaduru and I have been studying what happens to Black Matter and where it goes during the vanishing. Our research not only holds potential for developing teleportation but also offers revolutionary insights into the fundamental workings of physics and the universe."</p>
+          </div>
+          <div class="log-card">
+            <div class="log-card__meta">
+              <span class="log-card__id">Black Matter Generator</span>
+              <span class="log-card__author">EE</span>
+            </div>
+            <p class="log-card__text">"Black Matter Generator — Harnesses stored light within black matter and channels it through these tubes. Activate it to power the lab and teleporter chambers."</p>
+          </div>
+        </div>
+
       </div>
 
     </div><!-- fim lore-page -->
