@@ -1,17 +1,652 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../favicon.ico">
+  <link rel="shortcut icon" href="../favicon.ico">
+  <meta charset="UTF-8">  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mapas — Pato em Fradelos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/global.css">
-  <link rel="stylesheet" href="../css/pages.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ═══ MAPS PAGE LAYOUT ═══ */
+    .maps-page {
+      padding-top: var(--nav-height);
+      min-height: 100vh;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 60px;
+    }
+
+    /* ── PAGE HEADER ── */
+    .maps-header {
+      width: 100%;
+      max-width: 1160px;
+      padding: 24px 28px 12px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .maps-header__eyebrow {
+      font-size: 0.52rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: rgba(0,220,80,0.5);
+      margin-bottom: 6px;
+    }
+
+    .maps-header__title {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: clamp(1rem, 2.5vw, 1.5rem);
+      color: #fff;
+      letter-spacing: 0.1em;
+    }
+
+    .maps-header__right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    .maps-header__status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(0,220,80,0.65);
+    }
+
+    .maps-status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: rgba(0,220,80,0.9);
+      animation: blink 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    .maps-header__hint {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.5rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(0,220,80,0.3);
+    }
+
+    .hint-icon {
+      font-size: 0.65rem;
+      opacity: 0.5;
+      animation: blink 1.5s step-end infinite;
+    }
+
+    /* ── SURROUND LAYOUT ── */
+    .maps-surround {
+      width: 100%;
+      max-width: 1160px;
+      padding: 0 28px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    /* ── SIDE PANELS ── */
+    .maps-side {
+      flex-shrink: 0;
+      width: 165px;
+      padding: 16px 14px;
+      background: rgba(4,8,4,0.7);
+      border: 1px solid rgba(0,180,60,0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-family: 'VT323', monospace;
+      font-size: 14px;
+      color: rgba(180,230,180,0.75);
+      letter-spacing: 0.04em;
+      margin-top: 0;
+      align-self: stretch;
+    }
+
+    .side-label {
+      font-size: 12px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(0,220,80,0.55);
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(0,180,60,0.15);
+    }
+
+    .side-divider {
+      height: 1px;
+      background: rgba(0,180,60,0.12);
+    }
+
+    /* Bar group */
+    .side-bar-group { display: flex; flex-direction: column; gap: 6px; }
+
+    .side-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .side-bar-name {
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      color: rgba(160,220,160,0.65);
+      width: 36px;
+      flex-shrink: 0;
+    }
+
+    .side-bar-fill {
+      flex: 1;
+      height: 4px;
+      background: rgba(0,180,60,0.1);
+      border-radius: 1px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .side-bar-fill::after {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: var(--w, 50%);
+      background: rgba(0,220,80,0.65);
+      animation: fillIn 1.2s ease-out forwards;
+    }
+
+    /* Stat list */
+    .side-stat-list { display: flex; flex-direction: column; gap: 7px; }
+
+    .side-stat {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      line-height: 1.4;
+      color: rgba(200,240,200,0.92);
+    }
+
+    .side-stat-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .side-stat-dot.ok   { background: rgba(0,220,80,0.95); box-shadow: 0 0 4px rgba(0,220,80,0.5); }
+    .side-stat-dot.warn { background: rgba(255,160,0,1); box-shadow: 0 0 4px rgba(255,160,0,0.6); animation: blink 1.5s step-end infinite; }
+
+    /* Coords */
+    .side-coords {
+      font-size: 13px;
+      color: rgba(0,200,80,0.55);
+      line-height: 1.8;
+      letter-spacing: 0.04em;
+    }
+
+    /* Cam list (right panel) */
+    .side-cam-list { display: flex; flex-direction: column; gap: 6px; }
+
+    .side-cam-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      letter-spacing: 0.02em;
+      line-height: 1.5;
+    }
+
+    .side-cam-num {
+      color: rgba(0,200,80,0.6);
+      flex-shrink: 0;
+      width: 18px;
+    }
+
+    .side-cam-name {
+      flex: 1;
+      font-size: 13px;
+      color: rgba(200,240,200,0.85);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .side-cam-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .side-cam-dot.ok   { background: rgba(0,220,80,0.9); box-shadow: 0 0 4px rgba(0,220,80,0.4); }
+    .side-cam-dot.warn { background: rgba(255,80,80,1); box-shadow: 0 0 4px rgba(255,80,80,0.5); animation: blink 1.2s step-end infinite; }
+
+    /* ── BOTTOM STATUS BAR ── */
+    .maps-bottom-bar {
+      width: 100%;
+      max-width: 1160px;
+      padding: 10px 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'VT323', monospace;
+      font-size: 13px;
+      color: rgba(0,180,60,0.4);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-top: 1px solid rgba(0,180,60,0.08);
+      margin-top: 8px;
+    }
+
+    .maps-bottom-sep { color: rgba(0,180,60,0.18); }
+
+    @keyframes fillIn { from { transform: scaleX(0); transform-origin: left; } to { transform: scaleX(1); } }
+
+    /* ── HIDE SIDE PANELS ON SMALL SCREENS ── */
+    @media (max-width: 1100px) {
+      .maps-side { display: none; }
+      .maps-surround { padding: 0 12px; }
+      .maps-header { padding: 16px 12px 8px; }
+    }
+
+    @media (max-width: 600px) {
+      .maps-bottom-bar { flex-wrap: wrap; gap: 6px; font-size: 11px; padding: 8px 12px; }
+      .maps-header__right { display: none; }
+    }
+
+    /* ═══ MONITOR BRANCO ═══ */
+    .monitor-wrap { flex: 1; min-width: 0; padding-top: 0; }
+
+    .monitor {
+      position: relative;
+      background: linear-gradient(160deg, #2a2a34 0%, #22222c 40%, #1a1a22 100%);
+      border-radius: 18px 18px 0 0;
+      padding: 18px 18px 0;
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,0.5),
+        0 0 0 3px rgba(255,255,255,0.07),
+        0 0 0 5px rgba(0,0,0,0.4),
+        6px 8px 32px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.12),
+        inset 0 -2px 4px rgba(0,0,0,0.3);
+    }
+    /* Linha de brilho no topo */
+    .monitor::before {
+      content: '';
+      position: absolute;
+      top: 8px; left: 20px; right: 20px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 30%, rgba(255,255,255,0.18) 70%, transparent);
+      border-radius: 2px;
+      pointer-events: none;
+    }
+    /* Sombra interna lateral */
+    .monitor::after {
+      content: '';
+      position: absolute;
+      top: 18px; left: 0; bottom: 0; right: 0;
+      border-radius: 0 0 0 0;
+      box-shadow: inset 4px 0 8px rgba(0,0,0,0.15), inset -4px 0 8px rgba(0,0,0,0.15);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ═══ ECRÃ ═══ */
+    .monitor-screen {
+      position: relative;
+      background: #080a06;
+      border-radius: 8px 8px 0 0;
+      overflow: hidden;
+      aspect-ratio: 16/9.2;
+      box-shadow: inset 0 0 60px rgba(0,0,0,0.8), inset 0 0 12px rgba(0,0,0,0.6);
+    }
+    /* Scanlines */
+    .crt-scanlines {
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px);
+      pointer-events: none; z-index: 48; border-radius: 8px 8px 0 0;
+    }
+    /* Reflexo ecrã */
+    .crt-glare {
+      position: absolute; top: 0; left: 0; right: 0; height: 35%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.022) 0%, transparent 100%);
+      pointer-events: none; z-index: 47; border-radius: 8px 8px 0 0;
+    }
+    /* Vinheta */
+    .crt-vignette {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 88% 88% at 50% 50%, transparent 38%, rgba(0,0,0,0.72) 100%);
+      pointer-events: none; z-index: 46; border-radius: 8px 8px 0 0;
+    }
+    /* Flicker */
+    .crt-flicker {
+      position: absolute; inset: 0;
+      background: rgba(200,255,180,0.01);
+      animation: screenFlicker 6s step-end infinite;
+      pointer-events: none; z-index: 45; border-radius: 8px 8px 0 0;
+    }
+    @keyframes screenFlicker {
+      0%,100%{opacity:1;} 8%{opacity:.97;} 9%{opacity:1;} 43%{opacity:.95;} 44%{opacity:1;} 79%{opacity:.98;} 80%{opacity:1;}
+    }
+    /* Status bar */
+    .screen-statusbar {
+      position: absolute; top: 0; left: 0; right: 0; height: 20px;
+      background: rgba(0,0,0,0.65);
+      border-bottom: 1px solid rgba(0,220,80,0.12);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 10px; z-index: 44; pointer-events: none;
+    }
+    .sbar { font-family:'VT323',monospace; font-size:12px; color:rgba(0,220,80,0.65); letter-spacing:.04em; }
+    .sbar-rec { font-family:'VT323',monospace; font-size:12px; color:rgba(255,50,50,.85); display:flex; align-items:center; gap:4px; }
+    .sbar-rec::before { content:''; width:4px; height:4px; border-radius:50%; background:#ff3232; animation:blink 1s step-end infinite; }
+
+    /* ═══ GRELHA 3×3 — 9 câmeras ═══ */
+    .cctv-grid {
+      position: absolute; inset: 20px 0 0 0;
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      grid-template-rows: repeat(3,1fr);
+      gap: 1px; background: #000; z-index: 1;
+    }
+
+    /* ═══ CÉLULA ═══ */
+    .cam-cell {
+      position: relative; overflow: hidden; cursor: crosshair;
+    }
+    /* Scan por câmera */
+    .cam-cell::after {
+      content:''; position:absolute; left:0; right:0; height:2px;
+      background:linear-gradient(90deg,transparent,rgba(0,255,80,.05),transparent);
+      animation:camScan 3s linear infinite; pointer-events:none; z-index:9;
+    }
+    .cam-cell:nth-child(1)::after{animation-delay:0s}
+    .cam-cell:nth-child(2)::after{animation-delay:.38s}
+    .cam-cell:nth-child(3)::after{animation-delay:.76s}
+    .cam-cell:nth-child(4)::after{animation-delay:1.14s}
+    .cam-cell:nth-child(5)::after{animation-delay:1.52s}
+    .cam-cell:nth-child(6)::after{animation-delay:1.9s}
+    .cam-cell:nth-child(7)::after{animation-delay:2.28s}
+    .cam-cell:nth-child(8)::after{animation-delay:2.66s}
+    .cam-cell:nth-child(9)::after{animation-delay:3.04s}
+    @keyframes camScan{0%{top:0%;opacity:0}5%{opacity:1}95%{opacity:.3}100%{top:100%;opacity:0}}
+
+    /* Canvas de fundo */
+    .cam-canvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
+
+    /* Vinheta por câmera */
+    .cam-vig { position:absolute;inset:0;background:radial-gradient(ellipse 80% 80% at 50% 50%,transparent 30%,rgba(0,0,0,.65) 100%);pointer-events:none;z-index:7; }
+
+    /* HUD */
+    .cam-hud { position:absolute;inset:0;z-index:8;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:4px 6px; }
+    .cam-hud-top { display:flex;justify-content:space-between;align-items:flex-start; }
+    .cam-id { font-family:'VT323',monospace;font-size:14px;color:rgba(0,255,80,.85);text-shadow:0 0 4px rgba(0,255,80,.4);line-height:1.3; }
+    .cam-rec { font-family:'VT323',monospace;font-size:13px;color:rgba(255,50,50,.9);display:flex;align-items:center;gap:3px; }
+    .cam-rec::before { content:'';width:5px;height:5px;border-radius:50%;background:#ff3232;animation:blink 1.2s step-end infinite; }
+    .cam-hud-bot { display:flex;justify-content:space-between;align-items:flex-end; }
+    .cam-zone-name { font-family:'VT323',monospace;font-size:17px;color:rgba(240,255,240,.92);text-transform:uppercase;letter-spacing:.05em; }
+    .cam-ts { font-family:'VT323',monospace;font-size:13px;color:rgba(0,255,80,.6); }
+
+    /* ACCESS overlay */
+    .cam-access {
+      position:absolute;inset:0;background:rgba(0,0,0,0);
+      display:flex;align-items:center;justify-content:center;
+      opacity:0;transition:opacity .2s ease;z-index:10;pointer-events:none;
+    }
+    .cam-cell:hover .cam-access { opacity:1; }
+    .cam-access::before { content:'';position:absolute;inset:0;border:1px solid rgba(0,255,80,.25); }
+    .cam-access::after { content:'';position:absolute;top:3px;left:3px;width:10px;height:10px;border-top:1px solid rgba(0,255,80,.6);border-left:1px solid rgba(0,255,80,.6); }
+    .cam-access-text { font-family:'VT323',monospace;font-size:12px;color:rgba(0,255,80,.9);letter-spacing:.15em;text-transform:uppercase;text-shadow:0 0 8px rgba(0,255,80,.6);line-height:1.4;text-align:center; }
+    .cam-corner-br { position:absolute;bottom:3px;right:3px;width:10px;height:10px;border-bottom:1px solid rgba(0,255,80,.6);border-right:1px solid rgba(0,255,80,.6);pointer-events:none; }
+
+    /* Glitch */
+    .cam-cell.glitching .cam-canvas { animation:cellGlitch .12s steps(2) 3; }
+    @keyframes cellGlitch{0%{transform:translateX(0);filter:none}33%{transform:translateX(-2px) skewX(1deg);filter:hue-rotate(90deg) brightness(1.4)}66%{transform:translateX(2px) skewX(-1deg);filter:hue-rotate(-90deg)}100%{transform:translateX(0);filter:none}}
+
+    /* ═══ BASE MONITOR ═══ */
+    .monitor-base {
+      background: linear-gradient(180deg,#2a2a32 0%,#1e1e26 40%,#16161e 100%);
+      height: 48px;
+      border-radius: 0 0 10px 10px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px;
+      border-top: 1px solid rgba(0,0,0,0.5);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.06),
+        0 0 0 3px rgba(0,0,0,0.35),
+        0 8px 28px rgba(0,0,0,0.5);
+      position: relative;
+      overflow: hidden;
+    }
+    /* Reflexo subtil no topo da base */
+    .monitor-base::before {
+      content:'';
+      position:absolute;
+      top:0;left:10%;right:10%;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent);
+    }
+    /* Grupo esquerdo — LEDs de status */
+    .monitor-base__left {
+      display:flex; align-items:center; gap:10px;
+    }
+    /* Grupo central — brand */
+    .monitor-base__center {
+      position:absolute; left:50%; transform:translateX(-50%);
+      display:flex; flex-direction:column; align-items:center; gap:1px;
+    }
+    /* Grupo direito — botão power */
+    .monitor-base__right {
+      display:flex; align-items:center; gap:10px;
+    }
+    .monitor-led {
+      width:7px; height:7px;
+      border-radius:50%;
+      background:rgba(0,200,60,.9);
+      box-shadow:0 0 8px rgba(0,200,60,.7), 0 0 2px rgba(0,200,60,1);
+      animation:blink 3s ease-in-out infinite;
+      flex-shrink:0;
+    }
+    .monitor-led-label {
+      font-family:'VT323',monospace;
+      font-size:10px;
+      color:rgba(255,255,255,0.2);
+      letter-spacing:0.12em;
+      text-transform:uppercase;
+    }
+    .monitor-brand {
+      font-family:'VT323',monospace;
+      font-size:13px;
+      color:rgba(255,255,255,0.28);
+      letter-spacing:.22em;
+      text-transform:uppercase;
+    }
+    .monitor-brand-sub {
+      font-family:'VT323',monospace;
+      font-size:9px;
+      color:rgba(255,255,255,0.1);
+      letter-spacing:.3em;
+      text-transform:uppercase;
+    }
+    /* Botão de power — estilo industrial escuro */
+    .monitor-power-btn {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(145deg,#2e2e3a,#1a1a22);
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow:
+        0 2px 6px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        inset 0 -1px 0 rgba(0,0,0,0.4);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: box-shadow 0.15s, transform 0.1s;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .monitor-power-btn:hover {
+      box-shadow:
+        0 0 10px rgba(255,50,50,0.45),
+        0 2px 6px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      border-color: rgba(255,60,60,0.4);
+    }
+    .monitor-power-btn:active {
+      transform: scale(0.9);
+      box-shadow: 0 0 4px rgba(255,50,50,0.3), inset 0 2px 4px rgba(0,0,0,0.5);
+    }
+    /* Ícone ⏻ desenhado em CSS */
+    .monitor-power-btn::before {
+      content: '';
+      width: 10px; height: 10px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-radius: 50%;
+      border-top-color: transparent;
+      position: absolute;
+    }
+    .monitor-power-btn::after {
+      content: '';
+      width: 2px; height: 7px;
+      background: rgba(255,255,255,0.35);
+      border-radius: 1px;
+      position: absolute;
+      top: 4px;
+    }
+    .monitor-stand-neck { margin:0 auto;width:80px;height:18px;background:linear-gradient(180deg,#1a1a22,#141418);border-radius:0 0 4px 4px; box-shadow: inset 0 -1px 0 rgba(0,0,0,0.5); }
+    .monitor-stand-foot { margin:0 auto;width:220px;height:14px;background:linear-gradient(180deg,#141418,#0e0e12);border-radius:0 0 12px 12px;box-shadow:0 6px 20px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.04); }
+
+    /* ── TV-OFF overlay ── */
+    #tvOff {
+      position: absolute;
+      inset: 0;
+      z-index: 200;
+      pointer-events: none;
+      border-radius: 8px 8px 0 0;
+      overflow: hidden;
+      display: none;
+    }
+    #tvOff.active { display: block; }
+    #tvOff canvas { position:absolute;inset:0;width:100%;height:100%; }
+
+    /* ═══ OVERLAY DE ACESSO ═══ */
+    .access-overlay {
+      position:absolute;inset:0;background:rgba(0,0,0,0);
+      z-index:100;display:none;align-items:center;justify-content:center;
+      flex-direction:column;border-radius:8px 8px 0 0;
+    }
+    .access-overlay.active { display:flex; }
+    .access-terminal {
+      font-family:'VT323',monospace;font-size:16px;
+      color:rgba(0,255,80,.9);text-shadow:0 0 8px rgba(0,255,80,.4);
+      line-height:1.6;letter-spacing:.04em;text-align:left;min-width:280px;padding:0 20px;
+    }
+    .access-line { display:block;opacity:0;transform:translateY(4px);white-space:nowrap;overflow:hidden; }
+    .access-line.show { animation:accessIn .12s ease forwards; }
+    @keyframes accessIn { to{opacity:1;transform:translateY(0)} }
+    .access-cursor { display:inline-block;width:8px;height:14px;background:rgba(0,255,80,.9);animation:blink .5s step-end infinite;vertical-align:middle;margin-left:2px; }
+
+    /* ═══ CÂMERA EXPANDIDA ═══ */
+    .cam-expanded {
+      position:fixed; z-index:600; background:#000; overflow:hidden;
+      pointer-events:none; display:none;
+    }
+    .cam-expanded::before {
+      content:''; position:absolute; inset:0;
+      background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.1) 3px,rgba(0,0,0,.1) 6px);
+      pointer-events:none; z-index:10;
+    }
+    .cam-expanded::after {
+      content:''; position:absolute; left:0; right:0; height:4px;
+      background:linear-gradient(90deg,transparent,rgba(0,255,80,.06),transparent);
+      animation:camScan 8s linear infinite; pointer-events:none; z-index:11;
+    }
+    .cam-expanded.open { display:block; pointer-events:all; inset:0; top:0!important; left:0!important; width:100vw!important; height:100vh!important; }
+    .expanded-canvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
+    .expanded-vig { position:absolute;inset:0;background:radial-gradient(ellipse 100% 100% at 50% 50%,transparent 25%,rgba(0,0,0,.6) 100%);z-index:5;pointer-events:none; }
+    .expanded-hud-top {
+      position:absolute;top:0;left:0;right:0;height:40px;
+      background:rgba(0,0,0,.6);border-bottom:1px solid rgba(0,255,80,.12);
+      display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:20;
+      pointer-events:all;
+    }
+    .expanded-hud-top.ui-ready { pointer-events:all; }
+    .exp-left { display:flex;align-items:center;gap:16px; }
+    .exp-rec { font-family:'VT323',monospace;font-size:18px;color:rgba(255,50,50,.9);display:flex;align-items:center;gap:6px; }
+    .exp-rec::before { content:'';width:7px;height:7px;border-radius:50%;background:#ff3232;animation:blink 1s step-end infinite; }
+    .exp-cam-id { font-family:'VT323',monospace;font-size:18px;color:rgba(0,255,80,.7);letter-spacing:.08em; }
+    .exp-ts { font-family:'VT323',monospace;font-size:15px;color:rgba(0,255,80,.45); }
+    .exp-close { font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;background:none;border:1px solid rgba(255,255,255,.12);color:rgba(200,210,200,.5);padding:5px 14px;cursor:pointer;transition:all .2s; }
+    .exp-close:hover { border-color:rgba(0,255,80,.4);color:rgba(0,255,80,.8); }
+
+    /* Botão VOLTAR — flutua no canto superior esquerdo sobre o canvas animado */
+    .exp-back {
+      position:absolute;
+      top:78px; left:20px;
+      z-index:25;
+      font-family:'Share Tech Mono',monospace;
+      font-size:.58rem;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      background:rgba(0,0,0,.55);
+      border:1px solid rgba(0,255,80,.3);
+      color:rgba(0,255,80,.75);
+      padding:7px 16px;
+      cursor:pointer;
+      transition:all .25s;
+      backdrop-filter:blur(4px);
+      pointer-events:all;
+    }
+    .exp-back:hover {
+      background:rgba(0,255,80,.08);
+      border-color:rgba(0,255,80,.7);
+      color:rgba(0,255,80,1);
+      box-shadow:0 0 12px rgba(0,255,80,.15);
+    }
+    .exp-back::before { content:''; display:inline-block; width:6px; height:6px; border-top:1px solid currentColor; border-left:1px solid currentColor; transform:rotate(-45deg) translateY(1px); margin-right:8px; vertical-align:middle; }
+    .expanded-info {
+      position:absolute;top:40px;right:0;bottom:0;width:360px;
+      background:rgba(4,10,4,.93);border-left:1px solid rgba(0,255,80,.1);
+      padding:24px 20px;overflow-y:auto;z-index:15;
+      display:flex;flex-direction:column;gap:18px;
+      transform:translateX(100%);opacity:0;
+      transition:transform .45s cubic-bezier(.16,1,.3,1),opacity .3s ease;
+    }
+    .expanded-info::before { content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);pointer-events:none;z-index:-1; }
+    .expanded-info.slide-in { transform:translateX(0);opacity:1; }
+    .il { font-family:'VT323',monospace;font-size:13px;color:rgba(0,255,80,.35);letter-spacing:.25em;text-transform:uppercase;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid rgba(0,255,80,.07); }
+    .i-tag { display:inline-flex;align-items:center;gap:7px;padding:4px 11px;border:1px solid;font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;border-radius:2px;font-family:'Share Tech Mono',monospace; }
+    .i-dot { width:5px;height:5px;border-radius:50%;animation:blink 1.5s infinite; }
+    .i-name { font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(1.1rem,2.5vw,1.7rem);line-height:1.1; }
+    .i-desc { font-size:.71rem;line-height:1.9;color:rgba(200,220,200,.42);font-family:'Share Tech Mono',monospace; }
+    .i-stats { display:flex;flex-wrap:wrap;gap:5px; }
+    .i-stat { padding:3px 9px;font-size:.52rem;letter-spacing:.12em;text-transform:uppercase;border:1px solid rgba(255,255,255,.07);border-radius:2px;color:rgba(180,200,180,.38);font-family:'Share Tech Mono',monospace; }
+    .i-creatures { display:flex;flex-wrap:wrap;gap:7px; }
+    .i-creature { width:62px;padding:9px 6px;text-align:center;border:1px solid rgba(255,255,255,.06);border-radius:2px;background:rgba(0,0,0,.3);transition:border-color .2s; }
+    .i-creature:hover { border-color:rgba(0,255,80,.2); }
+    .i-ci { font-size:1.3rem;display:block;margin-bottom:4px; }
+    .i-cn { font-size:.45rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(150,180,150,.48);font-family:'Share Tech Mono',monospace; }
+
+    @media(max-width:900px){
+      .cctv-grid{grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);}
+      .expanded-info{width:260px;}
+    }
+    @media(max-width:600px){
+      .monitor-wrap{padding:12px 12px 0;}
+      .expanded-info{width:100%;top:auto;bottom:0;height:50vh;border-left:none;border-top:1px solid rgba(0,255,80,.1);transform:translateY(100%);}
+      .expanded-info.slide-in{transform:translateY(0);}
+    }
+  </style>
 </head>
 <body>
 
-  <!-- ── NAVBAR ── -->
   <nav class="navbar">
     <a href="../index.html" class="navbar__logo">PATO <span>//</span> FRADELOS</a>
     <ul class="navbar__links">
@@ -23,316 +658,1880 @@
       <li><a href="video.html">Vídeo</a></li>
       <li><a href="team.html">Equipa</a></li>
     </ul>
-    <button class="navbar__hamburger" aria-label="Abrir menu">
-      <span></span><span></span><span></span>
-    </button>
+    <button class="navbar__hamburger" aria-label="Abrir menu"><span></span><span></span><span></span></button>
   </nav>
   <div class="navbar__mobile-menu">
-    <a href="../index.html">Início</a>
-    <a href="maps.html" class="active">Mapas</a>
-    <a href="entities.html">Entidades</a>
-    <a href="skills.html">Skills</a>
-    <a href="lore.html">Lore</a>
-    <a href="video.html">Vídeo</a>
-    <a href="team.html">Equipa</a>
+    <a href="../index.html">Início</a><a href="maps.html" class="active">Mapas</a>
+    <a href="entities.html">Entidades</a><a href="skills.html">Skills</a>
+    <a href="lore.html">Lore</a><a href="video.html">Vídeo</a><a href="team.html">Equipa</a>
   </div>
 
-  <div class="page-content">
-    <div class="inner-page">
+  <div class="maps-page">
 
-      <!-- ── CABEÇALHO ── -->
-      <header class="page-header">
-        <div class="page-header__eyebrow">Instalação ORBIS // Zonas Conhecidas</div>
-        <h1 class="page-header__title">Mapas</h1>
-        <p class="page-header__desc">Atmosfera e características de cada zona da instalação. Selecciona uma zona para explorar.</p>
-      </header>
+    <!-- ── PAGE HEADER ── -->
+    <div class="maps-header">
+      <div class="maps-header__left">
+        <div class="maps-header__eyebrow">ORBIS-CCTV // SISTEMA DE VIGILÂNCIA</div>
+        <h1 class="maps-header__title">Monitor de Câmeras</h1>
+      </div>
+      <div class="maps-header__right">
+        <div class="maps-header__status">
+          <span class="maps-status-dot"></span>
+          <span>9 CÂMERAS ACTIVAS</span>
+        </div>
+        <div class="maps-header__hint">
+          <span class="hint-icon">⬛</span>
+          <span>Clica numa câmera para aceder</span>
+        </div>
+      </div>
+    </div>
 
-      <!-- ── TABS DE ZONA (sticky, atualizam com scroll) ── -->
-      <div class="map-tabs-sticky">
-        <div class="map-tabs">
-          <button class="map-tab active" data-target="map-aquarium">Aquário</button>
-          <button class="map-tab" data-target="map-depths">Depths</button>
-          <button class="map-tab" data-target="map-nature">Natureza</button>
-          <button class="map-tab" data-target="map-mines">Minas</button>
-          <button class="map-tab" data-target="map-facility">Facility</button>
-          <button class="map-tab" data-target="map-lab">Laboratório</button>
-          <button class="map-tab" data-target="map-corridor">Corredor</button>
-          <button class="map-tab" data-target="map-geysers">Geysers</button>
-          <button class="map-tab" data-target="map-transport">Transporte</button>
-          <button class="map-tab" data-target="map-wind">Vento</button>
+    <!-- ── DECORATIVE SIDE PANELS ── -->
+    <div class="maps-surround">
+      <!-- Left panel -->
+      <div class="maps-side maps-side--left">
+        <div class="side-label">SYS</div>
+        <div class="side-bar-group">
+          <div class="side-bar-row"><span class="side-bar-name">VIDEO</span><div class="side-bar-fill" style="--w:92%"></div></div>
+          <div class="side-bar-row"><span class="side-bar-name">AUDIO</span><div class="side-bar-fill" style="--w:68%"></div></div>
+          <div class="side-bar-row"><span class="side-bar-name">NET</span><div class="side-bar-fill" style="--w:77%"></div></div>
+          <div class="side-bar-row"><span class="side-bar-name">STOR</span><div class="side-bar-fill" style="--w:84%"></div></div>
+        </div>
+        <div class="side-divider"></div>
+        <div class="side-stat-list">
+          <div class="side-stat"><span class="side-stat-dot ok"></span>POWER STABLE</div>
+          <div class="side-stat"><span class="side-stat-dot ok"></span>ENCRYPTION ON</div>
+          <div class="side-stat"><span class="side-stat-dot warn"></span>FLOOR B?? SIGNAL</div>
+          <div class="side-stat"><span class="side-stat-dot ok"></span>BACKUP ACTIVE</div>
+        </div>
+        <div class="side-divider"></div>
+        <div class="side-coords">
+          LAT 41.5°N<br>LON 8.3°W<br>ALT -340m
         </div>
       </div>
 
-      <!-- ══════════ AQUÁRIO ══════════ -->
-      <div class="map-panel" id="map-aquarium">
-        <div class="atmosphere-container atm-aquarium">
-          <div class="atm-aquarium__bg"></div>
-          <div class="atm-aquarium__grid"></div>
-          <div class="map-info">
-            <div class="map-info__tag" style="border-color:rgba(77,217,217,0.2);color:rgba(77,217,217,0.6);">
-              <span style="width:5px;height:5px;border-radius:50%;background:#4dd9d9;display:inline-block;"></span>
-              Zona Controlada — Piso B2
+      <div class="monitor-wrap">
+        <div class="monitor">
+          <div class="monitor-screen" id="monitorScreen">
+          <div class="crt-scanlines"></div>
+          <div class="crt-glare"></div>
+          <div class="crt-vignette"></div>
+          <div class="crt-flicker"></div>
+          <div class="screen-statusbar">
+            <div style="display:flex;gap:12px;align-items:center;">
+              <span class="sbar">ORBIS-CCTV v2.1</span>
+              <span class="sbar">9 CAM ONLINE</span>
             </div>
-            <h2 class="map-info__title" style="color:#4dd9d9;text-shadow:0 0 40px rgba(77,217,217,0.4);">The Aquarium</h2>
-            <p class="map-info__desc">Câmara de observação principal. Construída pelos cientistas para estudar as criaturas afectadas pela matéria negra num ambiente controlado e iluminado. O vidro mantém tudo separado. A luz mantém tudo visível. O Observer mantém tudo vigiado.</p>
-            <div class="map-stats">
-              <span class="map-stat">Iluminação Artificial</span>
-              <span class="map-stat">Câmeras Activas</span>
-              <span class="map-stat">Ambiente Contido</span>
-              <span class="map-stat">Matéria Negra Estabilizada</span>
+            <div style="display:flex;gap:12px;align-items:center;">
+              <span class="sbar" id="clockDisplay">--:--:--</span>
+              <span class="sbar-rec">REC</span>
             </div>
-            <div class="zone-creatures">
-              <div class="zone-creature"><span class="zone-creature__icon">🪼</span><span class="zone-creature__name">Medusa</span></div>
-              <div class="zone-creature"><span class="zone-creature__icon">🐟</span><span class="zone-creature__name">Anglerfish</span></div>
-              <div class="zone-creature"><span class="zone-creature__icon">🌿</span><span class="zone-creature__name">Glowvine</span></div>
-              <div class="zone-creature"><span class="zone-creature__icon">👁️</span><span class="zone-creature__name">Observer</span></div>
+          </div>
+
+          <div class="cctv-grid" id="cctvGrid">
+            <!-- 9 cams: Western Mountains, Mining Site, Energy Facility, BM Research Lab, The Aquarium, Transportation Warehouse, The Abyss, Underground Caves, Windy Mountains -->
+
+            <div class="cam-cell" data-zone="nature">
+              <canvas class="cam-canvas"></canvas><div class="cam-vig"></div>
+              <div class="cam-hud"><div class="cam-hud-top"><div class="cam-id">CAM-01<br>EXT-W</div><div class="cam-rec">REC</div></div><div class="cam-hud-bot"><div class="cam-zone-name">W. Mountains</div><div class="cam-ts" data-clock></div></div></div>
+              <div class="cam-access"><div class="cam-access-text">ACCESS CAMERA<br>&gt; CAM-01_EXT</div><div class="cam-corner-br"></div></div>
             </div>
+
+            <div class="cam-cell" data-zone="mines">
+              <canvas class="cam-canvas"></canvas><div class="cam-vig"></div>
+              <div class="cam-hud"><div class="cam-hud-top"><div class="cam-id">CAM-02<br>B4</div><div class="cam-rec">REC</div></div><div class="cam-hud-bot"><div class="cam-zone-name">Mining Site</div><div class="cam-ts" data-clock></div></div></div>
+              <div class="cam-access"><div class="cam-access-text">ACCESS CAMERA<br>&gt; CAM-02_B4</div><div class="cam-corner-br"></div></div>
+            </div>
+
+            <div class="cam-cell" data-zone="facility">
+              <canvas class="cam-canvas"></canvas><div class="cam-vig"></div>
+              <div class="cam-hud"><div class="cam-hud-top"><div class="cam-id">CAM-03<br>B1</div><div class="cam-rec">REC</div></div><div class="cam-hud-bot"><div class="cam-zone-name">Energy Facility</div><div class="cam-ts" data-clock></div></div></div>
+              <div class="cam-access"><div class="cam-access-text">ACCESS CAMERA<br>&gt; CAM-03_B1</div><div class="cam-corner-br"></div></div>
+            </div>
+
+            <div class="cam-cell" data-zone="lab">
+              <canvas class="cam-canvas"></canvas><div class="cam-vig"></div>
+              <div class="cam-hud"><div class="cam-hud-top"><div class="cam-id">CAM-04<br>B3</div><div class="cam-rec">REC</div></div><div class="cam-hud-bot"><div class="cam-zone-name">BM Research Lab</div><div class="cam-ts" data-clock></div></div></div>
+              <div class="cam-access"><div class="cam-access-text">ACCESS CAMERA<br>&gt; CAM-04_B3</div><div class="cam-corner-br"></div></div>
+            </div>
+
+            <div class="cam-cell" data-zone="aquarium">
+              <canvas class="cam-canvas"></canvas><div class="cam-vig"></div>
+              <div class="cam-hud"><div class="cam-hud-top"><div class="cam-id">CAM-05<br>B2</div><div class="cam-rec">REC</div></div><div class="cam-hud-bot"><div class="cam-zone-name">The Aquarium</div><div class="cam-ts" data-clock></div></div></div>
+              <div class="cam-access"><div class="cam-access-text">ACCESS CAMERA<br>&gt; CAM-05_B2</div><div class="cam-corner-br"></div></div>
+            </div>
+
+            <div class="cam-cell" data-zone="transport">
+              <canvas class="cam-canvas"></canvas><div class="cam-vig"></div>
+              <div class="cam-hud"><div class="cam-hud-top"><div class="cam-id">CAM-06<br>B1/B4</div><div class="cam-rec">REC</div></div><div class="cam-hud-bot"><div class="cam-zone-name">Transport. Whse</div><div class="cam-ts" data-clock></div></div></div>
+              <div class="cam-access"><div class="cam-access-text">ACCESS CAMERA<br>&gt; CAM-06_B14</div><div class="cam-corner-br"></div></div>
+            </div>
+
+            <div class="cam-cell" data-zone="depths">
+              <canvas class="cam-canvas"></canvas><div class="cam-vig"></div>
+              <div class="cam-hud"><div class="cam-hud-top"><div class="cam-id">CAM-07<br>B??</div><div class="cam-rec">REC</div></div><div class="cam-hud-bot"><div class="cam-zone-name">The Depths</div><div class="cam-ts" data-clock></div></div></div>
+              <div class="cam-access"><div class="cam-access-text">ACCESS CAMERA<br>&gt; CAM-07_B??</div><div class="cam-corner-br"></div></div>
+            </div>
+
+            <div class="cam-cell" data-zone="geysers">
+              <canvas class="cam-canvas"></canvas><div class="cam-vig"></div>
+              <div class="cam-hud"><div class="cam-hud-top"><div class="cam-id">CAM-08<br>B5</div><div class="cam-rec">REC</div></div><div class="cam-hud-bot"><div class="cam-zone-name">Underground Caves</div><div class="cam-ts" data-clock></div></div></div>
+              <div class="cam-access"><div class="cam-access-text">ACCESS CAMERA<br>&gt; CAM-08_B5</div><div class="cam-corner-br"></div></div>
+            </div>
+
+            <div class="cam-cell" data-zone="wind">
+              <canvas class="cam-canvas"></canvas><div class="cam-vig"></div>
+              <div class="cam-hud"><div class="cam-hud-top"><div class="cam-id">CAM-09<br>EXT-E</div><div class="cam-rec">REC</div></div><div class="cam-hud-bot"><div class="cam-zone-name">Windy Mountains</div><div class="cam-ts" data-clock></div></div></div>
+              <div class="cam-access"><div class="cam-access-text">ACCESS CAMERA<br>&gt; CAM-09_EXT</div><div class="cam-corner-br"></div></div>
+            </div>
+
+          </div><!-- fim grid -->
+
+          <div class="access-overlay" id="accessOverlay"></div>
+          <div id="tvOff"><canvas id="tvOffCanvas"></canvas></div>
+        </div><!-- fim screen -->
+        <div class="monitor-base">
+          <div class="monitor-base__left">
+            <div class="monitor-led"></div>
+            <span class="monitor-led-label">PWR</span>
+            <div class="monitor-led" style="animation-delay:1.5s;background:rgba(255,180,0,.9);box-shadow:0 0 8px rgba(255,180,0,.7), 0 0 2px rgba(255,180,0,1);"></div>
+            <span class="monitor-led-label">REC</span>
+          </div>
+          <div class="monitor-base__center">
+            <div class="monitor-brand">ORBIS-7</div>
+            <div class="monitor-brand-sub">CCTV SYSTEM</div>
+          </div>
+          <div class="monitor-base__right">
+            <button class="monitor-power-btn" id="monitorPowerBtn" title="Power"></button>
           </div>
         </div>
       </div>
+      <div class="monitor-stand-neck"></div>
+      <div class="monitor-stand-foot"></div>
+    </div><!-- end monitor-wrap -->
 
-      <!-- ══════════ DEPTHS ══════════ -->
-      <div class="map-panel" id="map-depths">
-        <div class="atmosphere-container atm-depths">
-          <div class="atm-depths__bg"></div>
-          <div class="depths-eye"><div class="depths-eye__iris"></div></div>
-          <div class="black-water"><div class="black-water__surface"></div></div>
-          <div class="map-info">
-            <div class="map-info__tag" style="border-color:rgba(255,26,74,0.2);color:rgba(255,80,100,0.6);animation:dangerBlink 3s ease-in-out infinite;">
-              <span style="width:5px;height:5px;border-radius:50%;background:#ff1a4a;display:inline-block;animation:blink 1s infinite;"></span>
-              Zona Não Documentada — Acesso Restrito
-            </div>
-            <h2 class="map-info__title" style="color:#ddd;text-shadow:0 0 40px rgba(139,47,201,0.35);">Depths Chamber</h2>
-            <p class="map-info__desc">Ninguém sabe ao certo o que existe aqui. Os cientistas chegaram até à entrada e pararam. O chão é água negra. A escuridão não é vazia, ela pulsa. E algures lá dentro, algo que não devia existir está a observar de volta.</p>
-            <div class="map-stats">
-              <span class="map-stat">Luz Mínima</span>
-              <span class="map-stat">Água Negra</span>
-              <span class="map-stat">Entidades Não Catalogadas</span>
-              <span class="map-stat">Pulso Activo</span>
-            </div>
-            <div class="zone-creatures">
-              <div class="zone-creature"><span class="zone-creature__icon">🕷️</span><span class="zone-creature__name">Lurker</span></div>
-              <div class="zone-creature"><span class="zone-creature__icon">🌫️</span><span class="zone-creature__name">Shadow Wisp</span></div>
-              <div class="zone-creature"><span class="zone-creature__icon">👁️</span><span class="zone-creature__name">Ent. Secreta</span></div>
-              <div class="zone-creature"><span class="zone-creature__icon">🌑</span><span class="zone-creature__name">The Shadow</span></div>
-            </div>
-          </div>
+      <!-- Right panel -->
+      <div class="maps-side maps-side--right">
+        <div class="side-label">CAM</div>
+        <div class="side-cam-list">
+          <div class="side-cam-item"><span class="side-cam-num">01</span><span class="side-cam-name">W. Mountains</span><span class="side-cam-dot ok"></span></div>
+          <div class="side-cam-item"><span class="side-cam-num">02</span><span class="side-cam-name">Mining Site</span><span class="side-cam-dot ok"></span></div>
+          <div class="side-cam-item"><span class="side-cam-num">03</span><span class="side-cam-name">Energy Facility</span><span class="side-cam-dot ok"></span></div>
+          <div class="side-cam-item"><span class="side-cam-num">04</span><span class="side-cam-name">BM Research Lab</span><span class="side-cam-dot ok"></span></div>
+          <div class="side-cam-item"><span class="side-cam-num">05</span><span class="side-cam-name">The Aquarium</span><span class="side-cam-dot ok"></span></div>
+          <div class="side-cam-item"><span class="side-cam-num">06</span><span class="side-cam-name">Transport. Whse</span><span class="side-cam-dot ok"></span></div>
+          <div class="side-cam-item"><span class="side-cam-num">07</span><span class="side-cam-name">The Depths</span><span class="side-cam-dot warn"></span></div>
+          <div class="side-cam-item"><span class="side-cam-num">08</span><span class="side-cam-name">Underground Caves</span><span class="side-cam-dot ok"></span></div>
+          <div class="side-cam-item"><span class="side-cam-num">09</span><span class="side-cam-name">Windy Mountains</span><span class="side-cam-dot ok"></span></div>
+        </div>
+        <div class="side-divider"></div>
+        <div class="side-stat-list">
+          <div class="side-stat"><span class="side-stat-dot ok"></span>MOTION: CAM-07</div>
+          <div class="side-stat"><span class="side-stat-dot warn"></span>SIGNAL LOSS: B??</div>
+          <div class="side-stat"><span class="side-stat-dot ok"></span>REC: ALL CAMS</div>
         </div>
       </div>
 
-      <!-- ══════════ NATUREZA ══════════ -->
-      <div class="map-panel" id="map-nature">
-        <div class="atmosphere-container atm-nature">
-          <div class="atm-nature__bg"></div>
-          <div class="map-info">
-            <div class="map-info__tag" style="border-color:rgba(100,220,80,0.2);color:rgba(100,220,80,0.6);">
-              <span style="width:5px;height:5px;border-radius:50%;background:#64dc50;display:inline-block;animation:blink 2.5s infinite;"></span>
-              Zona Exterior — Ilha de Fradelos
-            </div>
-            <h2 class="map-info__title" style="color:#9dff6a;text-shadow:0 0 40px rgba(100,220,80,0.3);">Natureza</h2>
-            <p class="map-info__desc">A superfície da ilha antes de qualquer intervenção humana. A vegetação cresceu em torno da matéria negra durante décadas, adaptando-se a ela. As Glowvines florescem aqui em abundância. O som é diferente — abafado, como se a ilha absorvesse o ruído.</p>
-            <div class="map-stats">
-              <span class="map-stat">Luz Natural</span>
-              <span class="map-stat">Glowvines Abundantes</span>
-              <span class="map-stat">Matéria Negra Difusa</span>
-              <span class="map-stat">Terreno Irregular</span>
-            </div>
-            <div class="zone-creatures">
-              <div class="zone-creature"><span class="zone-creature__icon">🌿</span><span class="zone-creature__name">Glowvine</span></div>
-              <div class="zone-creature"><span class="zone-creature__icon">🦎</span><span class="zone-creature__name">Camaleão</span></div>
-              <div class="zone-creature"><span class="zone-creature__icon">🕷️</span><span class="zone-creature__name">Lurker</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
+    </div><!-- end maps-surround -->
 
-      <!-- ══════════ MINAS ══════════ -->
-      <div class="map-panel" id="map-mines">
-        <div class="atmosphere-container atm-mines">
-          <div class="atm-mines__bg"></div>
-          <div class="map-info">
-            <div class="map-info__tag" style="border-color:rgba(180,140,80,0.2);color:rgba(180,140,80,0.6);">
-              <span style="width:5px;height:5px;border-radius:50%;background:#b48c50;display:inline-block;animation:blink 1.8s infinite;"></span>
-              Zona Subterrânea — Piso B4
-            </div>
-            <h2 class="map-info__title" style="color:#d4a853;text-shadow:0 0 40px rgba(180,140,80,0.3);">Minas</h2>
-            <p class="map-info__desc">Túneis escavados nos primeiros anos da expedição para aceder aos depósitos de matéria negra em estado sólido. O ar é denso, a rocha absorve som. Alguns túneis foram selados depois do Incidente do Piso 3. Outros simplesmente desapareceram.</p>
-            <div class="map-stats">
-              <span class="map-stat">Ar Denso</span>
-              <span class="map-stat">Rocha Saturada</span>
-              <span class="map-stat">Túneis Selados</span>
-              <span class="map-stat">Matéria Negra Sólida</span>
-            </div>
-            <div class="zone-creatures">
-              <div class="zone-creature"><span class="zone-creature__icon">🕷️</span><span class="zone-creature__name">Lurker</span></div>
-              <div class="zone-creature"><span class="zone-creature__icon">🌑</span><span class="zone-creature__name">The Shadow</span></div>
-              <div class="zone-creature"><span class="zone-creature__icon">🌿</span><span class="zone-creature__name">Glowvine</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <!-- ── BOTTOM STATUS BAR ── -->
+    <div class="maps-bottom-bar">
+      <span class="maps-bottom-item">ORBIS-CCTV v2.1</span>
+      <span class="maps-bottom-sep">|</span>
+      <span class="maps-bottom-item">INSTALAÇÃO SUBTERRÂNEA — PISO B1 ATÉ B??</span>
+      <span class="maps-bottom-sep">|</span>
+      <span class="maps-bottom-item">ACESSO RESTRITO // NÍVEL 4</span>
+      <span class="maps-bottom-sep">|</span>
+      <span class="maps-bottom-item" id="bottomClock">--:--:--</span>
+    </div>
 
-      <!-- ══════════ FACILITY ══════════ -->
-      <div class="map-panel" id="map-facility">
-        <div class="atmosphere-container atm-facility">
-          <div class="atm-facility__bg"></div>
-          <div class="atm-facility__grid"></div>
-          <div class="map-info">
-            <div class="map-info__tag" style="border-color:rgba(0,180,255,0.2);color:rgba(0,180,255,0.6);">
-              <span style="width:5px;height:5px;border-radius:50%;background:#00b4ff;display:inline-block;animation:blink 2s infinite;"></span>
-              Instalação Principal — Piso B1
-            </div>
-            <h2 class="map-info__title" style="color:#66ccff;text-shadow:0 0 40px rgba(0,180,255,0.3);">The Facility</h2>
-            <p class="map-info__desc">O coração operacional da instalação ORBIS. Corredores brancos, portas com código, câmeras em cada canto. Tudo foi desenhado para parecer seguro. Tudo foi desenhado para controlar. Metade das portas já não abre. A outra metade não devia abrir.</p>
-            <div class="map-stats">
-              <span class="map-stat">Iluminação Fluorescente</span>
-              <span class="map-stat">Segurança Comprometida</span>
-              <span class="map-stat">Câmeras Parciais</span>
-              <span class="map-stat">Contenção Activa</span>
-            </div>
-            <div class="zone-creatures">
-              <div class="zone-creature"><span class="zone-creature__icon">👁️</span><span class="zone-creature__name">Observer</span></div>
-              <div class="zone-creature"><span class="zone-creature__icon">🦎</span><span class="zone-creature__name">Camaleão</span></div>
-              <div class="zone-creature"><span class="zone-creature__icon">🌫️</span><span class="zone-creature__name">Shadow Wisp</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
+  </div><!-- end maps-page -->
 
-      <!-- ══════════ LABORATÓRIO ══════════ -->
-      <div class="map-panel" id="map-lab">
-        <div class="atmosphere-container atm-lab">
-          <div class="atm-lab__bg"></div>
-          <div class="atm-lab__scan"></div>
-          <div class="map-info">
-            <div class="map-info__tag" style="border-color:rgba(180,60,255,0.2);color:rgba(180,60,255,0.6);">
-              <span style="width:5px;height:5px;border-radius:50%;background:#b43cff;display:inline-block;animation:blink 1.4s infinite;"></span>
-              Zona Classificada — Piso B3
-            </div>
-            <h2 class="map-info__title" style="color:#c880ff;text-shadow:0 0 40px rgba(180,60,255,0.35);">Laboratório</h2>
-            <p class="map-info__desc">Onde tudo começou. Onde o Observer foi construído. Onde a Entidade Secreta foi capturada e estudada. Os equipamentos ainda funcionam — mas ninguém os está a usar. As notas na bancada foram escritas em duas caliografias diferentes. A segunda não é humana.</p>
-            <div class="map-stats">
-              <span class="map-stat">Equipamento Activo</span>
-              <span class="map-stat">Contenção Máxima</span>
-              <span class="map-stat">Radiação de M. Negra</span>
-              <span class="map-stat">Registos Corrompidos</span>
-            </div>
-            <div class="zone-creatures">
-              <div class="zone-creature"><span class="zone-creature__icon">👁️</span><span class="zone-creature__name">Ent. Secreta</span></div>
-              <div class="zone-creature"><span class="zone-creature__icon">👁️</span><span class="zone-creature__name">Observer</span></div>
-              <div class="zone-creature"><span class="zone-creature__icon">🦎</span><span class="zone-creature__name">Camaleão</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <!-- EXPANDED -->
+  <div class="cam-expanded" id="camExpanded">
+    <canvas class="expanded-canvas" id="expandedCanvas"></canvas>
+    <div class="expanded-vig"></div>
 
-      <!-- ══════════ CORREDOR ══════════ -->
-      <div class="map-panel" id="map-corridor">
-        <div class="atmosphere-container atm-corridor">
-          <div class="atm-corridor__bg"></div>
-          <div class="atm-corridor__flicker"></div>
-          <div class="map-info">
-            <div class="map-info__tag" style="border-color:rgba(255,200,50,0.2);color:rgba(255,200,50,0.5);animation:dangerBlink 4s ease-in-out infinite;">
-              <span style="width:5px;height:5px;border-radius:50%;background:#ffc832;display:inline-block;animation:blink 0.8s infinite;"></span>
-              Zona de Transição — Piso B1/B2
-            </div>
-            <h2 class="map-info__title" style="color:#ffe080;text-shadow:0 0 40px rgba(255,200,50,0.25);">Corredor</h2>
-            <p class="map-info__desc">O corredor que liga todas as zonas da instalação. As luzes piscam em intervalos irregulares. Nos momentos de escuridão total, coisas movem-se. Os cientistas aprenderam a não parar aqui. A andar rápido. A não olhar para os lados.</p>
-            <div class="map-stats">
-              <span class="map-stat">Iluminação Instável</span>
-              <span class="map-stat">Alta Circulação</span>
-              <span class="map-stat">Zonas de Sombra</span>
-              <span class="map-stat">Sem Contenção</span>
-            </div>
-            <div class="zone-creatures">
-              <div class="zone-creature"><span class="zone-creature__icon">🌫️</span><span class="zone-creature__name">Shadow Wisp</span></div>
-              <div class="zone-creature"><span class="zone-creature__icon">🦎</span><span class="zone-creature__name">Camaleão</span></div>
-              <div class="zone-creature"><span class="zone-creature__icon">🕷️</span><span class="zone-creature__name">Lurker</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <!-- Botão VOLTAR — flutuante no canto superior esquerdo, sobre o canvas -->
+    <button class="exp-back" id="expBack">VOLTAR AO MONITOR</button>
 
-      <!-- ══════════ GEYSERS ══════════ -->
-      <div class="map-panel" id="map-geysers">
-        <div class="atmosphere-container atm-geysers">
-          <div class="atm-geysers__bg"></div>
-          <div class="map-info">
-            <div class="map-info__tag" style="border-color:rgba(255,100,30,0.2);color:rgba(255,100,30,0.6);">
-              <span style="width:5px;height:5px;border-radius:50%;background:#ff641e;display:inline-block;animation:blink 1.2s infinite;"></span>
-              Zona Geotérmica — Piso B5
-            </div>
-            <h2 class="map-info__title" style="color:#ff9955;text-shadow:0 0 40px rgba(255,100,30,0.35);">Campo dos Geysers</h2>
-            <p class="map-info__desc">Cavernas subterrâneas com actividade geotérmica intensa. Os geysers libertam vapor a temperaturas extremas em intervalos imprevisíveis. A matéria negra aqui comporta-se de forma estranha — expande com o calor, contrai com o vapor. Timing é tudo.</p>
-            <div class="map-stats">
-              <span class="map-stat">Temperatura Extrema</span>
-              <span class="map-stat">Vapor Periódico</span>
-              <span class="map-stat">Matéria Negra Instável</span>
-              <span class="map-stat">Terreno Volátil</span>
-            </div>
-            <div class="zone-creatures">
-              <div class="zone-creature"><span class="zone-creature__icon">🌑</span><span class="zone-creature__name">The Shadow</span></div>
-              <div class="zone-creature"><span class="zone-creature__icon">🕷️</span><span class="zone-creature__name">Lurker</span></div>
-            </div>
-          </div>
-        </div>
+    <!-- HUD topo — REC + cam id + timestamp + botão fechar info -->
+    <div class="expanded-hud-top" id="expandedHudTop">
+      <div class="exp-left">
+        <div class="exp-rec">REC</div>
+        <div class="exp-cam-id" id="expCamId">CAM-00</div>
+        <div class="exp-ts" id="expTs">--:--:--</div>
       </div>
-
-      <!-- ══════════ CORREDOR DE TRANSPORTE ══════════ -->
-      <div class="map-panel" id="map-transport">
-        <div class="atmosphere-container atm-transport">
-          <div class="atm-transport__bg"></div>
-          <div class="atm-transport__rail"></div>
-          <div class="map-info">
-            <div class="map-info__tag" style="border-color:rgba(80,160,255,0.2);color:rgba(80,160,255,0.6);">
-              <span style="width:5px;height:5px;border-radius:50%;background:#50a0ff;display:inline-block;animation:blink 2s infinite;"></span>
-              Logística — Piso B1/B4
-            </div>
-            <h2 class="map-info__title" style="color:#88bbff;text-shadow:0 0 40px rgba(80,160,255,0.3);">Corredor de Transporte</h2>
-            <p class="map-info__desc">Sistema de carris usado para mover equipamento entre pisos. Os carris percorrem toda a instalação vertical e horizontalmente. Os vagões ainda se movem — mas ninguém os programou para isso. Algo os está a usar.</p>
-            <div class="map-stats">
-              <span class="map-stat">Carris Activos</span>
-              <span class="map-stat">Movimento Autónomo</span>
-              <span class="map-stat">Piso a Piso</span>
-              <span class="map-stat">Sem Operador</span>
-            </div>
-            <div class="zone-creatures">
-              <div class="zone-creature"><span class="zone-creature__icon">🌫️</span><span class="zone-creature__name">Shadow Wisp</span></div>
-              <div class="zone-creature"><span class="zone-creature__icon">🌑</span><span class="zone-creature__name">The Shadow</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══════════ ZONA DO VENTO ══════════ -->
-      <div class="map-panel" id="map-wind">
-        <div class="atmosphere-container atm-wind">
-          <div class="atm-wind__bg"></div>
-          <div class="map-info">
-            <div class="map-info__tag" style="border-color:rgba(180,220,255,0.2);color:rgba(180,220,255,0.5);">
-              <span style="width:5px;height:5px;border-radius:50%;background:#b4dcff;display:inline-block;animation:blink 3s infinite;"></span>
-              Zona Aberta — Topo da Instalação
-            </div>
-            <h2 class="map-info__title" style="color:#cce8ff;text-shadow:0 0 40px rgba(180,220,255,0.25);">Zona do Vento</h2>
-            <p class="map-info__desc">O topo exposto da instalação. O vento aqui não segue direcções normais — muda de forma imprevisível, como se algo o estivesse a guiar. A matéria negra fica suspensa no ar, carregada pelas correntes. Plataformas movem-se. O horizonte não existe.</p>
-            <div class="map-stats">
-              <span class="map-stat">Correntes Imprevisíveis</span>
-              <span class="map-stat">Matéria Negra Suspensa</span>
-              <span class="map-stat">Plataformas Móveis</span>
-              <span class="map-stat">Sem Cobertura</span>
-            </div>
-            <div class="zone-creatures">
-              <div class="zone-creature"><span class="zone-creature__icon">🌫️</span><span class="zone-creature__name">Shadow Wisp</span></div>
-              <div class="zone-creature"><span class="zone-creature__icon">🪼</span><span class="zone-creature__name">Medusa</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- fim inner-page -->
-  </div><!-- fim page-content -->
+      <button class="exp-close" id="expClose">✕ FECHAR INFO</button>
+    </div>
+    <div class="expanded-info" id="expandedInfo"></div>
+  </div>
 
   <script src="../js/main.js"></script>
-  <script src="../js/maps.js"></script>
+  <script>
+  /* ════════════════════════════════════════════════════════════
+     DADOS DAS ZONAS
+  ════════════════════════════════════════════════════════════ */
+  const ZONES = {
+    nature:   { cam:'CAM-01', floor:'EXT-W',  name:'Western Mountains',          tagColor:'rgba(100,220,80,.65)',  tagBorder:'rgba(100,220,80,.25)',  dotColor:'#64dc50', tagText:'Exterior Zone — Western Ridge',       titleColor:'#9dff6a', titleGlow:'rgba(100,220,80,.3)',  desc:'The surface of the island before any human intervention. Vegetation grew around the black matter for decades, adapting to it. Glowvines flourish here in abundance. The sound is different — muffled, as if the island absorbs all noise.',  stats:['Natural Light','Glowvines Abundant','Black Matter Diffuse','Irregular Terrain'], creatures:[['🌿','Glowvine'],['🦎','Chameleon'],['🕷️','Lurker']] },
+    mines:    { cam:'CAM-02', floor:'B4',      name:'Mining Site',                tagColor:'rgba(180,140,80,.65)',  tagBorder:'rgba(180,140,80,.25)',  dotColor:'#b48c50', tagText:'Underground Zone — Floor B4',          titleColor:'#d4a853', titleGlow:'rgba(180,140,80,.3)',  desc:'Tunnels excavated in the early years of the expedition to access solid black matter deposits. The air is dense, rock absorbs sound. Crystals grew on the walls. Some tunnels were sealed after the Incident. Others simply vanished.', stats:['Dense Air','Saturated Rock','Active Crystals','Solid Black Matter'], creatures:[['🕷️','Lurker'],['🌑','The Shadow'],['🌿','Glowvine']] },
+    facility: { cam:'CAM-03', floor:'B1',      name:'Energy Facility',            tagColor:'rgba(0,200,255,.65)',   tagBorder:'rgba(0,200,255,.25)',   dotColor:'#00c8ff', tagText:'Main Installation — Floor B1',         titleColor:'#66ddff', titleGlow:'rgba(0,200,255,.3)',   desc:'The operational heart of ORBIS installation. Laser containment grids, elevator shafts running between floors. Half the doors no longer open. The other half should not be opened.',                                                    stats:['Lasers Active','Elevators OK','Partial Cameras','Containment Active'], creatures:[['👁️','Observer'],['🦎','Chameleon'],['🌫️','Shadow Wisp']] },
+    lab:      { cam:'CAM-04', floor:'B3',      name:'Black Matter Research Lab',  tagColor:'rgba(0,180,255,.65)',   tagBorder:'rgba(0,180,255,.25)',   dotColor:'#00b4ff', tagText:'Classified Zone — Floor B3',           titleColor:'#55ccff', titleGlow:'rgba(0,180,255,.35)', desc:'Where everything began. Tubes containing preserved creatures in blue liquid, brains wired to machines, sensor arrays, white ceiling lights. The equipment still runs. The notes were written in two handwriting styles. The second is not human.', stats:['Equipment Active','Max Containment','Pressurized Tubes','Corrupted Logs'], creatures:[['👁️','Secret Ent.'],['👁️','Observer'],['🦎','Chameleon']] },
+    aquarium: { cam:'CAM-05', floor:'B2',      name:'The Aquarium',               tagColor:'rgba(77,217,217,.65)',  tagBorder:'rgba(77,217,217,.25)',  dotColor:'#4dd9d9', tagText:'Controlled Zone — Floor B2',           titleColor:'#4dd9d9', titleGlow:'rgba(77,217,217,.4)', desc:'Main observation chamber. Built to study creatures affected by black matter in a controlled, illuminated environment. The glass keeps everything separated. The light keeps everything visible. The Observer keeps everything watched.',              stats:['Artificial Lighting','Active Cameras','Contained Environment','BM Stabilised'], creatures:[['🪼','Medusa'],['🐟','Anglerfish'],['🌿','Glowvine'],['👁️','Observer']] },
+    transport:{ cam:'CAM-06', floor:'B1/B4',   name:'Transportation Warehouse',   tagColor:'rgba(80,160,255,.65)',  tagBorder:'rgba(80,160,255,.25)',  dotColor:'#50a0ff', tagText:'Logistics — Floor B1/B4',              titleColor:'#88bbff', titleGlow:'rgba(80,160,255,.3)', desc:'Rail system used to move equipment between floors. The carts still move — but nobody programmed them to. Something is using them.',                                                                                                        stats:['Active Rails','Autonomous Movement','Floor to Floor','No Operator'], creatures:[['🌫️','Shadow Wisp'],['🌑','The Shadow']] },
+    depths:   { cam:'CAM-07', floor:'B??',     name:'The Depths',                 tagColor:'rgba(255,80,100,.65)',  tagBorder:'rgba(255,26,74,.25)',   dotColor:'#ff1a4a', tagText:'Undocumented Zone — Restricted Access', titleColor:'#ddd',    titleGlow:'rgba(139,47,201,.35)', desc:"Nobody knows what exists here. The floor is black water. The darkness is not empty — it pulses. Drops fall from the ceiling. Waves that shouldn't exist. An entity moves beneath the surface and disappears. Something is watching back.", stats:['Minimal Light','Black Water','Unlogged Entities','Active Pulse'], creatures:[['🕷️','Lurker'],['🌫️','Shadow Wisp'],['👁️','Secret Ent.'],['🌑','The Shadow']] },
+    geysers:  { cam:'CAM-08', floor:'B5',      name:'Underground Caves',          tagColor:'rgba(80,200,80,.65)',   tagBorder:'rgba(80,200,80,.25)',   dotColor:'#50c850', tagText:'Geothermal Zone — Floor B5',           titleColor:'#80ff80', titleGlow:'rgba(80,200,80,.35)', desc:'Underground caverns with intense geothermal activity. Geysers erupt in bursts of orange smoke and green vapour. Black matter behaves strangely here — it expands with heat, contracts with steam. Timing is everything.',               stats:['Active Geysers','Orange Smoke','Unstable BM','Volatile Ground'], creatures:[['🌑','The Shadow'],['🕷️','Lurker']] },
+    wind:     { cam:'CAM-09', floor:'EXT-E',   name:'Windy Mountains',            tagColor:'rgba(180,220,255,.55)', tagBorder:'rgba(180,220,255,.2)',  dotColor:'#b4dcff', tagText:'Open Zone — Eastern Summit',           titleColor:'#cce8ff', titleGlow:'rgba(180,220,255,.25)', desc:'The exposed top of the installation. The wind here does not follow normal directions — it changes unpredictably, as if guided. Black matter floats suspended in the air, carried by the currents. Platforms move. The horizon does not exist.',  stats:['Unpredictable Currents','Suspended BM','Moving Platforms','No Cover'], creatures:[['🌫️','Shadow Wisp'],['🪼','Medusa']] },
+  };
+
+  /* ════ RELÓGIO ════ */
+  function tick(){
+    const ts=new Date().toTimeString().slice(0,8);
+    document.getElementById('clockDisplay').textContent=ts;
+    document.querySelectorAll('[data-clock]').forEach(e=>e.textContent=ts);
+    const et=document.getElementById('expTs'); if(et) et.textContent=ts;
+    const bc=document.getElementById('bottomClock'); if(bc) bc.textContent=ts;
+  }
+  tick(); setInterval(tick,1000);
+
+  /* ════════════════════════════════════════════════════════════
+     CANVAS RENDERERS — um por zona
+  ════════════════════════════════════════════════════════════ */
+
+  /* Utilitários */
+  const PI2 = Math.PI*2;
+  const rand = (a,b) => a + Math.random()*(b-a);
+  const randInt = (a,b) => Math.floor(rand(a,b));
+
+  /* ── NATUREZA: céu, montanhas, nuvens, pássaros ── */
+  function initNature(canvas){
+    const ctx=canvas.getContext('2d');
+    const W=()=>canvas.width, H=()=>canvas.height;
+
+    // Pássaros
+    const birds=Array.from({length:8},(_,i)=>({
+      x:rand(0,1)*W(), y:rand(0.1,0.45)*H(),
+      vx:rand(0.3,0.8)*(Math.random()<.5?1:-1),
+      vy:rand(-0.05,0.05), wing:rand(0,PI2), ws:rand(0.08,0.15)
+    }));
+    // Nuvens
+    const clouds=Array.from({length:5},()=>({
+      x:rand(0,1)*W(), y:rand(0.05,0.3)*H(), w:rand(40,100), h:rand(18,36), vx:rand(0.1,0.3)
+    }));
+    // Montanhas (estáticas)
+    const mtns=[
+      [{x:0,y:1},{x:.15,y:.52},{x:.3,y:.68},{x:.5,y:.44},{x:.7,y:.6},{x:.85,y:.48},{x:1,y:.65},{x:1,y:1}],
+      [{x:0,y:1},{x:.1,y:.62},{x:.25,y:.72},{x:.45,y:.55},{x:.65,y:.7},{x:.8,y:.6},{x:1,y:.72},{x:1,y:1}]
+    ];
+    const mtnColors=['#2a4a1a','#1e3a14'];
+
+    function draw(){
+      if(!canvas.width||canvas.width<10){canvas.width=canvas.offsetWidth||200;canvas.height=canvas.offsetHeight||120;}
+      const w=W(),h=H();
+      if(!w||!h||!isFinite(w)||!isFinite(h)) return;
+      // Céu
+      const sky=ctx.createLinearGradient(0,0,0,h*.6);
+      sky.addColorStop(0,'#1a3020'); sky.addColorStop(1,'#0a1a0a');
+      ctx.fillStyle=sky; ctx.fillRect(0,0,w,h);
+      // Chão
+      const gnd=ctx.createLinearGradient(0,h*.55,0,h);
+      gnd.addColorStop(0,'#1a2a0a'); gnd.addColorStop(1,'#0a1204');
+      ctx.fillStyle=gnd; ctx.fillRect(0,h*.55,w,h*.45);
+
+      // Montanhas
+      mtns.forEach((pts,i)=>{
+        ctx.beginPath();
+        pts.forEach((p,j)=>j===0?ctx.moveTo(p.x*w,p.y*h):ctx.lineTo(p.x*w,p.y*h));
+        ctx.fillStyle=mtnColors[i]; ctx.fill();
+      });
+
+      // Nuvens
+      clouds.forEach(c=>{
+        c.x+=c.vx; if(c.x>w+c.w) c.x=-c.w;
+        ctx.beginPath();
+        ctx.ellipse(c.x,c.y,c.w*.5,c.h*.4,0,0,PI2);
+        ctx.ellipse(c.x+c.w*.25,c.y-c.h*.2,c.w*.3,c.h*.35,0,0,PI2);
+        ctx.ellipse(c.x-c.w*.2,c.y-c.h*.1,c.w*.25,c.h*.28,0,0,PI2);
+        ctx.fillStyle='rgba(180,220,160,0.1)'; ctx.fill();
+      });
+
+      // Pássaros
+      birds.forEach(b=>{
+        b.x+=b.vx; b.y+=b.vy;
+        b.wing+=b.ws;
+        if(b.x>w+10) b.x=-10;
+        if(b.x<-10) b.x=w+10;
+        b.y=Math.max(h*.05,Math.min(h*.48,b.y));
+        const wf=Math.sin(b.wing)*3;
+        ctx.beginPath();
+        ctx.moveTo(b.x,b.y);
+        ctx.quadraticCurveTo(b.x-6,b.y-wf,b.x-10,b.y);
+        ctx.moveTo(b.x,b.y);
+        ctx.quadraticCurveTo(b.x+6,b.y-wf,b.x+10,b.y);
+        ctx.strokeStyle='rgba(180,230,150,0.65)';
+        ctx.lineWidth=.8; ctx.stroke();
+      });
+    }
+    return draw;
+  }
+
+  /* ── MINAS: fundo escuro, cristais roxos/azuis, poeira ── */
+  function initMines(canvas){
+    const ctx=canvas.getContext('2d');
+    const W=()=>canvas.width, H=()=>canvas.height;
+    let structs=[], dusts=[], t=0;
+
+    function buildStructs(w,h){
+      structs=[];
+      const cols=['#7b2fff','#4444ff','#9b4dff','#2266ff','#cc44ff','#3399ff','#ff44cc','#44ffcc'];
+      /* Estalagmites — sobem do chão */
+      for(let i=0;i<16;i++){
+        const x=rand(.03,.97)*w;
+        const bY=h;
+        const ht=rand(.18,.52)*h;
+        const wid=rand(.012,.032)*w;
+        structs.push({type:'sta',x,bY,ht,wid,col:cols[randInt(0,cols.length)],glow:rand(0,Math.PI*2),pulse:rand(.01,.03)});
+      }
+      /* Estalactites — descem do tecto */
+      for(let i=0;i<14;i++){
+        const x=rand(.03,.97)*w;
+        const bY=0;
+        const ht=rand(.15,.45)*h;
+        const wid=rand(.010,.028)*w;
+        structs.push({type:'stc',x,bY,ht,wid,col:cols[randInt(0,cols.length)],glow:rand(0,Math.PI*2),pulse:rand(.01,.03)});
+      }
+      /* Cristais soltos nas paredes e chão — pequenos e médios */
+      for(let i=0;i<30;i++){
+        const side=Math.random();
+        let x,y,ang;
+        if(side<.3){x=rand(.02,.98)*w; y=rand(.72,.98)*h; ang=rand(-.3,.3);}       // chão
+        else if(side<.55){x=rand(.02,.1)*w; y=rand(.05,.9)*h; ang=rand(-.6,.6)+Math.PI*.5;}  // parede esq
+        else if(side<.8){x=rand(.9,.98)*w; y=rand(.05,.9)*h; ang=rand(-.6,.6)-Math.PI*.5;}  // parede dir
+        else {x=rand(.05,.95)*w; y=rand(.02,.25)*h; ang=rand(-.4,.4)+Math.PI;}     // tecto
+        const ht=rand(.04,.12)*h, wid=rand(.008,.022)*w;
+        structs.push({type:'crys',x,y,ht,wid,ang,col:cols[randInt(0,cols.length)],glow:rand(0,Math.PI*2),pulse:rand(.015,.04)});
+      }
+      dusts=Array.from({length:28},()=>({
+        x:rand(0,1)*w,y:rand(0,1)*h,
+        vx:rand(-.15,.15),vy:rand(-.25,-.04),
+        r:rand(.4,1.8),life:rand(0,1)
+      }));
+    }
+
+    function drawCrystal(x,y,ht,wid,ang,col,alpha){
+      ctx.save();
+      ctx.translate(x,y);
+      ctx.rotate(ang);
+      /* Brilho ao redor */
+      const gr=ctx.createRadialGradient(0,-ht*.5,0,0,-ht*.5,ht*.7);
+      gr.addColorStop(0,col.replace('#','rgba(').replace(/([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i,
+        (_,r,g,b)=>`${parseInt(r,16)},${parseInt(g,16)},${parseInt(b,16)}`)+`,${alpha*.25})`);
+      gr.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=gr;
+      ctx.beginPath(); ctx.ellipse(0,-ht*.5,ht*.7,ht*.7,0,0,Math.PI*2); ctx.fill();
+      /* Faceta principal */
+      ctx.beginPath();
+      ctx.moveTo(0,-ht);
+      ctx.lineTo(wid,0); ctx.lineTo(wid*.5,ht*.15);
+      ctx.lineTo(-wid*.5,ht*.15); ctx.lineTo(-wid,0);
+      ctx.closePath();
+      ctx.fillStyle=col+(Math.floor(alpha*255).toString(16).padStart(2,'0'));
+      ctx.fill();
+      ctx.strokeStyle=col; ctx.lineWidth=.6; ctx.globalAlpha=alpha*.9; ctx.stroke();
+      /* Reflexo */
+      ctx.beginPath(); ctx.moveTo(0,-ht); ctx.lineTo(-wid*.25,0);
+      ctx.strokeStyle='rgba(255,255,255,.18)'; ctx.lineWidth=.8; ctx.stroke();
+      /* Faceta secundária */
+      ctx.beginPath();
+      ctx.moveTo(wid*.1,-ht*.6); ctx.lineTo(wid*.8,-ht*.1); ctx.lineTo(wid*.5,ht*.1);
+      ctx.closePath();
+      ctx.fillStyle='rgba(255,255,255,.08)'; ctx.fill();
+      ctx.restore();
+    }
+
+    function draw(){
+      if(!canvas.width||canvas.width<10){canvas.width=canvas.offsetWidth||200;canvas.height=canvas.offsetHeight||120;}
+      const w=W(),h=H();
+      if(!w||!h||!isFinite(w)||!isFinite(h)) return;
+      if(!structs.length) buildStructs(w,h);
+      t+=.02;
+
+      /* Fundo caverna escura */
+      const bg=ctx.createLinearGradient(0,0,0,h);
+      bg.addColorStop(0,'#080510'); bg.addColorStop(.5,'#0a0715'); bg.addColorStop(1,'#050308');
+      ctx.fillStyle=bg; ctx.fillRect(0,0,w,h);
+
+      /* Paredes rochosas laterais */
+      ctx.fillStyle='#0d0a18';
+      ctx.fillRect(0,0,w*.04,h); ctx.fillRect(w*.96,0,w*.04,h);
+
+      /* Chão pedregoso */
+      ctx.fillStyle='#110e1e'; ctx.fillRect(0,h*.78,w,h*.22);
+      /* Tecto */
+      ctx.fillStyle='#0c0918'; ctx.fillRect(0,0,w,h*.06);
+
+      /* Veias de minério nas paredes */
+      for(let v=0;v<4;v++){
+        const vx=rand(0,1)*w, vy=rand(.1,.9)*h;
+        const vlen=rand(w*.08,w*.22);
+        ctx.beginPath(); ctx.moveTo(vx,vy);
+        ctx.bezierCurveTo(vx+rand(-20,20),vy+rand(-10,10),vx+vlen*.5+rand(-15,15),vy+rand(-8,8),vx+vlen,vy+rand(-5,5));
+        ctx.strokeStyle=`rgba(${60+randInt(0,80)},${randInt(0,40)},${140+randInt(0,80)},.08)`;
+        ctx.lineWidth=rand(1,3); ctx.stroke();
+      }
+
+      /* Estalactites + estalagmites */
+      structs.filter(s=>s.type==='stc'||s.type==='sta').forEach(s=>{
+        s.glow+=s.pulse;
+        const alpha=.35+Math.sin(s.glow)*.2;
+        const ang = s.type==='stc' ? Math.PI : 0;
+        drawCrystal(s.x, s.bY + (s.type==='stc'?0:0), s.ht, s.wid, ang, s.col, alpha);
+      });
+
+      /* Cristais soltos */
+      structs.filter(s=>s.type==='crys').forEach(s=>{
+        s.glow+=s.pulse;
+        const alpha=.4+Math.sin(s.glow)*.25;
+        drawCrystal(s.x,s.y,s.ht,s.wid,s.ang,s.col,alpha);
+      });
+
+      /* Luz ambiente dos cristais no fundo */
+      structs.slice(0,10).forEach(s=>{
+        s.glow+=.001;
+        const baseY=s.type==='sta'?h:s.type==='stc'?0:s.y||h*.5;
+        const lg=ctx.createRadialGradient(s.x,baseY,0,s.x,baseY,w*.1);
+        const hex=s.col.replace('#','');
+        const r=parseInt(hex.slice(0,2),16),g2=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);
+        lg.addColorStop(0,`rgba(${r},${g2},${b},.06)`); lg.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=lg; ctx.fillRect(0,0,w,h);
+      });
+
+      /* Poeira */
+      dusts.forEach(d=>{
+        d.x+=d.vx; d.y+=d.vy; d.life+=.007;
+        if(d.life>1){d.x=rand(0,1)*w;d.y=h;d.life=0;}
+        ctx.beginPath(); ctx.arc(d.x,d.y,d.r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(140,90,220,${.35*(1-d.life)})`; ctx.fill();
+      });
+    }
+    return draw;
+  }
+
+  /* ── FACILITY: lasers + elevadores ── */
+  function initFacility(canvas){
+    const ctx=canvas.getContext('2d');
+    const W=()=>canvas.width, H=()=>canvas.height;
+    let lasers=[], laserParticles=[], t=0;
+    let elevators=[];
+
+    function build(w,h){
+      /* Lasers no background */
+      lasers=Array.from({length:5},(_,i)=>({
+        y:h*(.12+i*.17),
+        active:false, timer:rand(0,140),
+        onTime:rand(35,90), offTime:rand(70,180),
+        alpha:0, flicker:1,
+        col: i%2===0 ? 'rgba(255,30,30,' : 'rgba(255,80,0,'
+      }));
+      /* Elevadores flanqueando o gerador */
+      elevators=[
+        {x:w*.08, y:rand(0,.5)*h, w:w*.07, h:h*.14, vy:rand(.4,.8)},
+        {x:w*.85, y:rand(.3,1)*h, w:w*.07, h:h*.14, vy:-rand(.4,.8)},
+      ];
+    }
+
+    /* Desenha o gerador central */
+    function drawGenerator(w,h){
+      const cx=w*.5, cy=h*.5;
+      const gw=w*.22, gh=h*.58;
+      const pulse=Math.sin(t*2.5)*.5+.5;
+      const innerPulse=Math.sin(t*3.5)*.5+.5;
+
+      /* Glow vermelho em redor do gerador — radiação */
+      const radGlow=ctx.createRadialGradient(cx,cy,gw*.2,cx,cy,gw*2.2);
+      radGlow.addColorStop(0,`rgba(255,20,0,${0.12+pulse*.08})`);
+      radGlow.addColorStop(.4,`rgba(180,0,0,${0.06+pulse*.04})`);
+      radGlow.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=radGlow; ctx.fillRect(0,0,w,h);
+
+      /* Sombra base do gerador */
+      ctx.fillStyle='rgba(0,0,0,0.5)';
+      ctx.beginPath(); ctx.ellipse(cx,h*.88,gw*.55,h*.04,0,0,Math.PI*2); ctx.fill();
+
+      /* Corpo principal — bloco metálico central */
+      const bodyGrad=ctx.createLinearGradient(cx-gw*.5,0,cx+gw*.5,0);
+      bodyGrad.addColorStop(0,'#1a1a1e');
+      bodyGrad.addColorStop(.15,'#2e2e38');
+      bodyGrad.addColorStop(.5,'#3a3a48');
+      bodyGrad.addColorStop(.85,'#2e2e38');
+      bodyGrad.addColorStop(1,'#1a1a1e');
+      ctx.fillStyle=bodyGrad;
+      ctx.fillRect(cx-gw*.5, cy-gh*.5, gw, gh);
+
+      /* Painéis laterais — detalhes metálicos */
+      ctx.fillStyle='#22222c';
+      ctx.fillRect(cx-gw*.5, cy-gh*.5, gw*.06, gh);
+      ctx.fillRect(cx+gw*.44, cy-gh*.5, gw*.06, gh);
+
+      /* Linhas horizontais de painéis */
+      for(let pi=0;pi<6;pi++){
+        const py=cy-gh*.5+gh*(pi+1)/7;
+        ctx.beginPath(); ctx.moveTo(cx-gw*.5,py); ctx.lineTo(cx+gw*.5,py);
+        ctx.strokeStyle='rgba(0,0,0,0.4)'; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx-gw*.5,py+1); ctx.lineTo(cx+gw*.5,py+1);
+        ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=.5; ctx.stroke();
+      }
+
+      /* Núcleo de energia — cilindro central que pulsa vermelho */
+      const coreW=gw*.28, coreH=gh*.7;
+      const coreGrad=ctx.createLinearGradient(cx-coreW*.5,0,cx+coreW*.5,0);
+      coreGrad.addColorStop(0,'#1a0000');
+      coreGrad.addColorStop(.25,`rgb(${140+Math.floor(innerPulse*80)},${Math.floor(innerPulse*10)},0)`);
+      coreGrad.addColorStop(.5,`rgb(${200+Math.floor(innerPulse*55)},${Math.floor(innerPulse*20)},0)`);
+      coreGrad.addColorStop(.75,`rgb(${140+Math.floor(innerPulse*80)},${Math.floor(innerPulse*10)},0)`);
+      coreGrad.addColorStop(1,'#1a0000');
+      ctx.fillStyle=coreGrad;
+      ctx.fillRect(cx-coreW*.5, cy-coreH*.5, coreW, coreH);
+
+      /* Brilho interno do núcleo */
+      const coreGlow=ctx.createRadialGradient(cx,cy,0,cx,cy,coreW*.8);
+      coreGlow.addColorStop(0,`rgba(255,${40+Math.floor(innerPulse*30)},0,${0.4+innerPulse*.3})`);
+      coreGlow.addColorStop(.5,`rgba(200,10,0,${0.15+innerPulse*.1})`);
+      coreGlow.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=coreGlow;
+      ctx.fillRect(cx-coreW*.5, cy-coreH*.5, coreW, coreH);
+
+      /* Bordas do núcleo — metal escuro */
+      ctx.strokeStyle='#111118'; ctx.lineWidth=2;
+      ctx.strokeRect(cx-coreW*.5, cy-coreH*.5, coreW, coreH);
+
+      /* Contorno externo do gerador */
+      ctx.strokeStyle=`rgba(${60+Math.floor(pulse*40)},${Math.floor(pulse*15)},${Math.floor(pulse*5)},0.85)`;
+      ctx.lineWidth=1.5;
+      ctx.strokeRect(cx-gw*.5, cy-gh*.5, gw, gh);
+
+      /* Cantos metálicos */
+      [[cx-gw*.5,cy-gh*.5],[cx+gw*.5,cy-gh*.5],[cx-gw*.5,cy+gh*.5],[cx+gw*.5,cy+gh*.5]].forEach(([bx,by])=>{
+        ctx.fillStyle='#404050';
+        ctx.fillRect(bx-(bx<cx?0:6), by-(by<cy?0:6), 6, 6);
+      });
+
+      /* Indicadores LED vermelhos — piscam */
+      const ledPositions=[[cx-gw*.35,cy-gh*.42],[cx+gw*.35,cy-gh*.42],[cx-gw*.35,cy+gh*.42],[cx+gw*.35,cy+gh*.42]];
+      ledPositions.forEach(([lx,ly],i)=>{
+        const ledA=0.5+Math.sin(t*3+i*1.2)*.4;
+        ctx.beginPath(); ctx.arc(lx,ly,3,0,Math.PI*2);
+        ctx.fillStyle=`rgba(255,20,0,${ledA})`; ctx.fill();
+        ctx.beginPath(); ctx.arc(lx,ly,6,0,Math.PI*2);
+        ctx.fillStyle=`rgba(255,20,0,${ledA*.25})`; ctx.fill();
+      });
+
+      /* Topo do gerador — cúpula / saída de energia */
+      ctx.fillStyle='#2a2a35';
+      ctx.fillRect(cx-gw*.35, cy-gh*.5-h*.04, gw*.7, h*.04);
+      /* Antena/condutor no topo */
+      ctx.fillStyle='#1a1a22';
+      ctx.fillRect(cx-gw*.04, cy-gh*.5-h*.1, gw*.08, h*.1);
+      /* Faísca no topo */
+      const sparkA=Math.sin(t*8)*.5+.5;
+      ctx.beginPath(); ctx.arc(cx, cy-gh*.5-h*.1, 4+sparkA*3, 0, Math.PI*2);
+      ctx.fillStyle=`rgba(255,${60+Math.floor(sparkA*100)},0,${0.6+sparkA*.4})`; ctx.fill();
+      ctx.beginPath(); ctx.arc(cx, cy-gh*.5-h*.1, 8+sparkA*5, 0, Math.PI*2);
+      ctx.fillStyle=`rgba(255,40,0,${0.15+sparkA*.15})`; ctx.fill();
+
+      /* Rodapé do gerador */
+      ctx.fillStyle='#28282e';
+      ctx.fillRect(cx-gw*.6, cy+gh*.5, gw*1.2, h*.04);
+      ctx.fillStyle='#1e1e26';
+      ctx.fillRect(cx-gw*.7, cy+gh*.5+h*.04, gw*1.4, h*.025);
+    }
+
+    function draw(){
+      if(!canvas.width||canvas.width<10){canvas.width=canvas.offsetWidth||200;canvas.height=canvas.offsetHeight||120;}
+      const w=W(),h=H();
+      if(!w||!h||!isFinite(w)||!isFinite(h)) return;
+      if(!lasers.length) build(w,h); t+=0.02;
+
+      /* Fundo industrial escuro */
+      ctx.fillStyle='#040810'; ctx.fillRect(0,0,w,h);
+
+      /* Grade metálica de fundo */
+      ctx.strokeStyle='rgba(0,140,200,0.04)'; ctx.lineWidth=.5;
+      for(let x=0;x<w;x+=w/12){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}
+      for(let y=0;y<h;y+=h/7){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
+
+      /* Chão e tecto */
+      ctx.fillStyle='#080e16'; ctx.fillRect(0,0,w,h*.07);
+      ctx.fillStyle='#080e16'; ctx.fillRect(0,h*.88,w,h*.12);
+
+      /* ── LASERS no background (atrás do gerador) ── */
+      lasers.forEach(l=>{
+        l.timer--;
+        if(l.timer<=0){l.active=!l.active;l.timer=l.active?l.onTime:l.offTime;l.flicker=1;}
+        if(l.active){
+          l.alpha=Math.min(l.alpha+.1,1);
+          l.flicker=Math.random()<.07?rand(.3,.7):1;
+          const a=l.alpha*l.flicker*.55; /* mais subtis — no background */
+          const hg=ctx.createLinearGradient(0,l.y-5,0,l.y+5);
+          hg.addColorStop(0,'rgba(0,0,0,0)');
+          hg.addColorStop(.5,l.col+(a*.15)+')');
+          hg.addColorStop(1,'rgba(0,0,0,0)');
+          ctx.fillStyle=hg; ctx.fillRect(0,l.y-5,w,10);
+          ctx.beginPath(); ctx.moveTo(0,l.y); ctx.lineTo(w,l.y);
+          ctx.strokeStyle=l.col+(a*.7)+')';
+          ctx.lineWidth=.7; ctx.stroke();
+          ctx.beginPath(); ctx.arc(3,l.y,2.5,0,PI2);
+          ctx.fillStyle=l.col+(a)+')'; ctx.fill();
+          ctx.beginPath(); ctx.arc(w-3,l.y,2.5,0,PI2);
+          ctx.fillStyle=l.col+(a)+')'; ctx.fill();
+          if(Math.random()<.1)
+            laserParticles.push({x:rand(0,1)*w,y:l.y,vy:rand(-.3,.3),vx:rand(-.15,.15),life:0,col:l.col});
+        } else { l.alpha=Math.max(l.alpha-.07,0); }
+      });
+
+      laserParticles=laserParticles.filter(p=>{
+        p.x+=p.vx; p.y+=p.vy; p.life+=.07;
+        if(p.life>1) return false;
+        ctx.beginPath(); ctx.arc(p.x,p.y,1*(1-p.life),0,PI2);
+        ctx.fillStyle=p.col+(0.7*(1-p.life))+')'; ctx.fill();
+        return true;
+      });
+
+      /* ── GERADOR CENTRAL ── */
+      drawGenerator(w,h);
+
+      /* ── ELEVADORES aos lados do gerador ── */
+      elevators.forEach((el,idx)=>{
+        el.y+=el.vy;
+        if(el.y>h+el.h*2) el.y=-el.h;
+        if(el.y<-el.h*2) el.y=h+el.h;
+        /* Cabo */
+        ctx.beginPath(); ctx.moveTo(el.x+el.w/2,0); ctx.lineTo(el.x+el.w/2,el.y);
+        ctx.strokeStyle='rgba(0,120,180,.18)'; ctx.lineWidth=.6; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(el.x+el.w/2,el.y+el.h); ctx.lineTo(el.x+el.w/2,h);
+        ctx.strokeStyle='rgba(0,120,180,.1)'; ctx.lineWidth=.6; ctx.stroke();
+        /* Corpo do elevador */
+        const elGrad=ctx.createLinearGradient(el.x,0,el.x+el.w,0);
+        elGrad.addColorStop(0,'rgba(18,35,55,.88)');
+        elGrad.addColorStop(.5,'rgba(22,42,65,.88)');
+        elGrad.addColorStop(1,'rgba(18,35,55,.88)');
+        ctx.fillStyle=elGrad; ctx.fillRect(el.x,el.y,el.w,el.h);
+        ctx.strokeStyle='rgba(0,160,220,.35)'; ctx.lineWidth=.9;
+        ctx.strokeRect(el.x,el.y,el.w,el.h);
+        /* Painel interior */
+        ctx.fillStyle='rgba(0,0,0,.3)';
+        ctx.fillRect(el.x+el.w*.15,el.y+el.h*.15,el.w*.7,el.h*.5);
+        /* LED de estado */
+        const ledA=0.5+Math.sin(t*2+idx)*.3;
+        ctx.beginPath(); ctx.arc(el.x+el.w*.5,el.y+el.h*.25,2,0,PI2);
+        ctx.fillStyle=`rgba(0,200,255,${ledA})`; ctx.fill();
+        /* Luz de piso */
+        const floorGlow=ctx.createRadialGradient(el.x+el.w*.5,el.y+el.h*.9,0,el.x+el.w*.5,el.y+el.h*.9,el.w*.5);
+        floorGlow.addColorStop(0,`rgba(0,160,255,${.12+ledA*.05})`);
+        floorGlow.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=floorGlow; ctx.fillRect(el.x-el.w,el.y,el.w*3,el.h);
+      });
+    }
+    return draw;
+  }
+
+  /* ── LAB: azul neon, tubos científicos, sensores, data streams ── */
+  function initLab(canvas){
+    const ctx=canvas.getContext('2d');
+    const W=()=>canvas.width, H=()=>canvas.height;
+    let tubes=[], ceilingLights=[], sensors=[], dataStreams=[], scanLine={y:0,speed:.4}, t=0;
+    const CONTENTS=['brain','dna','cell','formula'];
+
+    function build(w,h){
+      tubes=Array.from({length:4},(_,i)=>({
+        x:(i*.22+.07)*w, y:h*.15, w:w*.065, h:h*.68,
+        liquid:rand(0,PI2), content:CONTENTS[i%CONTENTS.length],
+        bubbles:Array.from({length:4},()=>({bx:rand(0,1),by:rand(0,1),bs:rand(.8,1.8),bv:rand(.003,.009)}))
+      }));
+      // Luzes neon azuis no tecto
+      ceilingLights=Array.from({length:5},(_,i)=>({
+        x:(i+.5)*w/5, flicker:rand(0,PI2), speed:rand(.04,.09),
+        on:true, timer:rand(0,400), buzz:0
+      }));
+      // Sensores — bolinhas azul/verde nas paredes e no tecto
+      sensors=Array.from({length:8},()=>({
+        x:rand(0,1)*w, y:rand(0,1)*h,
+        col:Math.random()<.5?'0,220,255':'0,255,140',
+        pulse:rand(0,PI2), speed:rand(.03,.08),
+        beam:Math.random()<.4, beamAngle:rand(0,Math.PI)
+      }));
+      // Streams de dados (caracteres a descer)
+      dataStreams=Array.from({length:6},()=>({
+        x:rand(0,1)*w, chars:Array.from({length:8},()=>({y:rand(0,1)*h, c:String.fromCharCode(randInt(48,90)),speed:rand(.3,.8),alpha:rand(.1,.5)}))
+      }));
+    }
+
+    function drawBrain(ctx,cx,cy,r){
+      // Azul neon
+      ctx.beginPath(); ctx.ellipse(cx,cy,r*.9,r*.7,0,0,PI2);
+      ctx.strokeStyle='rgba(0,200,255,.55)'; ctx.lineWidth=.9; ctx.stroke();
+      ctx.fillStyle='rgba(0,40,80,.3)'; ctx.fill();
+      for(let i=0;i<4;i++){
+        ctx.beginPath(); ctx.moveTo(cx-r*.65+i*r*.38,cy-r*.35);
+        ctx.quadraticCurveTo(cx-r*.4+i*r*.38,cy,cx-r*.5+i*r*.38,cy+r*.28);
+        ctx.strokeStyle='rgba(0,180,255,.35)'; ctx.lineWidth=.5; ctx.stroke();
+      }
+    }
+
+    function drawDNA(ctx,cx,cy,r,t){
+      for(let y=-r;y<r;y+=r*.2){
+        const a=y/r*Math.PI+t;
+        const x1=Math.sin(a)*r*.7, x2=-Math.sin(a)*r*.7;
+        const alpha=0.3+Math.abs(Math.sin(a))*.5;
+        ctx.beginPath(); ctx.arc(cx+x1,cy+y,1.5,0,PI2);
+        ctx.fillStyle=`rgba(0,220,255,${alpha})`; ctx.fill();
+        ctx.beginPath(); ctx.arc(cx+x2,cy+y,1.5,0,PI2);
+        ctx.fillStyle=`rgba(0,255,180,${alpha})`; ctx.fill();
+        if(Math.floor(y/r*5)%2===0){
+          ctx.beginPath(); ctx.moveTo(cx+x1,cy+y); ctx.lineTo(cx+x2,cy+y);
+          ctx.strokeStyle=`rgba(0,200,255,${alpha*.4})`; ctx.lineWidth=.5; ctx.stroke();
+        }
+      }
+    }
+
+    function drawCell(ctx,cx,cy,r,t){
+      // Membrana celular
+      ctx.beginPath();
+      for(let a=0;a<PI2;a+=.15){
+        const wr=r*(0.75+Math.sin(a*5+t*.6)*.18+Math.cos(a*3+t*.4)*.1);
+        ctx.lineTo(cx+Math.cos(a)*wr,cy+Math.sin(a)*wr);
+      }
+      ctx.closePath();
+      ctx.fillStyle='rgba(0,60,100,.3)'; ctx.fill();
+      ctx.strokeStyle='rgba(0,200,255,.5)'; ctx.lineWidth=.7; ctx.stroke();
+      // Núcleo
+      ctx.beginPath(); ctx.arc(cx,cy,r*.35,0,PI2);
+      ctx.fillStyle='rgba(0,150,220,.4)'; ctx.fill();
+      ctx.strokeStyle='rgba(0,220,255,.6)'; ctx.lineWidth=.5; ctx.stroke();
+    }
+
+    function drawFormula(ctx,cx,cy,r,t){
+      // Fórmulas científicas flutuantes
+      const chars=['H₂O','CO₂','BM','∆T','N₂','λ','∑','Ψ'];
+      ctx.font=`${r*.55}px "Share Tech Mono",monospace`;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      chars.slice(0,4).forEach((c,i)=>{
+        const a=i*PI2/4+t*.3;
+        const rx=cx+Math.cos(a)*r*.7, ry=cy+Math.sin(a)*r*.7;
+        const alpha=0.25+Math.sin(t+i)*.15;
+        ctx.fillStyle=`rgba(0,220,255,${alpha})`; ctx.fillText(c,rx,ry);
+      });
+    }
+
+    function draw(){
+      if(!canvas.width||canvas.width<10){canvas.width=canvas.offsetWidth||200;canvas.height=canvas.offsetHeight||120;}
+      const w=W(),h=H();
+      if(!w||!h||!isFinite(w)||!isFinite(h)) return;
+      if(!tubes.length) build(w,h); t+=0.022;
+
+      // Fundo azul muito escuro
+      ctx.fillStyle='#010810'; ctx.fillRect(0,0,w,h);
+      // Grade técnica azul neon
+      ctx.strokeStyle='rgba(0,180,255,0.055)'; ctx.lineWidth=.4;
+      for(let x=0;x<w;x+=w*.1){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}
+      for(let y=0;y<h;y+=h*.12){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
+
+      // Linha de scan horizontal
+      scanLine.y+=scanLine.speed; if(scanLine.y>h) scanLine.y=0;
+      const sg=ctx.createLinearGradient(0,scanLine.y-4,0,scanLine.y+4);
+      sg.addColorStop(0,'rgba(0,0,0,0)'); sg.addColorStop(.5,'rgba(0,200,255,.08)'); sg.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=sg; ctx.fillRect(0,scanLine.y-4,w,8);
+
+      // Data streams (colunas de código azul a descer)
+      dataStreams.forEach(ds=>{
+        ds.chars.forEach(ch=>{
+          ch.y+=ch.speed; if(ch.y>h) ch.y=0;
+          ctx.font='7px "Share Tech Mono",monospace'; ctx.textAlign='center'; ctx.textBaseline='top';
+          ctx.fillStyle=`rgba(0,200,255,${ch.alpha})`; ctx.fillText(ch.c,ds.x,ch.y);
+        });
+      });
+
+      // Luzes de tecto neon azul
+      ceilingLights.forEach(l=>{
+        l.flicker+=l.speed; l.timer--;
+        if(l.timer<=0){ l.on=Math.random()>.08; l.timer=l.on?rand(300,800):rand(5,25); }
+        const buzz=l.on?0.8+Math.sin(l.flicker*8)*.2:0;
+        const a=l.on?buzz:0; if(a<.01) return;
+        // Armadura neon
+        ctx.fillStyle=`rgba(150,220,255,${a*.5})`;
+        ctx.fillRect(l.x-8,0,16,3);
+        // Tubo de néon
+        const ng=ctx.createLinearGradient(l.x-8,0,l.x+8,0);
+        ng.addColorStop(0,'rgba(0,0,0,0)'); ng.addColorStop(.5,`rgba(0,220,255,${a*.7})`); ng.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=ng; ctx.fillRect(l.x-8,0,16,2);
+        // Cone de luz azul neon
+        const coneW=w*.1, coneH=h*.75;
+        const cg=ctx.createLinearGradient(l.x,0,l.x,coneH);
+        cg.addColorStop(0,`rgba(0,200,255,${a*.18})`); cg.addColorStop(.5,`rgba(0,160,220,${a*.06})`); cg.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.beginPath(); ctx.moveTo(l.x,0); ctx.lineTo(l.x+coneW*.5,coneH); ctx.lineTo(l.x-coneW*.5,coneH); ctx.closePath();
+        ctx.fillStyle=cg; ctx.fill();
+        // Aureola azul
+        const hg=ctx.createRadialGradient(l.x,0,0,l.x,0,coneW*.35);
+        hg.addColorStop(0,`rgba(0,220,255,${a*.25})`); hg.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=hg; ctx.beginPath(); ctx.ellipse(l.x,0,coneW*.35,5,0,0,PI2); ctx.fill();
+      });
+
+      // Sensores com feixes
+      sensors.forEach(s=>{
+        s.pulse+=s.speed;
+        const a=0.4+Math.sin(s.pulse)*.4;
+        ctx.beginPath(); ctx.arc(s.x,s.y,2.5,0,PI2);
+        ctx.fillStyle=`rgba(${s.col},${a})`; ctx.fill();
+        const hg2=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,7);
+        hg2.addColorStop(0,`rgba(${s.col},${a*.35})`); hg2.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=hg2; ctx.beginPath(); ctx.arc(s.x,s.y,7,0,PI2); ctx.fill();
+        if(s.beam){
+          const bx=s.x+Math.cos(s.beamAngle+t*.2)*30;
+          const by=s.y+Math.sin(s.beamAngle+t*.2)*30;
+          ctx.beginPath(); ctx.moveTo(s.x,s.y); ctx.lineTo(bx,by);
+          ctx.strokeStyle=`rgba(${s.col},${a*.3})`; ctx.lineWidth=.5; ctx.stroke();
+        }
+      });
+
+      // Tubos com líquido azul neon
+      tubes.forEach(tb=>{
+        const liq=0.65+Math.sin(tb.liquid+=.018)*.06;
+        // Fundo do tubo
+        const liqGrad=ctx.createLinearGradient(tb.x,tb.y,tb.x+tb.w,tb.y);
+        liqGrad.addColorStop(0,`rgba(0,20,50,${liq})`);
+        liqGrad.addColorStop(.5,`rgba(0,40,80,${liq*.9})`);
+        liqGrad.addColorStop(1,`rgba(0,20,50,${liq})`);
+        ctx.fillStyle=liqGrad;
+        ctx.beginPath(); ctx.roundRect?ctx.roundRect(tb.x,tb.y,tb.w,tb.h,3):ctx.rect(tb.x,tb.y,tb.w,tb.h);
+        ctx.fill();
+        // Borda neon azul
+        ctx.strokeStyle='rgba(0,180,255,.45)'; ctx.lineWidth=.9;
+        ctx.shadowColor='rgba(0,180,255,.5)'; ctx.shadowBlur=4;
+        ctx.beginPath(); ctx.roundRect?ctx.roundRect(tb.x,tb.y,tb.w,tb.h,3):ctx.rect(tb.x,tb.y,tb.w,tb.h);
+        ctx.stroke(); ctx.shadowBlur=0;
+        // Reflexo
+        ctx.fillStyle='rgba(0,200,255,0.06)'; ctx.fillRect(tb.x+tb.w*.04,tb.y+2,tb.w*.1,tb.h-4);
+        // Conteúdo
+        const cx=tb.x+tb.w/2, cy=tb.y+tb.h*.44+Math.sin(t*.55+tb.x)*(tb.h*.04);
+        const cr=tb.w*.3;
+        if(tb.content==='brain') drawBrain(ctx,cx,cy,cr);
+        else if(tb.content==='dna') drawDNA(ctx,cx,cy,cr,t);
+        else if(tb.content==='cell') drawCell(ctx,cx,cy,cr,t);
+        else drawFormula(ctx,cx,cy,cr,t);
+        // Bolhas azuis
+        tb.bubbles.forEach(b=>{
+          b.by-=b.bv; if(b.by<0) b.by=1;
+          const bx=tb.x+b.bx*tb.w*.5+tb.w*.25;
+          const by_=tb.y+b.by*tb.h;
+          ctx.beginPath(); ctx.arc(bx,by_,b.bs,0,PI2);
+          ctx.strokeStyle='rgba(0,200,255,.45)'; ctx.lineWidth=.5; ctx.stroke();
+        });
+        // Leitura de dados ao lado do tubo
+        ctx.font='6px "Share Tech Mono",monospace'; ctx.textAlign='left'; ctx.textBaseline='top';
+        ctx.fillStyle=`rgba(0,180,255,${0.18+Math.sin(t+tb.x)*.08})`;
+        ctx.fillText(`${(Math.sin(t*0.5+tb.x)*50+50).toFixed(0)}%`,tb.x+tb.w+2,tb.y+4);
+      });
+
+      // Cabos de dados entre tubos (azul neon)
+      for(let i=0;i<tubes.length-1;i++){
+        const a=tubes[i], b=tubes[i+1];
+        ctx.beginPath();
+        ctx.moveTo(a.x+a.w/2, a.y+a.h*.82);
+        ctx.quadraticCurveTo((a.x+b.x)/2+a.w/2, h*.96, b.x+b.w/2, b.y+b.h*.82);
+        ctx.strokeStyle=`rgba(0,160,255,${0.15+Math.sin(t*.4)*.08})`; ctx.lineWidth=.9; ctx.stroke();
+      }
+    }
+    return draw;
+  }
+
+  /* ── AQUÁRIO: fundo azul, bolhas, raios de luz, medusas ── */
+  function initAquarium(canvas){
+    const ctx=canvas.getContext('2d');
+    const W=()=>canvas.width, H=()=>canvas.height;
+    let bubbles=[], rays=[], jellyfish=[], t=0;
+
+    function build(w,h){
+      bubbles=Array.from({length:18},()=>({
+        x:rand(0.05,0.95)*w, y:rand(0,1)*h,
+        r:rand(1.5,4.5), vy:rand(.3,.7), vx:rand(-.1,.1), life:rand(0,1)
+      }));
+      rays=Array.from({length:5},()=>({
+        x:rand(0.1,0.9)*w, alpha:rand(.05,.18), w:rand(8,22), speed:rand(.005,.012), phase:rand(0,PI2)
+      }));
+      jellyfish=Array.from({length:2},(_,i)=>({
+        x:rand(.2,.8)*w, y:rand(.2,.7)*h,
+        vx:rand(-.2,.2), vy:rand(-.1,.1),
+        r:rand(10,18), t:rand(0,PI2), speed:rand(.02,.04)
+      }));
+    }
+
+    function draw(){
+      if(!canvas.width||canvas.width<10){canvas.width=canvas.offsetWidth||200;canvas.height=canvas.offsetHeight||120;}
+      const w=W(),h=H();
+      if(!w||!h||!isFinite(w)||!isFinite(h)) return;
+      if(!bubbles.length) build(w,h); t+=0.025;
+      // Fundo aquático
+      const bg=ctx.createLinearGradient(0,0,0,h);
+      bg.addColorStop(0,'#051828'); bg.addColorStop(.5,'#0a2a40'); bg.addColorStop(1,'#020d18');
+      ctx.fillStyle=bg; ctx.fillRect(0,0,w,h);
+
+      // Raios de luz
+      rays.forEach(r=>{
+        r.phase+=r.speed;
+        const sx=r.x+Math.sin(r.phase)*15;
+        const grad=ctx.createLinearGradient(sx,0,sx+5,h*.8);
+        grad.addColorStop(0,`rgba(100,220,220,${r.alpha})`);
+        grad.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.beginPath();
+        ctx.moveTo(sx,0); ctx.lineTo(sx+r.w,h*.8); ctx.lineTo(sx,h*.8); ctx.closePath();
+        ctx.fillStyle=grad; ctx.fill();
+      });
+
+      // Fundo de areia
+      ctx.fillStyle='#0d2030'; ctx.fillRect(0,h*.85,w,h*.15);
+      // Ondulação do fundo
+      ctx.beginPath(); ctx.moveTo(0,h*.85);
+      for(let x=0;x<w;x+=4) ctx.lineTo(x,h*.85+Math.sin(x*.03+t)*2.5);
+      ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath();
+      ctx.fillStyle='#0a1824'; ctx.fill();
+
+      // Medusas
+      jellyfish.forEach(j=>{
+        j.x+=j.vx; j.y+=j.vy+Math.sin(t*j.speed*40+j.t)*.3;
+        j.t+=j.speed;
+        if(j.x<0||j.x>w) j.vx*=-1;
+        if(j.y<0||j.y>h*.8) j.vy*=-1;
+        const pulse=0.7+Math.sin(j.t)*0.3;
+        // Corpo
+        ctx.beginPath(); ctx.ellipse(j.x,j.y,j.r*pulse,j.r*.7,0,0,Math.PI);
+        ctx.fillStyle='rgba(77,180,200,0.25)'; ctx.fill();
+        ctx.strokeStyle='rgba(100,220,230,0.4)'; ctx.lineWidth=.7; ctx.stroke();
+        // Tentáculos
+        for(let i=-2;i<=2;i++){
+          const tx=j.x+i*(j.r*.3);
+          ctx.beginPath(); ctx.moveTo(tx,j.y);
+          ctx.quadraticCurveTo(tx+Math.sin(t+i)*4,j.y+j.r*.8,tx+Math.sin(t*1.5+i)*6,j.y+j.r*1.6);
+          ctx.strokeStyle='rgba(77,200,220,0.2)'; ctx.lineWidth=.6; ctx.stroke();
+        }
+      });
+
+      // Bolhas
+      bubbles.forEach(b=>{
+        b.y-=b.vy; b.x+=b.vx; b.life+=0.005;
+        if(b.y<0||b.life>1){b.y=h;b.x=rand(.05,.95)*w;b.life=0;}
+        const alpha=0.4*(1-b.life*.5);
+        ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,PI2);
+        ctx.strokeStyle=`rgba(120,220,220,${alpha})`; ctx.lineWidth=.7; ctx.stroke();
+        ctx.beginPath(); ctx.arc(b.x-b.r*.3,b.y-b.r*.3,b.r*.25,0,PI2);
+        ctx.fillStyle=`rgba(200,240,240,${alpha*.5})`; ctx.fill();
+      });
+    }
+    return draw;
+  }
+
+  /* ── TRANSPORTE: carris, vagões animados, sombras ── */
+  function initTransport(canvas){
+    const ctx=canvas.getContext('2d');
+    const W=()=>canvas.width, H=()=>canvas.height;
+    let carts=[], sparks=[], t=0;
+
+    function build(w,h){
+      carts=Array.from({length:3},(_,i)=>({
+        x:rand(0,1)*w, y:(i*.28+.18)*h,
+        w:w*.08, h:h*.08, vx:rand(.4,.9)*(Math.random()<.5?1:-1)
+      }));
+      sparks=[];
+    }
+
+    function draw(){
+      if(!canvas.width||canvas.width<10){canvas.width=canvas.offsetWidth||200;canvas.height=canvas.offsetHeight||120;}
+      const w=W(),h=H();
+      if(!w||!h||!isFinite(w)||!isFinite(h)) return;
+      if(!carts.length) build(w,h); t+=.02;
+      ctx.fillStyle='#03060e'; ctx.fillRect(0,0,w,h);
+      // Paredes com marcas
+      ctx.fillStyle='#060b16'; ctx.fillRect(0,0,w*.04,h);
+      ctx.fillStyle='#060b16'; ctx.fillRect(w*.96,0,w*.04,h);
+
+      // Carris
+      carts.forEach(c=>{
+        const ry=c.y+c.h*.5;
+        ctx.beginPath(); ctx.moveTo(0,ry); ctx.lineTo(w,ry);
+        ctx.strokeStyle='rgba(80,140,220,.2)'; ctx.lineWidth=.8; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0,ry+2); ctx.lineTo(w,ry+2);
+        ctx.strokeStyle='rgba(80,140,220,.1)'; ctx.lineWidth=.5; ctx.stroke();
+        // Suportes do carril
+        for(let x=0;x<w;x+=w*.1){
+          ctx.beginPath(); ctx.moveTo(x,ry-1); ctx.lineTo(x,ry+3);
+          ctx.strokeStyle='rgba(60,100,160,.15)'; ctx.lineWidth=.5; ctx.stroke();
+        }
+      });
+
+      // Vagões
+      carts.forEach(c=>{
+        c.x+=c.vx;
+        if(c.x>w+c.w) c.x=-c.w;
+        if(c.x<-c.w) c.x=w;
+        // Faíscas
+        if(Math.random()<.04){
+          sparks.push({x:c.x+c.w/2,y:c.y+c.h*.5,vx:rand(-1.5,1.5),vy:rand(-1.5,1.5),life:0,r:rand(.5,1.5)});
+        }
+        // Sombra do vagão
+        ctx.fillStyle='rgba(0,80,160,0.08)'; ctx.fillRect(c.x+3,c.y+3,c.w,c.h);
+        // Vagão
+        ctx.fillStyle='rgba(15,35,65,0.8)';
+        ctx.strokeStyle='rgba(80,160,255,.25)';
+        ctx.lineWidth=.8;
+        ctx.beginPath(); ctx.rect(c.x,c.y,c.w,c.h); ctx.fill(); ctx.stroke();
+        // Janela
+        ctx.fillStyle='rgba(0,120,200,0.12)';
+        ctx.fillRect(c.x+c.w*.15,c.y+c.h*.15,c.w*.7,c.h*.4);
+        ctx.strokeStyle='rgba(80,160,255,.2)'; ctx.lineWidth=.5;
+        ctx.strokeRect(c.x+c.w*.15,c.y+c.h*.15,c.w*.7,c.h*.4);
+        // Luz frontal
+        const dir=c.vx>0?1:-1;
+        const lx=c.vx>0?c.x+c.w:c.x;
+        const lg=ctx.createRadialGradient(lx,c.y+c.h*.5,0,lx,c.y+c.h*.5,c.w*.6);
+        lg.addColorStop(0,`rgba(80,160,255,0.35)`);
+        lg.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=lg; ctx.fillRect(lx-c.w*.6,c.y-c.h*.3,c.w*1.2,c.h*1.6);
+      });
+
+      // Faíscas
+      sparks=sparks.filter(s=>{
+        s.x+=s.vx; s.y+=s.vy; s.vy+=.05; s.life+=.07;
+        if(s.life>1) return false;
+        ctx.beginPath(); ctx.arc(s.x,s.y,s.r*(1-s.life),0,PI2);
+        ctx.fillStyle=`rgba(100,180,255,${.8*(1-s.life)})`; ctx.fill();
+        return true;
+      });
+    }
+    return draw;
+  }
+
+  /* ── THE DEPTHS — água vista de cima, perspectiva de cima, entidade sob a superfície ── */
+  function initDepths(canvas){
+    const ctx=canvas.getContext('2d');
+    const W=()=>canvas.width, H=()=>canvas.height;
+    let t=0, shakeX=0, shakeY=0, shakeMag=0, shakeDecay=0.84;
+
+    /* Canvas offscreen para o grão — putImageData aqui, depois drawImage com blend */
+    const noiseCanvas=document.createElement('canvas');
+    const noiseCtx=noiseCanvas.getContext('2d');
+
+    /* ── Ripples — ondas concêntricas vista de cima ── */
+    const ripples=[];
+    function spawnRipple(x,y,n,maxR,spd){
+      for(let i=0;i<n;i++)
+        ripples.push({x,y,r:i*5,maxR:maxR+i*10,speed:spd*(1+i*0.1)});
+    }
+
+    /* ── Gotas que caem do tecto ── */
+    const drops=[];
+    function spawnDrop(){
+      const w=W(),h=H(); if(!w||!h) return;
+      drops.push({x:rand(0.05,0.95)*w, y:rand(0.05,0.95)*h, timer:rand(50,220)});
+    }
+    for(let i=0;i<7;i++) spawnDrop();
+
+    /* ── Entidade preta ── */
+    let ent={active:false,x:0,y:0,vx:0,r:0,phase:0,timer:rand(250,500),didShake:false};
+    function launchEnt(){
+      const w=W(),h=H(); if(!w||!h) return;
+      const left=Math.random()<0.5;
+      ent.x = left ? -w*0.15 : w*1.15;
+      ent.y = rand(0.2,0.8)*h;
+      ent.vx = left ? rand(14,22) : -rand(14,22);
+      ent.r = rand(0.07,0.11)*w;
+      ent.phase=rand(0,Math.PI*2);
+      ent.active=true; ent.didShake=false;
+    }
+
+    /* ── Reflexos bioluminescentes na superfície ── */
+    const glints=Array.from({length:18},()=>({
+      x:Math.random(), y:Math.random(),
+      phase:rand(0,Math.PI*2), speed:rand(0.002,0.007), len:rand(8,30)
+    }));
+
+    function draw(){
+      if(!canvas.width||canvas.width<10){canvas.width=canvas.offsetWidth||200;canvas.height=canvas.offsetHeight||120;}
+      const w=W(),h=H();
+      if(!w||!h||!isFinite(w)||!isFinite(h)) return;
+      t+=0.016;
+
+      /* Shake decay */
+      shakeMag*=shakeDecay;
+      shakeX=(Math.random()-0.5)*shakeMag;
+      shakeY=(Math.random()-0.5)*shakeMag;
+      ctx.save();
+      ctx.translate(shakeX,shakeY);
+
+      /* ── Fundo — água negra vista de cima ── */
+      const bg=ctx.createRadialGradient(w*0.5,h*0.5,0,w*0.5,h*0.5,Math.max(w*0.8,1));
+      bg.addColorStop(0,'#060020'); bg.addColorStop(0.5,'#030012'); bg.addColorStop(1,'#010008');
+      ctx.fillStyle=bg; ctx.fillRect(0,0,w,h);
+
+      /* Pulse roxo central */
+      const pulse=Math.sin(t*0.5)*0.5+0.5;
+      const glow=ctx.createRadialGradient(w*0.5,h*0.5,0,w*0.5,h*0.5,Math.max(h*0.65,1));
+      glow.addColorStop(0,`rgba(60,0,120,${0.10+pulse*0.06})`);
+      glow.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=glow; ctx.fillRect(0,0,w,h);
+
+      /* ── Padrão de ondas na superfície — vista de cima ── */
+      for(let ring=0;ring<5;ring++){
+        const rph=t*0.3+ring*1.3;
+        const rx=w*0.5+Math.sin(rph*0.55)*w*0.07;
+        const ry=h*0.5+Math.cos(rph*0.45)*h*0.06;
+        const rad=(ring+1)*Math.min(w,h)*0.13+Math.sin(t*0.22+ring)*3;
+        ctx.beginPath();
+        ctx.ellipse(rx,ry,rad,rad*0.48,t*0.03+ring*0.32,0,Math.PI*2);
+        ctx.strokeStyle=`rgba(50,5,100,${0.05-ring*0.006})`;
+        ctx.lineWidth=0.6; ctx.stroke();
+      }
+
+      /* ── Glints bioluminescentes ── */
+      glints.forEach(g=>{
+        g.phase+=g.speed*60;
+        const a=Math.max(0,Math.sin(g.phase))*0.14;
+        if(a<0.005) return;
+        ctx.beginPath();
+        ctx.moveTo(g.x*w-g.len*0.5,g.y*h);
+        ctx.lineTo(g.x*w+g.len*0.5,g.y*h);
+        ctx.strokeStyle=`rgba(100,20,180,${a})`; ctx.lineWidth=0.5; ctx.stroke();
+      });
+
+      /* ── GOTAS A CAIR NA ÁGUA ── */
+      for(let i=drops.length-1;i>=0;i--){
+        const d=drops[i]; d.timer--;
+        if(d.timer<=0){
+          if(isFinite(d.x)&&isFinite(d.y)){
+            /* Ripples de gota — vista de cima, oval achatado */
+            spawnRipple(d.x,d.y,3,rand(22,42),0.9);
+            /* Flash de impacto */
+            const fl=ctx.createRadialGradient(d.x,d.y,0,d.x,d.y,12);
+            fl.addColorStop(0,'rgba(180,80,255,0.45)');
+            fl.addColorStop(1,'rgba(0,0,0,0)');
+            ctx.fillStyle=fl; ctx.fillRect(0,0,w,h);
+          }
+          drops.splice(i,1); spawnDrop();
+        }
+      }
+
+      /* ── RIPPLES — ondas elípticas achatadas (perspectiva de cima) ── */
+      for(let i=ripples.length-1;i>=0;i--){
+        const rp=ripples[i]; rp.r+=rp.speed*2.0;
+        const life=rp.r/rp.maxR;
+        if(life>=1){ripples.splice(i,1);continue;}
+        const a=(1-life)*0.65;
+        /* Anel principal */
+        ctx.beginPath(); ctx.ellipse(rp.x,rp.y,rp.r,rp.r*0.4,0,0,Math.PI*2);
+        ctx.strokeStyle=`rgba(140,20,230,${a})`; ctx.lineWidth=1.0+a*0.8; ctx.stroke();
+        /* Anel interior mais tênue */
+        if(rp.r>6){
+          ctx.beginPath(); ctx.ellipse(rp.x,rp.y,rp.r*0.52,rp.r*0.21,0,0,Math.PI*2);
+          ctx.strokeStyle=`rgba(200,80,255,${a*0.38})`; ctx.lineWidth=0.4; ctx.stroke();
+        }
+      }
+
+      /* ── ENTIDADE — bola preta a passar MUITO RÁPIDO ── */
+      if(!ent.active){
+        ent.timer--; if(ent.timer<=0) launchEnt();
+      } else {
+        ent.x+=ent.vx; ent.phase+=0.06;
+        const inView=ent.x>-ent.r*2&&ent.x<w+ent.r*2;
+
+        /* Ao entrar → splash grande + shake de terramoto */
+        if(inView&&!ent.didShake){
+          ent.didShake=true;
+          const ex=ent.vx>0?0:w;
+          spawnRipple(ex,ent.y,8,ent.r*2.8,3.2);
+          /* Flash de entrada */
+          const fl2=ctx.createRadialGradient(ex,ent.y,0,ex,ent.y,ent.r*2);
+          fl2.addColorStop(0,'rgba(80,0,150,0.5)'); fl2.addColorStop(1,'rgba(0,0,0,0)');
+          ctx.fillStyle=fl2; ctx.fillRect(0,0,w,h);
+          shakeMag=rand(18,26); shakeDecay=0.87;
+        }
+
+        if(inView){
+          const ex=ent.x, ey=ent.y+Math.sin(ent.phase)*h*0.015, er=ent.r;
+
+          /* Ondas de deslocação ao longo do trajecto */
+          if(Math.random()<0.22)
+            spawnRipple(ex+(Math.random()-0.5)*er*0.7,ey+(Math.random()-0.5)*er*0.3,1,rand(14,30),1.3);
+
+          ctx.save();
+
+          /* Aura de distorção da água ao redor */
+          const aura=ctx.createRadialGradient(ex,ey,er*0.35,ex,ey,er*1.9);
+          aura.addColorStop(0,'rgba(8,0,30,0.92)');
+          aura.addColorStop(0.5,'rgba(3,0,12,0.5)');
+          aura.addColorStop(1,'rgba(0,0,0,0)');
+          ctx.beginPath(); ctx.ellipse(ex,ey,er*1.9,er*0.85,0,0,Math.PI*2);
+          ctx.fillStyle=aura; ctx.fill();
+
+          /* CORPO PRETO — bola sólida achatada (perspectiva de cima) */
+          ctx.beginPath(); ctx.ellipse(ex,ey,er,er*0.46,0,0,Math.PI*2);
+          ctx.fillStyle='#000'; ctx.fill();
+
+          /* Contorno roxo escuro bem definido */
+          ctx.beginPath(); ctx.ellipse(ex,ey,er,er*0.46,0,0,Math.PI*2);
+          ctx.strokeStyle='rgba(90,0,160,0.9)'; ctx.lineWidth=2.5; ctx.stroke();
+
+          /* Reflexo tênue da superfície da água */
+          const hi=ctx.createRadialGradient(ex-er*0.3,ey-er*0.24,0,ex-er*0.3,ey-er*0.24,er*0.6);
+          hi.addColorStop(0,'rgba(120,40,200,0.22)'); hi.addColorStop(1,'rgba(0,0,0,0)');
+          ctx.beginPath(); ctx.ellipse(ex,ey,er,er*0.46,0,0,Math.PI*2);
+          ctx.fillStyle=hi; ctx.fill();
+
+          /* Rastro de água perturbada */
+          for(let tr=1;tr<=7;tr++){
+            const tx=ex-ent.vx*tr*2.8;
+            ctx.globalAlpha=0.22*(1-tr/7);
+            ctx.beginPath(); ctx.ellipse(tx,ey,er*(1-tr*0.09)*0.6,er*0.27*(1-tr*0.09),0,0,Math.PI*2);
+            ctx.fillStyle='rgba(3,0,15,0.9)'; ctx.fill();
+          }
+          ctx.restore();
+        }
+
+        /* Saiu → reset com intervalo longo */
+        if(ent.x>w*1.4||ent.x<-w*0.4){
+          ent.active=false;
+          ent.timer=rand(350,700);
+          spawnRipple(ent.x<0?0:w,ent.y,3,50,1.8);
+          if(shakeMag<3){shakeMag=rand(3,6);shakeDecay=0.82;}
+        }
+      }
+
+      ctx.restore(); /* fim shake */
+
+      /* ── ESTÁTICA DE TV — grão cinzento por cima de tudo ── */
+      /* Desenha o grão no canvas offscreen, depois compõe com drawImage */
+      noiseCanvas.width=w; noiseCanvas.height=h;
+      const noiseImg=noiseCtx.createImageData(w,h);
+      const nd=noiseImg.data;
+      for(let i=0;i<nd.length;i+=4){
+        const v=Math.random();
+        if(v>0.45){
+          const br=Math.floor((v-0.45)/0.55*200);
+          nd[i]=br; nd[i+1]=br; nd[i+2]=br;
+          nd[i+3]=Math.floor(v*55);
+        }
+      }
+      noiseCtx.putImageData(noiseImg,0,0);
+
+      /* Faixas de interferência */
+      for(let wi=0;wi<5;wi++){
+        const wy=((t*30+wi*(h/5)*1.4)%(h*1.5))-h*0.25;
+        noiseCtx.fillStyle=`rgba(210,210,210,${0.08+Math.random()*0.10})`;
+        noiseCtx.fillRect(0,wy,w,1+Math.random()*5);
+      }
+      if(Math.random()<0.09){
+        noiseCtx.fillStyle='rgba(230,230,230,0.14)';
+        noiseCtx.fillRect(0,Math.random()*h,w,Math.random()<0.5?1:3);
+      }
+
+      ctx.save();
+      ctx.globalCompositeOperation='screen';
+      ctx.globalAlpha=0.85;
+      ctx.drawImage(noiseCanvas,0,0);
+      ctx.restore();
+    }
+
+    return draw;
+  }
+  function initGeysers(canvas){
+    const ctx=canvas.getContext('2d');
+    const W=()=>canvas.width, H=()=>canvas.height;
+    let geysers=[], particles=[], t=0;
+    let shakeX=0, shakeY=0, shakeMag=0, shakeDecay=0.88;
+
+    function build(w,h){
+      geysers=Array.from({length:5},(_,i)=>({
+        x:(.08+i*.21)*w, baseY:h,
+        phase:rand(0,Math.PI*2), period:rand(100,180), timer:rand(0,180),
+        active:false, burst:0, width:rand(18,38)
+      }));
+    }
+
+    function draw(){
+      if(!canvas.width||canvas.width<10){canvas.width=canvas.offsetWidth||200;canvas.height=canvas.offsetHeight||120;}
+      const w=W(),h=H();
+      if(!w||!h||!isFinite(w)||!isFinite(h)) return;
+      if(!geysers.length) build(w,h); t+=.02;
+
+      /* Shake decay */
+      shakeMag*=shakeDecay;
+      shakeX=(Math.random()-.5)*shakeMag;
+      shakeY=(Math.random()-.5)*shakeMag;
+      ctx.save();
+      ctx.translate(shakeX,shakeY);
+
+      /* Fundo verde escuro */
+      const bg=ctx.createLinearGradient(0,0,0,h);
+      bg.addColorStop(0,'#020c04'); bg.addColorStop(.6,'#041008'); bg.addColorStop(1,'#060e04');
+      ctx.fillStyle=bg; ctx.fillRect(0,0,w,h);
+      /* Chão */
+      ctx.fillStyle='#0a1a0c'; ctx.fillRect(0,h*.78,w,h*.22);
+      /* Fissuras no chão */
+      for(let i=0;i<6;i++){
+        const fx=rand(0,1)*w;
+        ctx.beginPath(); ctx.moveTo(fx,h*.78);
+        ctx.quadraticCurveTo(fx+rand(-10,10),h*.88,fx+rand(-5,5),h);
+        ctx.strokeStyle='rgba(0,180,60,.14)'; ctx.lineWidth=.7; ctx.stroke();
+      }
+
+      geysers.forEach(g=>{
+        g.timer--;
+        if(g.timer<=0){
+          const wasActive=g.active;
+          g.active=!g.active; g.timer=g.active?rand(40,80):rand(70,160); g.burst=0;
+          /* Tremor quando o geyser explode */
+          if(g.active&&!wasActive){
+            shakeMag=Math.max(shakeMag,rand(5,10)); shakeDecay=.86;
+          }
+        }
+        if(g.active){
+          g.burst=Math.min(g.burst+.06,1);
+          /* Emite partículas mais generosas */
+          const emitCount=Math.floor(rand(1,4)*g.burst);
+          for(let ei=0;ei<emitCount;ei++){
+            const spd=rand(2.0,4.5)*g.burst;
+            const spread=g.width*.5;
+            particles.push({
+              x:g.x+rand(-spread,spread), y:h*.76,
+              vx:rand(-.8,.8), vy:-spd,
+              r:rand(3,8), life:0,
+              isOrange:Math.random()<.45
+            });
+          }
+          /* Coluna de vapor — mais larga */
+          const colW=g.width*g.burst;
+          const ch=h*.75*g.burst;
+          for(let side=-1;side<=1;side+=2){
+            const cg=ctx.createLinearGradient(g.x,h*.78,g.x,h*.78-ch);
+            cg.addColorStop(0,`rgba(40,180,60,${.45*g.burst})`);
+            cg.addColorStop(.5,`rgba(100,220,80,${.2*g.burst})`);
+            cg.addColorStop(1,'rgba(40,120,40,0)');
+            ctx.beginPath();
+            for(let y=0;y<ch;y+=3){
+              const wave=Math.sin(y*.07+t*3+side)*colW*(1-y/ch)*.8;
+              y===0?ctx.moveTo(g.x+side*colW*.5+wave,h*.78-y):ctx.lineTo(g.x+side*colW*.5+wave,h*.78-y);
+            }
+            ctx.strokeStyle=`rgba(80,200,80,${.18*g.burst})`; ctx.lineWidth=colW*.7*g.burst; ctx.stroke();
+          }
+          /* Halo mais largo na base */
+          const hg=ctx.createRadialGradient(g.x,h*.8,0,g.x,h*.8,g.width*2.5*g.burst);
+          hg.addColorStop(0,`rgba(100,220,80,${.45*g.burst})`); hg.addColorStop(1,'rgba(0,0,0,0)');
+          ctx.fillStyle=hg; ctx.beginPath(); ctx.ellipse(g.x,h*.8,g.width*2.5*g.burst,g.width*.8*g.burst,0,0,Math.PI*2); ctx.fill();
+        }
+      });
+
+      /* Partículas */
+      particles=particles.filter(p=>{
+        p.x+=p.vx; p.y+=p.vy; p.vy*=.97; p.vx*=.98; p.r+=.06; p.life+=.013;
+        if(p.life>1) return false;
+        const alpha=.55*(1-p.life);
+        if(p.isOrange){
+          ctx.beginPath(); ctx.arc(p.x,p.y,p.r*(1+p.life),0,Math.PI*2);
+          ctx.fillStyle=`rgba(255,${100+Math.floor(p.life*60)},20,${alpha*.75})`; ctx.fill();
+        } else {
+          ctx.beginPath(); ctx.arc(p.x,p.y,p.r*(1+p.life*.5),0,Math.PI*2);
+          ctx.fillStyle=`rgba(60,${180+Math.floor(p.life*40)},60,${alpha})`; ctx.fill();
+        }
+        return true;
+      });
+
+      /* Luz ambiente */
+      geysers.forEach(g=>{
+        if(g.active&&g.burst>.2){
+          const lg=ctx.createRadialGradient(g.x,h*.85,0,g.x,h*.85,w*.16);
+          lg.addColorStop(0,`rgba(40,160,60,${.18*g.burst})`); lg.addColorStop(1,'rgba(0,0,0,0)');
+          ctx.fillStyle=lg; ctx.fillRect(0,0,w,h);
+        }
+      });
+
+      ctx.restore();
+    }
+    return draw;
+  }
+  /* ── WINDY MOUNTAINS: céu tempestuoso, montanhas, vento, matéria negra flutuante ── */
+  function initWind(canvas){
+    const ctx=canvas.getContext('2d');
+    const W=()=>canvas.width, H=()=>canvas.height;
+    let t=0, streaks=[], bmParticles=[], clouds=[];
+
+    function build(w,h){
+      // Riscos de vento
+      streaks=Array.from({length:22},()=>spawnStreak(w,h));
+      // Partículas de matéria negra suspensas
+      bmParticles=Array.from({length:14},()=>spawnBM(w,h));
+      // Nuvens tempestuosas
+      clouds=Array.from({length:6},()=>({
+        x:rand(0,w),y:rand(h*.04,h*.28),w:rand(50,120),h:rand(14,32),vx:rand(.6,1.8)
+      }));
+    }
+
+    function spawnStreak(w,h){
+      return {
+        x:-rand(0,w*.3), y:rand(0,h*.75),
+        len:rand(30,90), alpha:rand(.06,.18),
+        vx:rand(4,9), vy:rand(-.4,.4),
+        life:0, maxLife:rand(.4,1)
+      };
+    }
+
+    function spawnBM(w,h){
+      return {
+        x:rand(0,w), y:rand(h*.15,h*.7),
+        r:rand(3,9), vx:rand(1.2,3.5), vy:rand(-.25,.25),
+        phase:rand(0,PI2), alpha:rand(.5,.9)
+      };
+    }
+
+    // Montanhas — silhuetas em camadas
+    const mtLayers=[
+      // Fundo — mais claras
+      [ [0,1],[.06,.44],[.14,.55],[.22,.38],[.32,.52],[.42,.33],[.52,.48],[.62,.36],[.72,.51],[.82,.40],[.92,.54],[1,.45],[1,1] ],
+      // Meio
+      [ [0,1],[.05,.56],[.12,.65],[.2,.48],[.3,.6],[.4,.44],[.5,.57],[.6,.45],[.7,.58],[.8,.47],[.9,.6],[1,.52],[1,1] ],
+      // Frente — mais escuras
+      [ [0,1],[.08,.68],[.18,.75],[.28,.62],[.38,.72],[.5,.58],[.62,.68],[.74,.60],[.86,.70],[1,.62],[1,1] ],
+    ];
+    const mtColors=['rgba(25,35,50,.7)','rgba(15,22,35,.85)','rgba(8,12,22,.95)'];
+
+    function draw(){
+      if(!canvas.width||canvas.width<10){canvas.width=canvas.offsetWidth||200;canvas.height=canvas.offsetHeight||120;}
+      const w=W(),h=H();
+      if(!w||!h||!isFinite(w)||!isFinite(h)) return;
+      if(!streaks.length) build(w,h); t+=.02;
+
+      // Céu — gradiente tempestuoso azul-acinzentado
+      const sky=ctx.createLinearGradient(0,0,0,h*.65);
+      sky.addColorStop(0,'#060d18');
+      sky.addColorStop(.4,'#0a1525');
+      sky.addColorStop(1,'#0d1c30');
+      ctx.fillStyle=sky; ctx.fillRect(0,0,w,h);
+
+      // Chão
+      const gnd=ctx.createLinearGradient(0,h*.6,0,h);
+      gnd.addColorStop(0,'#0a1020'); gnd.addColorStop(1,'#060c18');
+      ctx.fillStyle=gnd; ctx.fillRect(0,h*.6,w,h*.4);
+
+      // Nuvens tempestuosas
+      clouds.forEach(c=>{
+        c.x+=c.vx; if(c.x>w+c.w) c.x=-c.w;
+        const cg=ctx.createRadialGradient(c.x,c.y,0,c.x,c.y,c.w*.55);
+        cg.addColorStop(0,'rgba(30,50,90,.18)'); cg.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=cg; ctx.beginPath();
+        ctx.ellipse(c.x,c.y,c.w*.5,c.h*.5,0,0,PI2); ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(c.x+c.w*.2,c.y-c.h*.2,c.w*.32,c.h*.4,0,0,PI2); ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(c.x-c.w*.2,c.y-c.h*.1,c.w*.28,c.h*.32,0,0,PI2); ctx.fill();
+      });
+
+      // Riscos de vento
+      streaks=streaks.map(s=>{
+        s.x+=s.vx; s.y+=s.vy; s.life+=.04;
+        if(s.life>=s.maxLife || s.x>w+s.len) return spawnStreak(w,h);
+        const a=s.alpha*(1-s.life/s.maxLife);
+        ctx.beginPath();
+        ctx.moveTo(s.x,s.y); ctx.lineTo(s.x+s.len*(1-s.life*.3),s.y+s.vy*2);
+        const lg=ctx.createLinearGradient(s.x,s.y,s.x+s.len,s.y);
+        lg.addColorStop(0,'rgba(140,180,255,0)');
+        lg.addColorStop(.3,`rgba(160,200,255,${a})`);
+        lg.addColorStop(1,'rgba(140,180,255,0)');
+        ctx.strokeStyle=lg; ctx.lineWidth=rand(.4,1.1); ctx.stroke();
+        return s;
+      });
+
+      // Montanhas em camadas
+      mtLayers.forEach((pts,i)=>{
+        ctx.beginPath();
+        pts.forEach(([x,y],j)=>j===0?ctx.moveTo(x*w,y*h):ctx.lineTo(x*w,y*h));
+        ctx.closePath(); ctx.fillStyle=mtColors[i]; ctx.fill();
+      });
+
+      // Matéria negra flutuante (esferas escuras arrastadas pelo vento)
+      bmParticles=bmParticles.map(p=>{
+        p.x+=p.vx; p.y+=p.vy+Math.sin(t+p.phase)*.3;
+        if(p.x>w+20) return spawnBM(w,h);
+        // Sombra de arrastamento
+        for(let i=1;i<=3;i++){
+          const tx=p.x-p.vx*i*3;
+          const tg=ctx.createRadialGradient(tx,p.y,0,tx,p.y,p.r*(1+i*.2));
+          tg.addColorStop(0,`rgba(0,0,0,${p.alpha*(1-i*.28)*.4})`);
+          tg.addColorStop(1,'rgba(0,0,0,0)');
+          ctx.fillStyle=tg; ctx.beginPath(); ctx.arc(tx,p.y,p.r*(1+i*.2),0,PI2); ctx.fill();
+        }
+        // Esfera principal
+        const bg=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r);
+        bg.addColorStop(0,`rgba(5,5,15,${p.alpha})`);
+        bg.addColorStop(.7,`rgba(2,2,8,${p.alpha*.8})`);
+        bg.addColorStop(1,`rgba(20,10,40,${p.alpha*.3})`);
+        ctx.fillStyle=bg; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,PI2); ctx.fill();
+        // Contorno roxo subtil
+        ctx.strokeStyle=`rgba(80,20,120,${p.alpha*.25})`; ctx.lineWidth=.5;
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,PI2); ctx.stroke();
+        return p;
+      });
+    }
+    return draw;
+  }
+
+  /* ════════════════════════════════════════════════════════════
+     LOOP DE ANIMAÇÃO — um requestAnimationFrame partilhado
+  ════════════════════════════════════════════════════════════ */
+  const renderers=new Map();
+
+  function buildRenderer(cell){
+    const canvas=cell.querySelector('.cam-canvas');
+    if(!canvas) return null;
+    const zone=cell.dataset.zone;
+    const builders={nature:initNature,mines:initMines,facility:initFacility,lab:initLab,aquarium:initAquarium,transport:initTransport,depths:initDepths,geysers:initGeysers,wind:initWind};
+    if(!builders[zone]) return null;
+    return builders[zone](canvas);
+  }
+
+  document.querySelectorAll('.cam-cell').forEach(cell=>{
+    const draw=buildRenderer(cell);
+    if(draw) renderers.set(cell,draw);
+  });
+
+  // Expanded canvas renderer
+  let expandedRenderer=null;
+  let expandedActive=false;
+
+  function animLoop(){
+    renderers.forEach(draw=>draw());
+    if(expandedActive && expandedRenderer) expandedRenderer();
+    requestAnimationFrame(animLoop);
+  }
+  requestAnimationFrame(animLoop);
+
+  // Resize observer
+  const ro=new ResizeObserver(()=>{});
+  document.querySelectorAll('.cam-cell').forEach(c=>ro.observe(c));
+
+  /* ════ GLITCH ════ */
+  function scheduleGlitch(){
+    const cells=document.querySelectorAll('.cam-cell');
+    const cell=cells[Math.floor(Math.random()*cells.length)];
+    cell.classList.add('glitching');
+    setTimeout(()=>cell.classList.remove('glitching'),500);
+    setTimeout(scheduleGlitch,5000+Math.random()*10000);
+  }
+  setTimeout(scheduleGlitch,4000);
+
+  /* ════ RELÓGIO ════ */
+  /* ════════════════════════════════════════════════════════════
+     ACESSO + ZOOM
+  ════════════════════════════════════════════════════════════ */
+  const accessOverlay=document.getElementById('accessOverlay');
+  const expanded=document.getElementById('camExpanded');
+  const expCanvas=document.getElementById('expandedCanvas');
+  const expInfo=document.getElementById('expandedInfo');
+  const expCamId=document.getElementById('expCamId');
+  const expClose=document.getElementById('expClose');
+  const hudTop=document.getElementById('expandedHudTop');
+  let animating=false;
+
+  const BUILDERS={nature:initNature,mines:initMines,facility:initFacility,lab:initLab,aquarium:initAquarium,transport:initTransport,depths:initDepths,geysers:initGeysers,wind:initWind};
+
+  function startAccess(cell,zone){
+    if(animating) return; animating=true;
+    const z=ZONES[zone];
+    accessOverlay.innerHTML=''; accessOverlay.style.background='rgba(0,0,0,0)';
+    accessOverlay.classList.add('active');
+    const lines=[`> ORBIS-CCTV // SISTEMA DE ACESSO`,`> CÂMERA: ${z.cam} // ${z.floor}`,`> AUTENTICAÇÃO...........OK`,`> STREAM: ACTIVO`,`> DESENCRIPTANDO FEED...`,`> ACESSO CONCEDIDO`];
+    const terminal=document.createElement('div'); terminal.className='access-terminal';
+    const lineEls=lines.map(txt=>{const s=document.createElement('span');s.className='access-line';s.textContent=txt;return s;});
+    lineEls.forEach(l=>terminal.appendChild(l));
+    const cursor=document.createElement('span'); cursor.className='access-cursor';
+    terminal.appendChild(cursor); accessOverlay.appendChild(terminal);
+    let t2=0; const dk=setInterval(()=>{t2+=.08;accessOverlay.style.background=`rgba(0,0,0,${Math.min(t2*.7,.7)})`;if(t2>=1)clearInterval(dk);},20);
+    [0,120,280,440,580,720].forEach((d,i)=>setTimeout(()=>lineEls[i].classList.add('show'),d));
+    setTimeout(()=>{accessOverlay.classList.remove('active');accessOverlay.style.background='';doZoom(cell,zone);},1100);
+  }
+
+  function doZoom(cell,zone){
+    const z=ZONES[zone];
+    const rect=cell.getBoundingClientRect();
+    expanded.style.cssText=`display:block;position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px;pointer-events:none;z-index:600;overflow:hidden;`;
+    expCamId.textContent=`${z.cam} // ${z.floor}`;
+    expanded.classList.remove('open');
+    hudTop.classList.remove('ui-ready');
+    expInfo.classList.remove('slide-in');
+    expanded.offsetHeight;
+    const vw=window.innerWidth, vh=window.innerHeight;
+    expanded.style.transition='left .5s cubic-bezier(.4,0,.2,1),top .5s cubic-bezier(.4,0,.2,1),width .5s cubic-bezier(.4,0,.2,1),height .5s cubic-bezier(.4,0,.2,1)';
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      expanded.style.left='0px'; expanded.style.top='0px';
+      expanded.style.width=vw+'px'; expanded.style.height=vh+'px';
+    }));
+    setTimeout(()=>{
+      expanded.style.transition=''; expanded.style.cssText='';
+      expanded.classList.add('open');
+      expanded.style.pointerEvents='all';
+      document.body.style.overflow='hidden';
+      /* Define canvas ANTES de criar o renderer */
+      expCanvas.width=vw; expCanvas.height=vh;
+      expCanvas.style.width=vw+'px'; expCanvas.style.height=vh+'px';
+      expandedActive=false; expandedRenderer=null;
+      if(BUILDERS[zone]){
+        expandedRenderer=BUILDERS[zone](expCanvas);
+        expandedActive=true;
+      }
+      expInfo.innerHTML=`
+        <div><div class="il">// Estado da Zona</div><div class="i-tag" style="border-color:${z.tagBorder};color:${z.tagColor};"><span class="i-dot" style="background:${z.dotColor};"></span>${z.tagText}</div></div>
+        <div><div class="i-name" style="color:${z.titleColor};text-shadow:0 0 40px ${z.titleGlow};">${z.name}</div></div>
+        <div><div class="il">// Relatório de Campo</div><p class="i-desc">${z.desc}</p></div>
+        <div><div class="il">// Condições Ambientais</div><div class="i-stats">${z.stats.map(s=>`<span class="i-stat">${s}</span>`).join('')}</div></div>
+        <div><div class="il">// Fauna Detectada</div><div class="i-creatures">${z.creatures.map(([ic,nm])=>`<div class="i-creature"><span class="i-ci">${ic}</span><span class="i-cn">${nm}</span></div>`).join('')}</div></div>`;
+      hudTop.classList.add('ui-ready');
+      infoVisible=true;
+      expClose.textContent='✕ FECHAR INFO';
+      setTimeout(()=>expInfo.classList.add('slide-in'),80);
+      animating=false;
+    },520);
+  }
+
+  function closeExpanded(){
+    expInfo.classList.remove('slide-in');
+    expanded.classList.remove('open');
+    expandedActive=false; expandedRenderer=null;
+    document.body.style.overflow='';
+    setTimeout(()=>{expanded.style.display='none';expInfo.innerHTML='';infoVisible=true;},300);
+  }
+
+  let infoVisible=true;
+  function toggleInfo(){
+    infoVisible=!infoVisible;
+    if(infoVisible){
+      expInfo.classList.add('slide-in');
+      expClose.textContent='✕ FECHAR INFO';
+    } else {
+      expInfo.classList.remove('slide-in');
+      expClose.textContent='▶ VER INFO';
+    }
+  }
+
+  document.querySelectorAll('.cam-cell').forEach(c=>c.addEventListener('click',()=>startAccess(c,c.dataset.zone)));
+  expClose.addEventListener('click',toggleInfo);
+  document.getElementById('expBack').addEventListener('click',closeExpanded);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeExpanded();});
+
+  /* ── TV OFF ANIMATION ── */
+  (function(){
+    const btn = document.getElementById('monitorPowerBtn');
+    const overlay = document.getElementById('tvOff');
+    const cvs = document.getElementById('tvOffCanvas');
+    const ctx2 = cvs.getContext('2d');
+    let animFrame = null;
+    let powered = true;
+
+    function runTvOff(){
+      const screen = overlay.parentElement;
+      cvs.width = screen.offsetWidth || 800;
+      cvs.height = screen.offsetHeight || 500;
+      const W = cvs.width, H = cvs.height;
+
+      overlay.classList.add('active');
+      let phase = 0; /* 0=static burst, 1=shrink, 2=line, 3=fade out */
+      let progress = 0;
+      let lineW = W, lineH = H;
+
+      function frame(){
+        ctx2.clearRect(0,0,W,H);
+
+        if(phase===0){
+          /* Fase 0 — explosão de estática branca + cor */
+          const a = 1 - progress/0.3;
+          /* Fundo preto que aparece */
+          ctx2.fillStyle=`rgba(0,0,0,${progress/0.3})`;
+          ctx2.fillRect(0,0,W,H);
+          /* Grão intenso */
+          const id = ctx2.createImageData(W,H);
+          const d=id.data;
+          for(let i=0;i<d.length;i+=4){
+            const v=Math.random();
+            const br=Math.floor(v*255);
+            d[i]=br; d[i+1]=br; d[i+2]=br; d[i+3]=Math.floor(a*200);
+          }
+          ctx2.putImageData(id,0,0);
+          progress += 0.04;
+          if(progress>=0.3){ phase=1; progress=0; lineH=H; lineW=W; }
+
+        } else if(phase===1){
+          /* Fase 1 — ecrã encolhe verticalmente até uma linha */
+          const ease = 1 - Math.pow(1-progress,3);
+          lineH = H * (1 - ease);
+          const centerY = H/2;
+          const top = centerY - lineH/2;
+
+          /* Fundo preto total */
+          ctx2.fillStyle='#000';
+          ctx2.fillRect(0,0,W,H);
+
+          if(lineH > 1){
+            /* Conteúdo encolhido — estática */
+            ctx2.save();
+            ctx2.beginPath();
+            ctx2.rect(0, top, W, lineH);
+            ctx2.clip();
+            /* Grão dentro da faixa */
+            const id2 = ctx2.createImageData(W, Math.max(1,Math.floor(lineH)));
+            const d2=id2.data;
+            for(let i=0;i<d2.length;i+=4){
+              const v=Math.random()*0.6+0.2;
+              const br=Math.floor(v*200);
+              d2[i]=br; d2[i+1]=br; d2[i+2]=br; d2[i+3]=180;
+            }
+            ctx2.putImageData(id2,0,top);
+
+            /* Borda brilhante da faixa */
+            const lineGlow=ctx2.createLinearGradient(0,top,0,top+lineH);
+            lineGlow.addColorStop(0,'rgba(255,255,255,0.6)');
+            lineGlow.addColorStop(0.1,'rgba(255,255,255,0.0)');
+            lineGlow.addColorStop(0.9,'rgba(255,255,255,0.0)');
+            lineGlow.addColorStop(1,'rgba(255,255,255,0.6)');
+            ctx2.fillStyle=lineGlow;
+            ctx2.fillRect(0,top,W,lineH);
+            ctx2.restore();
+          }
+
+          progress += 0.035;
+          if(progress>=1){ phase=2; progress=0; }
+
+        } else if(phase===2){
+          /* Fase 2 — linha horizontal brilhante que encolhe e desaparece */
+          const ease = 1 - Math.pow(1-Math.min(progress,1),2);
+          const currentW = W * (1 - ease);
+          const lineThick = Math.max(1, 3*(1-progress*0.8));
+          const cy = H/2;
+
+          ctx2.fillStyle='#000'; ctx2.fillRect(0,0,W,H);
+
+          if(currentW > 2){
+            const lx = (W - currentW)/2;
+            /* Glow suave */
+            const lg = ctx2.createLinearGradient(0,cy-12,0,cy+12);
+            lg.addColorStop(0,'rgba(255,255,255,0)');
+            lg.addColorStop(0.35,`rgba(255,255,255,${0.15*(1-progress)})`);
+            lg.addColorStop(0.5,`rgba(255,255,255,${0.6*(1-progress*0.5)})`);
+            lg.addColorStop(0.65,`rgba(255,255,255,${0.15*(1-progress)})`);
+            lg.addColorStop(1,'rgba(255,255,255,0)');
+            ctx2.fillStyle=lg;
+            ctx2.fillRect(lx,cy-12,currentW,24);
+            /* Linha central brilhante */
+            ctx2.fillStyle=`rgba(255,255,255,${0.95-progress*0.4})`;
+            ctx2.fillRect(lx,cy-lineThick/2,currentW,lineThick);
+          }
+
+          progress += 0.028;
+          if(progress>=1){ phase=3; progress=0; }
+
+        } else if(phase===3){
+          /* Fase 3 — fade para preto total */
+          const a = 1 - progress;
+          ctx2.fillStyle=`rgba(0,0,0,${a<0.05?0:0.02})`;
+          ctx2.fillRect(0,0,W,H);
+          progress += 0.06;
+          if(progress>=1){
+            /* Mantém o overlay preto sólido — tapa o ecrã completamente */
+            ctx2.fillStyle='#000'; ctx2.fillRect(0,0,W,H);
+            cancelAnimationFrame(animFrame);
+            powered = false;
+            /* LED fica vermelho */
+            btn.style.boxShadow='0 0 8px rgba(255,30,30,0.6), 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.4)';
+            /* NÃO remove .active — o overlay preto fica a tapar o ecrã */
+            return;
+          }
+        }
+
+        animFrame = requestAnimationFrame(frame);
+      }
+
+      cancelAnimationFrame(animFrame);
+      frame();
+    }
+
+    function runTvOn(){
+      const screen = overlay.parentElement;
+      cvs.width = screen.offsetWidth || 800;
+      cvs.height = screen.offsetHeight || 500;
+      const W=cvs.width, H=cvs.height;
+      /* Preenche de preto imediatamente para não haver flash */
+      ctx2.fillStyle='#000'; ctx2.fillRect(0,0,W,H);
+      let progress=0;
+
+      function frame(){
+        ctx2.clearRect(0,0,W,H);
+        /* Linha cresce do centro */
+        const ease = 1-Math.pow(1-Math.min(progress*2,1),3);
+        const lineW2 = W*ease;
+        const lx=(W-lineW2)/2;
+        const cy=H/2;
+        ctx2.fillStyle='#000'; ctx2.fillRect(0,0,W,H);
+
+        if(lineW2>2){
+          /* Glow da linha */
+          const lg=ctx2.createLinearGradient(0,cy-14,0,cy+14);
+          lg.addColorStop(0,'rgba(255,255,255,0)');
+          lg.addColorStop(0.4,`rgba(255,255,255,${0.25*Math.min(progress*3,1)})`);
+          lg.addColorStop(0.5,`rgba(255,255,255,${0.8*Math.min(progress*3,1)})`);
+          lg.addColorStop(0.6,`rgba(255,255,255,${0.25*Math.min(progress*3,1)})`);
+          lg.addColorStop(1,'rgba(255,255,255,0)');
+          ctx2.fillStyle=lg; ctx2.fillRect(lx,cy-14,lineW2,28);
+          ctx2.fillStyle=`rgba(255,255,255,${Math.min(progress*4,0.9)})`;
+          ctx2.fillRect(lx,cy-1.5,lineW2,3);
+        }
+
+        /* A partir de metade, expande verticalmente */
+        if(progress>0.4){
+          const p2=(progress-0.4)/0.6;
+          const ease2=1-Math.pow(1-p2,2);
+          const lineH2=H*ease2;
+          const top=cy-lineH2/2;
+          ctx2.save();
+          ctx2.beginPath(); ctx2.rect(0,top,W,lineH2); ctx2.clip();
+          const id=ctx2.createImageData(W,Math.max(1,Math.floor(lineH2)));
+          const d=id.data;
+          for(let i=0;i<d.length;i+=4){
+            const v=Math.random()*0.4+0.1;
+            const br=Math.floor(v*180);
+            d[i]=br; d[i+1]=br; d[i+2]=br; d[i+3]=Math.floor(p2*160);
+          }
+          ctx2.putImageData(id,0,top);
+          ctx2.restore();
+          if(p2>0.8){
+            ctx2.fillStyle=`rgba(0,0,0,${(p2-0.8)/0.2})`;
+            ctx2.fillRect(0,0,W,H);
+          }
+        }
+
+        progress+=0.025;
+        if(progress>=1){
+          overlay.classList.remove('active');
+          cancelAnimationFrame(animFrame);
+          powered=true;
+          btn.style.boxShadow='';
+          return;
+        }
+        animFrame=requestAnimationFrame(frame);
+      }
+
+      cancelAnimationFrame(animFrame);
+      frame();
+    }
+
+    btn.addEventListener('click',()=>{
+      if(powered) runTvOff();
+      else runTvOn();
+    });
+  })();
+
+  </script>
 </body>
 </html>

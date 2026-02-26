@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="../favicon.ico">
+  <link rel="shortcut icon" href="../favicon.ico">
+  <meta charset="UTF-8">  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Entidades — Pato em Fradelos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
@@ -12,7 +13,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --nav-h: 61px;
+      --nav-h: 56px;
       --sidebar-w: 270px;
       --bg: #060a0f;
       --bg-panel: #0a1018;
@@ -49,7 +50,7 @@
       background: rgba(6,10,15,0.97);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
-      padding: 0 40px;
+      padding: 0 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -58,8 +59,8 @@
     .navbar__logo {
       font-family: 'Orbitron', monospace;
       font-weight: 900;
-      font-size: 1.1rem;
-      letter-spacing: 0.3em;
+      font-size: 0.85rem;
+      letter-spacing: 0.25em;
       color: #fff;
       text-decoration: none;
     }
@@ -69,32 +70,36 @@
     .navbar__links {
       display: flex;
       list-style: none;
-      gap: 36px;
+      gap: 2px;
     }
 
     .navbar__links a {
-      font-size: 0.72rem;
+      font-size: 0.6rem;
       text-transform: uppercase;
-      letter-spacing: 0.15em;
+      letter-spacing: 0.2em;
       color: var(--dim);
       text-decoration: none;
       position: relative;
-      transition: color 0.3s;
+      padding: 8px 14px;
+      display: block;
+      transition: color 0.2s ease;
+      white-space: nowrap;
     }
 
     .navbar__links a::after {
       content: '';
       position: absolute;
-      bottom: -4px; left: 0; right: 0;
-      height: 1px;
+      bottom: 0; left: 14px; right: 14px;
+      height: 2px;
       background: #00ccff;
       transform: scaleX(0);
       transform-origin: right;
-      transition: transform 0.3s;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 1px;
     }
 
     .navbar__links a:hover,
-    .navbar__links a.active { color: #00ccff; }
+    .navbar__links a.active { color: #fff; }
 
     .navbar__links a.active::after,
     .navbar__links a:hover::after {

@@ -137,19 +137,37 @@ body::after {
 .navbar__links a {
   display: block;
   padding: 8px 14px;
-  font-size: 0.6rem;
-  letter-spacing: 0.2em;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   text-decoration: none;
   color: var(--text-dim);
-  border-bottom: 2px solid transparent;
-  transition: color var(--transition), border-color var(--transition);
+  position: relative;
+  transition: color var(--transition);
   white-space: nowrap;
 }
+
+.navbar__links a::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 14px; right: 14px;
+  height: 2px;
+  background: var(--cyan);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 1px;
+}
+
 .navbar__links a:hover,
 .navbar__links a.active {
   color: #fff;
-  border-bottom-color: var(--cyan);
+}
+
+.navbar__links a:hover::after,
+.navbar__links a.active::after {
+  transform: scaleX(1);
+  transform-origin: left;
 }
 
 /* Botão hamburger — só visível em mobile */
