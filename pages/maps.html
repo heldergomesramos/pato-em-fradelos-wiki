@@ -260,8 +260,66 @@
     }
 
     @media (max-width: 600px) {
-      .maps-bottom-bar { flex-wrap: wrap; gap: 6px; font-size: 11px; padding: 8px 12px; }
+      /* Header compacto */
+      .maps-header {
+        padding: 10px 12px 6px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+      .maps-header__eyebrow { font-size: 0.45rem; }
+      .maps-header__title { font-size: 1rem; }
       .maps-header__right { display: none; }
+
+      /* Surround sem padding lateral extra */
+      .maps-surround { padding: 0 8px; }
+
+      /* Monitor — remove moldura decorativa, fica flat */
+      .monitor-wrap { padding: 0 !important; }
+      .monitor {
+        border-radius: 6px 6px 0 0 !important;
+        padding: 6px 6px 0 !important;
+        box-shadow: 0 0 0 1px rgba(0,0,0,0.5) !important;
+      }
+      /* Barra de status do ecrã mais pequena */
+      .screen-statusbar { height: 16px !important; }
+      .sbar { font-size: 10px !important; }
+      .sbar-rec { font-size: 10px !important; }
+
+      /* Câmeras — HUD mais legível no toque */
+      .cam-id { font-size: 10px !important; line-height: 1.2 !important; }
+      .cam-rec { font-size: 10px !important; }
+      .cam-rec::before { width: 4px !important; height: 4px !important; }
+      .cam-zone-name { font-size: 11px !important; }
+      .cam-ts { display: none; }
+      .cam-hud { padding: 2px 3px !important; }
+
+      /* Base do monitor mais fina */
+      .monitor-base {
+        height: 32px !important;
+        padding: 0 12px !important;
+      }
+      .monitor-brand { font-size: 10px !important; }
+      .monitor-brand-sub { font-size: 7px !important; }
+      .monitor-led { width: 5px !important; height: 5px !important; }
+      .monitor-led-label { font-size: 8px !important; }
+      .monitor-power-btn { width: 22px !important; height: 22px !important; }
+
+      /* Pescoço e pé — mais finos */
+      .monitor-stand-neck { width: 50px !important; height: 10px !important; }
+      .monitor-stand-foot { width: 140px !important; height: 8px !important; }
+
+      /* Barra inferior — só mostra o essencial */
+      .maps-bottom-bar {
+        flex-wrap: wrap;
+        gap: 4px;
+        font-size: 10px;
+        padding: 6px 10px;
+        justify-content: center;
+      }
+      /* Esconde separadores e itens extra */
+      .maps-bottom-sep { display: none; }
+      .maps-bottom-bar span:not(:first-child):not(:last-child) { display: none; }
     }
 
     /* ═══ MONITOR BRANCO ═══ */
@@ -569,6 +627,23 @@
       animation:camScan 8s linear infinite; pointer-events:none; z-index:11;
     }
     .cam-expanded.open { display:block; pointer-events:all; inset:0; top:0!important; left:0!important; width:100vw!important; height:100vh!important; }
+
+    /* Zoom-in: canvas começa escalado e recua para 1 */
+    .cam-expanded.zoom-enter .expanded-canvas {
+      animation: zoomEnter 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes zoomEnter {
+      from { transform: scale(1.18); opacity: 0.6; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+    /* Vinheta pulsa no início para reforçar o zoom */
+    .cam-expanded.zoom-enter .expanded-vig {
+      animation: vigPulse 0.65s ease forwards;
+    }
+    @keyframes vigPulse {
+      from { opacity: 1.8; }
+      to   { opacity: 1; }
+    }
     .expanded-canvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
     .expanded-vig { position:absolute;inset:0;background:radial-gradient(ellipse 100% 100% at 50% 50%,transparent 25%,rgba(0,0,0,.6) 100%);z-index:5;pointer-events:none; }
     .expanded-hud-top {
@@ -640,8 +715,85 @@
     }
     @media(max-width:600px){
       .monitor-wrap{padding:12px 12px 0;}
-      .expanded-info{width:100%;top:auto;bottom:0;height:50vh;border-left:none;border-top:1px solid rgba(0,255,80,.1);transform:translateY(100%);}
-      .expanded-info.slide-in{transform:translateY(0);}
+
+      /* Canvas ocupa o ecrã todo — igual ao desktop */
+      .cam-expanded.open {
+        display: block !important;
+        height: 100vh !important;
+        overflow: hidden !important;
+      }
+      .expanded-canvas {
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+      }
+      .expanded-vig {
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+      }
+      /* HUD topo — mais compacto */
+      .expanded-hud-top {
+        height: 36px !important;
+        padding: 0 12px !important;
+      }
+      .exp-rec { font-size: 14px !important; }
+      .exp-cam-id { font-size: 14px !important; }
+      .exp-ts { font-size: 12px !important; }
+      .exp-close {
+        font-size: .5rem !important;
+        padding: 4px 10px !important;
+        letter-spacing: .12em !important;
+      }
+      /* Botão voltar — abaixo do HUD */
+      .exp-back {
+        top: 44px !important;
+        left: 12px !important;
+        font-size: .5rem !important;
+        padding: 5px 10px !important;
+      }
+      /* Terminal de acesso — mais pequeno */
+      .access-terminal {
+        font-size: 13px !important;
+        min-width: 220px !important;
+        padding: 0 16px !important;
+      }
+      /* Info: painel que desliza de baixo, ocupa metade inferior */
+      .expanded-info {
+        position: absolute !important;
+        left: 0 !important; right: 0 !important;
+        bottom: 0 !important;
+        top: auto !important;
+        width: 100% !important;
+        height: 55vh !important;
+        border-left: none !important;
+        border-top: 1px solid rgba(0,255,80,.2) !important;
+        transform: translateY(100%) !important;
+        opacity: 1 !important;
+        transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        padding: 14px 14px 28px !important;
+        gap: 12px !important;
+      }
+      .expanded-info.slide-in {
+        transform: translateY(0) !important;
+      }
+      .expanded-info.info-hidden {
+        transform: translateY(100%) !important;
+        transition: transform 0.38s cubic-bezier(0.4, 0, 1, 1) !important;
+      }
+      /* Info content — tamanhos mais pequenos */
+      .i-name { font-size: 1.2rem !important; }
+      .i-desc { font-size: .65rem !important; line-height: 1.7 !important; }
+      .i-stat { font-size: .48rem !important; padding: 2px 7px !important; }
+      .i-creature { width: 52px !important; padding: 7px 4px !important; }
+      .i-ci { font-size: 1.1rem !important; }
+      .i-cn { font-size: .4rem !important; }
+      .il { font-size: 11px !important; }
+      .i-tag { font-size: .48rem !important; padding: 3px 8px !important; }
     }
   </style>
 </head>
@@ -2252,70 +2404,121 @@
     terminal.appendChild(cursor); accessOverlay.appendChild(terminal);
     let t2=0; const dk=setInterval(()=>{t2+=.08;accessOverlay.style.background=`rgba(0,0,0,${Math.min(t2*.7,.7)})`;if(t2>=1)clearInterval(dk);},20);
     [0,120,280,440,580,720].forEach((d,i)=>setTimeout(()=>lineEls[i].classList.add('show'),d));
-    setTimeout(()=>{accessOverlay.classList.remove('active');accessOverlay.style.background='';doZoom(cell,zone);},1100);
+    setTimeout(()=>{
+      accessOverlay.classList.remove('active');
+      accessOverlay.style.background='';
+      doZoom(cell,zone);
+    },1100);
   }
 
   function doZoom(cell,zone){
     const z=ZONES[zone];
     const rect=cell.getBoundingClientRect();
-    expanded.style.cssText=`display:block;position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px;pointer-events:none;z-index:600;overflow:hidden;`;
-    expCamId.textContent=`${z.cam} // ${z.floor}`;
-    expanded.classList.remove('open');
-    hudTop.classList.remove('ui-ready');
-    expInfo.classList.remove('slide-in');
-    expanded.offsetHeight;
     const vw=window.innerWidth, vh=window.innerHeight;
-    expanded.style.transition='left .5s cubic-bezier(.4,0,.2,1),top .5s cubic-bezier(.4,0,.2,1),width .5s cubic-bezier(.4,0,.2,1),height .5s cubic-bezier(.4,0,.2,1)';
+
+    /* Escala e offset para o canvas fullscreen parecer a célula */
+    const sx=rect.width/vw;
+    const sy=rect.height/vh;
+    /* translateX/Y em % do tamanho fullscreen para alinhar com o canto da célula */
+    const tx=rect.left - (vw-rect.width)/2;  /* pixels */
+    const ty=rect.top  - (vh-rect.height)/2;
+
+    /* Mostra o expanded imediatamente, canvas escalado para caber na célula */
+    expanded.classList.remove('zoom-enter');
+    hudTop.classList.remove('ui-ready');
+    expInfo.classList.remove('slide-in','info-hidden');
+    expCamId.textContent=`${z.cam} // ${z.floor}`;
+
+    expanded.style.cssText='display:block;pointer-events:none;';
+    expanded.classList.add('open');
+
+    expCanvas.width=vw; expCanvas.height=vh;
+    expCanvas.style.cssText=`width:${vw}px;height:${vh}px;transform:translate(${tx}px,${ty}px) scale(${sx},${sy});transform-origin:center center;will-change:transform;`;
+
+    /* Arranca o renderer JÁ — o canvas está a animar enquanto renderiza */
+    expandedActive=false; expandedRenderer=null;
+    if(BUILDERS[zone]){
+      expandedRenderer=BUILDERS[zone](expCanvas);
+      expandedActive=true;
+    }
+
+    /* Força reflow para a posição inicial ser aplicada antes da transição */
+    expCanvas.offsetHeight;
+
+    /* Anima para escala 1 — zoom contínuo sem corte */
+    const dur=620;
+    const easing='cubic-bezier(0.4, 0, 0.2, 1)';
+    expCanvas.style.transition=`transform ${dur}ms ${easing}`;
+
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      expanded.style.left='0px'; expanded.style.top='0px';
-      expanded.style.width=vw+'px'; expanded.style.height=vh+'px';
+      expCanvas.style.transform='translate(0,0) scale(1,1)';
     }));
+
     setTimeout(()=>{
-      expanded.style.transition=''; expanded.style.cssText='';
-      expanded.classList.add('open');
+      expCanvas.style.transition='';
       expanded.style.pointerEvents='all';
       document.body.style.overflow='hidden';
-      /* Define canvas ANTES de criar o renderer */
-      expCanvas.width=vw; expCanvas.height=vh;
-      expCanvas.style.width=vw+'px'; expCanvas.style.height=vh+'px';
-      expandedActive=false; expandedRenderer=null;
-      if(BUILDERS[zone]){
-        expandedRenderer=BUILDERS[zone](expCanvas);
-        expandedActive=true;
-      }
+
       expInfo.innerHTML=`
         <div><div class="il">// Estado da Zona</div><div class="i-tag" style="border-color:${z.tagBorder};color:${z.tagColor};"><span class="i-dot" style="background:${z.dotColor};"></span>${z.tagText}</div></div>
         <div><div class="i-name" style="color:${z.titleColor};text-shadow:0 0 40px ${z.titleGlow};">${z.name}</div></div>
         <div><div class="il">// Relatório de Campo</div><p class="i-desc">${z.desc}</p></div>
         <div><div class="il">// Condições Ambientais</div><div class="i-stats">${z.stats.map(s=>`<span class="i-stat">${s}</span>`).join('')}</div></div>
         <div><div class="il">// Fauna Detectada</div><div class="i-creatures">${z.creatures.map(([ic,nm])=>`<div class="i-creature"><span class="i-ci">${ic}</span><span class="i-cn">${nm}</span></div>`).join('')}</div></div>`;
+
       hudTop.classList.add('ui-ready');
       infoVisible=true;
       expClose.textContent='✕ FECHAR INFO';
-      setTimeout(()=>expInfo.classList.add('slide-in'),80);
-      animating=false;
-    },520);
+      setTimeout(()=>{ expInfo.classList.add('slide-in'); animating=false; }, 100);
+    }, dur+20);
   }
 
   function closeExpanded(){
     expInfo.classList.remove('slide-in');
-    expanded.classList.remove('open');
+    expInfo.classList.add('info-hidden');
+    expanded.style.transition='opacity 0.3s ease';
+    expanded.style.opacity='0';
     expandedActive=false; expandedRenderer=null;
     document.body.style.overflow='';
-    setTimeout(()=>{expanded.style.display='none';expInfo.innerHTML='';infoVisible=true;},300);
+    setTimeout(()=>{
+      expanded.style.transition='';
+      expanded.style.opacity='';
+      expanded.classList.remove('open');
+      expanded.style.display='none';
+      expInfo.classList.remove('info-hidden');
+      expInfo.innerHTML='';
+      infoVisible=true;
+    }, 320);
   }
 
   let infoVisible=true;
   function toggleInfo(){
+    const isMobile = window.innerWidth <= 600;
     infoVisible=!infoVisible;
     if(infoVisible){
-      expInfo.classList.add('slide-in');
+      if(isMobile){
+        expInfo.classList.remove('info-hidden');
+      } else {
+        expInfo.classList.add('slide-in');
+      }
       expClose.textContent='✕ FECHAR INFO';
     } else {
-      expInfo.classList.remove('slide-in');
+      if(isMobile){
+        expInfo.classList.add('info-hidden');
+      } else {
+        expInfo.classList.remove('slide-in');
+      }
       expClose.textContent='▶ VER INFO';
     }
   }
+
+  /* Recalcula canvas quando o ecrã é redimensionado com câmara aberta */
+  window.addEventListener('resize', ()=>{
+    if(!expanded.classList.contains('open')) return;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    expCanvas.width = vw; expCanvas.height = vh;
+    expCanvas.style.width = vw+'px'; expCanvas.style.height = vh+'px';
+  });
 
   document.querySelectorAll('.cam-cell').forEach(c=>c.addEventListener('click',()=>startAccess(c,c.dataset.zone)));
   expClose.addEventListener('click',toggleInfo);
@@ -2337,21 +2540,23 @@
       cvs.height = screen.offsetHeight || 500;
       const W = cvs.width, H = cvs.height;
 
+      /* Tapa as câmaras imediatamente com preto — sem flash de câmaras visíveis */
+      ctx2.fillStyle='#000';
+      ctx2.fillRect(0,0,W,H);
       overlay.classList.add('active');
       let phase = 0; /* 0=static burst, 1=shrink, 2=line, 3=fade out */
       let progress = 0;
       let lineW = W, lineH = H;
 
       function frame(){
-        ctx2.clearRect(0,0,W,H);
+        /* Preto sólido sempre — câmaras nunca transparecem */
+        ctx2.fillStyle='#000';
+        ctx2.fillRect(0,0,W,H);
 
         if(phase===0){
-          /* Fase 0 — explosão de estática branca + cor */
+          /* Fase 0 — explosão de estática branca sobre fundo preto */
           const a = 1 - progress/0.3;
-          /* Fundo preto que aparece */
-          ctx2.fillStyle=`rgba(0,0,0,${progress/0.3})`;
-          ctx2.fillRect(0,0,W,H);
-          /* Grão intenso */
+          /* Grão intenso por cima */
           const id = ctx2.createImageData(W,H);
           const d=id.data;
           for(let i=0;i<d.length;i+=4){
@@ -2430,7 +2635,14 @@
           }
 
           progress += 0.028;
-          if(progress>=1){ phase=3; progress=0; }
+          if(progress>=1){
+            /* Linha desapareceu — fica preto sólido, para a animação */
+            ctx2.fillStyle='#000'; ctx2.fillRect(0,0,W,H);
+            cancelAnimationFrame(animFrame);
+            powered = false;
+            btn.style.boxShadow='0 0 8px rgba(255,30,30,0.6), 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.4)';
+            return;
+          }
 
         } else if(phase===3){
           /* Fase 3 — fade para preto total */
