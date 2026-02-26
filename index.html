@@ -99,13 +99,40 @@
           <div class="gallery-card__overlay">+ ver</div>
         </div>
 
-        <!-- Card normal -->
-        <div class="gallery-card">
-          <div class="gallery-card__placeholder">
-            <span class="gallery-card__placeholder-icon">👁️</span>
-            <span class="gallery-card__placeholder-label">Observer</span>
+        <!-- Card Observer — clicável -->
+        <div id="obs-card" class="gallery-card gallery-card--observer" onclick="window.location.href='pages/observer.html'" style="cursor:none;position:relative;overflow:hidden;background:#000;">
+          <!-- Observer eye that follows mouse inside the card -->
+          <div id="obs-card-eye" style="
+            position:absolute;
+            left:50%;top:50%;
+            width:120px;height:120px;
+            transform:translate(-50%,-50%);
+            pointer-events:none;
+            z-index:2;
+          ">
+            <!-- Rotating ObserverFull -->
+            <img id="obs-card-full" src="ObserverFull.webp" style="
+              position:absolute;inset:0;
+              width:100%;height:100%;
+              image-rendering:pixelated;
+              transition: filter 0.3s ease;
+            ">
+            <!-- Pupil that tracks mouse -->
+            <div id="obs-card-pupil-wrap" style="
+              position:absolute;
+              left:50%;top:50%;
+              transform:translate(-50%,-50%);
+              width:30px;height:30px;
+              pointer-events:none;
+            ">
+              <img id="obs-card-pupil" src="ObserverRedFrontPupil.webp" style="
+                position:absolute;inset:0;
+                width:100%;height:100%;
+                image-rendering:pixelated;
+              ">
+            </div>
           </div>
-          <div class="gallery-card__overlay">+ ver</div>
+          <div class="gallery-card__overlay" style="cursor:none;font-size:0.7rem;letter-spacing:0.2em;color:rgba(200,30,30,0.9);z-index:3;">👁 ENTRAR</div>
         </div>
 
         <!-- Card largo -->
@@ -173,5 +200,98 @@
   </div><!-- fim page-content -->
 
   <script src="js/main.js"></script>
+
+  <style>
+  /* Default cursor: crosshair (+) for the whole page */
+  body { cursor: crosshair; }
+
+  /* No cursor inside the observer card (handled by JS eye) */
+  #obs-card { cursor: none !important; }
+  #obs-card * { cursor: none !important; }
+  </style>
+
+  <script>
+  (function(){
+    const card       = document.getElementById('obs-card');
+    const fullImg    = document.getElementById('obs-card-full');
+    const pupilWrap  = document.getElementById('obs-card-pupil-wrap');
+    const eyeDiv     = document.getElementById('obs-card-eye');
+
+    let angle = 0;
+    let rotSpeed = 0.5; // deg/frame — increases with time
+    let hoverStartTime = null;
+    let isHovering = false;
+    let lastTS = null;
+    let mx = 0, my = 0; // mouse relative to card center
+
+    // Max glow intensity config
+    const MAX_GLOW_TIME = 5000; // ms to reach max glow
+    const MAX_GLOW_PX = 40;
+    const MAX_SPEED = 12; // deg/frame max
+
+    // Pupil track radius (max offset from center)
+    const PUPIL_RADIUS = 18;
+
+    card.addEventListener('mouseenter', (e) => {
+      isHovering = true;
+      hoverStartTime = performance.now();
+    });
+
+    card.addEventListener('mouseleave', () => {
+      isHovering = false;
+      hoverStartTime = null;
+      rotSpeed = 0.5;
+      // Reset pupil to center
+      pupilWrap.style.transform = 'translate(-50%, -50%)';
+    });
+
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      mx = e.clientX - cx;
+      my = e.clientY - cy;
+    });
+
+    function animate(ts) {
+      if (!lastTS) lastTS = ts;
+      const dt = ts - lastTS;
+      lastTS = ts;
+
+      if (isHovering && hoverStartTime !== null) {
+        const elapsed = ts - hoverStartTime;
+        const t = Math.min(elapsed / MAX_GLOW_TIME, 1);
+
+        // Speed ramp: ease-in
+        rotSpeed = 0.5 + (MAX_SPEED - 0.5) * (t * t);
+
+        // Glow intensity
+        const glowPx = Math.round(MAX_GLOW_PX * t);
+        const glowOpacity = 0.2 + 0.8 * t;
+        fullImg.style.filter = `drop-shadow(0 0 ${glowPx}px rgba(200, 20, 20, ${glowOpacity})) drop-shadow(0 0 ${glowPx * 2}px rgba(255, 60, 0, ${glowOpacity * 0.6}))`;
+
+        // Pupil tracking
+        const dist = Math.sqrt(mx * mx + my * my);
+        const norm = dist > 0 ? Math.min(dist, PUPIL_RADIUS) / dist : 0;
+        const px = mx * norm;
+        const py = my * norm;
+        pupilWrap.style.transform = `translate(calc(-50% + ${px}px), calc(-50% + ${py}px))`;
+      } else {
+        // Slowly decay glow and speed when not hovering
+        rotSpeed = Math.max(0.5, rotSpeed - 0.05);
+        fullImg.style.filter = 'none';
+      }
+
+      // Always rotate
+      angle = (angle + rotSpeed * (dt / 16.67)) % 360;
+      fullImg.style.transform = `rotate(${angle}deg)`;
+
+      requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
+  })();
+  </script>
+
 </body>
 </html>
