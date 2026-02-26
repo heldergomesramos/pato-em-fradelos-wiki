@@ -288,6 +288,32 @@ After using a large teleporter, the duck temporarily turns fully black and can t
 - `lore.html` — World lore and story summary
 - `mechanics.html` — Core gameplay mechanics explained
 - `creatures.html` — All creatures and entities
+
+---
+
+## 12. UI Features — Home Page
+
+### Global Observer Follower
+
+The home page (`index.html`) features an **Observer eye sprite** that follows the mouse cursor across the entire page.
+
+**Visual Design:**
+- **Outer layer:** `ObserverRedFront.png` — red exterior part that rotates continuously
+- **Pupil:** `ObserverRedFrontPupil.png` — red inner pupil that tracks subtle mouse movements
+- **Glow effect:** Pulsing drop-shadow (red + orange) that cycles every 3 seconds
+- **Position:** Fixed to viewport, centered on mouse position
+- **Cursor:** Page maintains crosshair cursor (`+`) at all times for consistency
+
+**Implementation:**
+- Observer element is positioned at `fixed` with pointer-events none to avoid interference
+- Placed in z-index 9999 to render on top of all page content
+- Animation runs continuously with `requestAnimationFrame` for smooth 60fps
+- Pupil has subtle oscillation (not locked to exact mouse position) for a living, eerie feel
+
+**Technical Notes:**
+- Built with vanilla JavaScript in a self-contained IIFE in `index.html`
+- Uses `mousemove` event on document to track global cursor position
+- No external dependencies beyond the sprite images
 - `locations.html` — All named locations
 - `upgrades.html` — Upgrades and abilities
 - `characters.html` — The Duck, scientists, The Observer
