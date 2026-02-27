@@ -3,14 +3,391 @@
 <head>
   <link rel="icon" type="image/png" href="../favicon.ico">
   <link rel="shortcut icon" href="../favicon.ico">
-  <meta charset="UTF-8">  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lore — Pato em Fradelos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/global.css">
   <link rel="stylesheet" href="../css/lore.css">
+  <style>
+
+    /* ═══════════════════════════════════════════════
+       ANIMATED BACKGROUND
+    ═══════════════════════════════════════════════ */
+
+    /* Canvas sits behind everything */
+    #lore-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Observer ghost — positioned fixed, follows scroll via JS */
+    .observer-ghost {
+      position: fixed;
+      right: 6vw;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 220px;
+      height: 220px;
+      pointer-events: none;
+      z-index: 1;
+      transition: top 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      opacity: 0.15;
+      filter: none;
+    }
+
+    .observer-ghost canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Everything above bg */
+    .page-content { position: relative; z-index: 2; }
+    .navbar        { z-index: 1001; }
+
+
+    /* ═══════════════════════════════════════════════
+       TAB SYSTEM
+    ═══════════════════════════════════════════════ */
+    .lore-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 48px;
+      border-bottom: 1px solid var(--border);
+      justify-content: center;
+    }
+    .lore-tab {
+      padding: 10px 36px;
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: -1px;
+    }
+    .lore-tab:hover { color: var(--text); }
+    .lore-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+
+    /* ═══════════════════════════════════════════════
+       LORE TAB — narrative prose (LARGER TEXT)
+    ═══════════════════════════════════════════════ */
+    .narrative {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .narrative-chapter {
+      margin-bottom: 68px;
+      animation: fadeInUp 0.5s ease both;
+    }
+
+    .chapter-eyebrow {
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      opacity: 0.55;
+      margin-bottom: 8px;
+    }
+
+    .chapter-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.08em;
+      margin-bottom: 22px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .chapter-body p {
+      font-size: 1.05rem;
+      line-height: 2.1;
+      color: rgba(200, 216, 232, 0.72);
+      margin-bottom: 1.2em;
+    }
+    .chapter-body p:last-child { margin-bottom: 0; }
+
+    .pull-quote {
+      border-left: 2px solid var(--border-light);
+      padding: 14px 0 14px 24px;
+      margin: 32px 0;
+      font-style: italic;
+      color: rgba(200, 216, 232, 0.4);
+      font-size: 0.98rem;
+      line-height: 1.95;
+    }
+    .pull-quote cite {
+      display: block;
+      font-style: normal;
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-top: 12px;
+      color: #1e2a32;
+    }
+
+    .chapter-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 48px 0;
+      opacity: 0.22;
+    }
+    .chapter-divider::before,
+    .chapter-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .chapter-divider span {
+      font-size: 0.48rem;
+      letter-spacing: 0.3em;
+      color: var(--text-dim);
+      white-space: nowrap;
+    }
+
+
+    /* ═══════════════════════════════════════════════
+       LOGS TAB — bigger terminal text
+    ═══════════════════════════════════════════════ */
+    #tab-logs .terminal__body {
+      font-size: 0.88rem;
+      line-height: 2;
+    }
+    #tab-logs .terminal__separator {
+      font-size: 0.68rem;
+    }
+    .logs-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .log-group-title {
+      font-family: var(--font-display);
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      opacity: 0.65;
+      margin-bottom: 8px;
+      margin-top: 28px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .log-group-title:first-child { margin-top: 0; }
+
+    .terminal__page-break {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 12px 0;
+    }
+
+
+    /* ═══════════════════════════════════════════════
+       NOTAS TAB — full sci-fi / futuristic cards
+    ═══════════════════════════════════════════════ */
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+      align-items: start;
+    }
+
+    .note-card {
+      position: relative;
+      background:
+        linear-gradient(180deg, rgba(0,180,220,0.04) 0%, transparent 50%),
+        linear-gradient(145deg, #06101a 0%, #030810 100%);
+      border: 1px solid rgba(0, 180, 220, 0.14);
+      border-top-color: rgba(0, 204, 255, 0.3);
+      border-radius: 2px;
+      padding: 0;
+      overflow: hidden;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeInUp 0.4s ease both;
+      clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+    }
+    .note-card:hover {
+      border-color: rgba(0, 204, 255, 0.35);
+      box-shadow:
+        0 0 32px rgba(0, 180, 255, 0.07),
+        inset 0 0 40px rgba(0, 80, 120, 0.05);
+    }
+
+    /* clipped corner triangle */
+    .note-card::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 0 14px 14px 0;
+      border-color: transparent rgba(0,204,255,0.25) transparent transparent;
+      z-index: 2;
+    }
+
+    /* bottom-left corner bracket */
+    .note-card::after {
+      content: '';
+      position: absolute;
+      bottom: 9px; left: 9px;
+      width: 10px; height: 10px;
+      border-left: 1px solid rgba(0,204,255,0.2);
+      border-bottom: 1px solid rgba(0,204,255,0.2);
+    }
+
+    /* top-left corner bracket */
+    .note-card__corner {
+      position: absolute;
+      top: 9px; left: 9px;
+      width: 10px; height: 10px;
+      border-top: 1px solid rgba(0,204,255,0.28);
+      border-left: 1px solid rgba(0,204,255,0.28);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* header band */
+    .note-card__header {
+      padding: 11px 18px 10px;
+      background: rgba(0, 180, 220, 0.05);
+      border-bottom: 1px solid rgba(0, 180, 220, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .note-card__id {
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(0, 204, 255, 0.5);
+    }
+
+    .note-card__author-badge {
+      font-family: var(--font-display);
+      font-size: 0.5rem;
+      letter-spacing: 0.2em;
+      color: rgba(0, 204, 255, 0.55);
+      border: 1px solid rgba(0,204,255,0.2);
+      padding: 2px 8px;
+      border-radius: 1px;
+      background: rgba(0,204,255,0.04);
+    }
+
+    /* body */
+    .note-card__body {
+      padding: 16px 18px 14px;
+    }
+
+    .note-card__title {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(160, 220, 255, 0.82);
+      margin-bottom: 12px;
+    }
+
+    .note-card__text {
+      font-family: var(--font-mono);
+      font-size: 0.86rem;
+      line-height: 1.9;
+      color: rgba(200, 216, 232, 0.54);
+      white-space: pre-line;
+    }
+
+    /* status bar */
+    .note-card__status {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 18px 10px;
+      border-top: 1px solid rgba(0,180,220,0.07);
+      margin-top: 4px;
+    }
+    .note-card__status-dot {
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: rgba(0,204,255,0.2);
+    }
+    .note-card__status-dot.active {
+      background: rgba(0,255,140,0.6);
+      box-shadow: 0 0 5px rgba(0,255,140,0.35);
+      animation: blink 2.5s infinite;
+    }
+    .note-card__status-label {
+      font-family: var(--font-mono);
+      font-size: 0.48rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(0,204,255,0.22);
+      margin-left: 4px;
+    }
+
+    /* scan line animation on hover */
+    .note-card__scan {
+      position: absolute;
+      left: 0; right: 0;
+      height: 60px;
+      background: linear-gradient(180deg, transparent, rgba(0,204,255,0.04), transparent);
+      top: -60px;
+      pointer-events: none;
+      animation: noteScan 5s linear infinite;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .note-card:hover .note-card__scan { opacity: 1; }
+
+    @keyframes noteScan {
+      0%   { top: -60px; }
+      100% { top: calc(100% + 60px); }
+    }
+
+
+    /* ═══════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .observer-ghost { display: none; }
+    }
+    @media (max-width: 600px) {
+      .lore-tab { padding: 8px 16px; font-size: 0.56rem; letter-spacing: 0.15em; }
+      .notes-grid { grid-template-columns: 1fr; }
+      .chapter-body p { font-size: 0.95rem; }
+    }
+
+  </style>
 </head>
 <body>
+
+  <!-- ── ANIMATED BACKGROUND CANVAS ── -->
+  <canvas id="lore-bg"></canvas>
+
+  <!-- ── OBSERVER GHOST ── -->
+  <div class="observer-ghost" id="observer-ghost">
+    <canvas id="observer-canvas" width="220" height="220"></canvas>
+  </div>
 
   <!-- ── NAVBAR ── -->
   <nav class="navbar">
@@ -41,7 +418,7 @@
   <div class="page-content">
     <div class="lore-page">
 
-      <!-- ── CABEÇALHO ── -->
+      <!-- ── HEADER ── -->
       <header class="lore-header">
         <div class="lore-header__eyebrow">Projecto ORBIS // Arquivos Classificados</div>
         <h1 class="lore-header__title">Registos dos Cientistas</h1>
@@ -51,426 +428,657 @@
         </p>
       </header>
 
-      <!-- ── FILTROS ── -->
-      <div class="lore-filters">
-        <button class="filter-btn active" data-filter="all">Todos</button>
-        <button class="filter-btn" data-filter="discovery">Descoberta</button>
-        <button class="filter-btn" data-filter="creatures">Criaturas</button>
-        <button class="filter-btn" data-filter="incident">Incidente</button>
-        <button class="filter-btn" data-filter="orbis">Projecto ORBIS</button>
-        <button class="filter-btn" data-filter="notas">Notas de Campo</button>
+      <!-- ── TABS ── -->
+      <div class="lore-tabs">
+        <button class="lore-tab active" data-tab="lore">Lore</button>
+        <button class="lore-tab" data-tab="logs">Logs</button>
+        <button class="lore-tab" data-tab="notas">Notas</button>
       </div>
 
-      <!-- ── NOTAS DE CAMPO (Papers do JSON) ── -->
-      <div data-category="notas">
-        <div class="log-section">
-          <div class="log-section__title">// Ficheiro: Notas Manuscritas — Recuperadas</div>
 
-          <div class="log-card">
-            <div class="log-card__meta">
-              <span class="log-card__id">Perspective?</span>
-              <span class="log-card__author">EX</span>
+      <!-- ════════════════════════════════════════════════
+           TAB: LORE
+      ════════════════════════════════════════════════ -->
+      <div class="tab-panel active" id="tab-lore">
+        <div class="narrative">
+
+          <div class="narrative-chapter">
+            <div class="chapter-eyebrow">Chapter I</div>
+            <h2 class="chapter-title">Discovery</h2>
+            <div class="chapter-body">
+              <p>It began, as most things do, with someone noticing something they could not explain.</p>
+              <p>Orbital imaging of a remote, nameless island flagged a series of anomalies: regions of absolute darkness that absorbed every wavelength directed at them. Not shadows. Not geological voids. Something that consumed light entirely and offered nothing back. The data was passed up the chain. Within weeks, a team of scientists, engineers, and explorers had been dispatched.</p>
+              <p>What they found was a lake — or something that wore the shape of one. Nestled between two mountains, it stretched across the basin floor in perfect, unbroken black. It made no sound when disturbed. It offered no resistance when probed. Objects submerged into it without ripple or splash, as though the surface were an agreement rather than a boundary.</p>
+              <p>The first real clue came by accident. One evening, as the team's lights swept away from the lake, a researcher glanced back — and the lake was gone. Not dark. Not obscured. Gone. The moment a light returned to it, the lake was there again, solid and absolute as ever.</p>
+              <div class="pull-quote">
+                If we cannot see it, it does not exist. We proposed that this black substance only manifests when exposed to conscious observation. Further study was imperative.
+                <cite>— Field Log #004, Day 4</cite>
+              </div>
+              <p>They called the substance Black Matter. They built a laboratory.</p>
             </div>
-            <p class="log-card__text">"Sometimes it's all about perspective..."</p>
           </div>
 
-          <div class="log-card">
-            <div class="log-card__meta">
-              <span class="log-card__id">Purple Sticky Material</span>
-              <span class="log-card__author">EX</span>
+          <div class="chapter-divider"><span>// ORBIS</span></div>
+
+          <div class="narrative-chapter">
+            <div class="chapter-eyebrow">Chapter II</div>
+            <h2 class="chapter-title">Properties</h2>
+            <div class="chapter-body">
+              <p>Black Matter was hollow. Creatures moved freely inside it. It absorbed all incoming light, giving it its pure, lightless appearance — yet light generated from within could pass outward, making the interior visible to careful observers. It was solid as long as someone was looking at it. It spread rapidly through water. And when introduced to the water inside a living organism, it changed them.</p>
+              <p>The researchers found an entire ecosystem within the black lake: anglerfish disguised behind luminous flower-shaped lures, carnivorous plants whose roots penetrated solid rock, jellyfish that swam through nothing, fireflies drawn perpetually toward light. One species among them had been extinct on the surface for centuries. Here, it persisted.</p>
+              <p>The lake's flora proved especially strange. The black gloamvines — green vines bearing clusters of purple glowing flowers — grew downward from ceilings saturated with Black Matter. Their flowers were visible. Their roots were not. The roots existed inside Black Matter itself, anchored to something no instrument could reach. They also distorted whatever they grew through: a slab of rock intersected by a root looked solid, but if you stepped where the root passed, your foot found no floor.</p>
+              <p>The plants emitted light. The researchers wondered where that light came from. The answer, once found, changed everything: Black Matter stores all the light it absorbs. The glowing flowers were simply releasing it. That energy, they realised, was immense — and potentially useful.</p>
             </div>
-            <p class="log-card__text">"Do not eat this purple sticky liquid! Not only does it taste awful but it gets stuck in your tongue and it's a pain to get rid of!"</p>
           </div>
 
-          <div class="log-card">
-            <div class="log-card__meta">
-              <span class="log-card__id">Lab Door Closed</span>
-              <span class="log-card__author">EE</span>
+          <div class="chapter-divider"><span>// ORBIS</span></div>
+
+          <div class="narrative-chapter">
+            <div class="chapter-eyebrow">Chapter III</div>
+            <h2 class="chapter-title">The Energy Facility</h2>
+            <div class="chapter-body">
+              <p>The Black Matter Generator was built in a facility to the east of the research laboratory, connected by a metal bridge. It processed Black Matter in sealed square containers, extracting and converting the accumulated photonic energy within. That energy was then routed to power the laboratory, the observation systems, and whatever would come next.</p>
+              <p>A secondary discovery followed from the same principle: the researchers developed a light source capable of reflecting off objects inside Black Matter, making what was hidden briefly visible. It was modelled after the gloamvines — a small, dense, intensely luminous ball that could be thrown and retrieved. They called it the Gloamvine Core. With it, the invisible roots of the black gloamvines could finally be seen.</p>
+              <p>For a time, the project appeared not only viable but extraordinary.</p>
             </div>
-            <p class="log-card__text">"For all of you who come in here and meet the door of the lab closed, cross this bridge and go into the facility ahead. I'll probably be working on the generator and it will soon power the entire lab and future projects."</p>
           </div>
 
-          <div class="log-card">
-            <div class="log-card__meta">
-              <span class="log-card__id">Big Eye Creature</span>
-              <span class="log-card__author">EX</span>
+          <div class="chapter-divider"><span>// ORBIS</span></div>
+
+          <div class="narrative-chapter">
+            <div class="chapter-eyebrow">Chapter IV</div>
+            <h2 class="chapter-title">Internull</h2>
+            <div class="chapter-body">
+              <p>A timed camera was placed inside a Black Matter cavity and set to take one photograph per second over a five-second interval. When retrieved, all five images carried the exact same internal timestamp. Inside Black Matter — when unobserved — time did not pass.</p>
+              <p>The researchers called it the Vanishing: the state Black Matter enters when no conscious observer is present. It does not disappear. It relocates to an alternate dimension — a place where time only advances when something is watching. They called this place the Internull.</p>
+              <p>Once they understood the Vanishing, they understood teleportation. Spherical chambers were constructed from Black Matter, sealed from outside observation. When a person entered one and the door was closed, they transitioned into the Internull alongside the chamber's walls. From within that other-dimensional space, they could traverse distance and re-emerge at a destination sphere tuned to matching coordinates. The teleporter spheres became operational.</p>
+              <div class="pull-quote">
+                We've succeeded. Internull is real. We have finally discovered where Black Matter goes during the Vanishing — and with our Sleep Fracture Protocol, we can traverse it.
+                <cite>— Classified Communication, Undated</cite>
+              </div>
             </div>
-            <p class="log-card__text">"I just came back from the aquarium. A big red eyed creature appeared in the dark out of nowhere and started quickly heating my body. This is very dangerous! Warn everyone immediately!"</p>
           </div>
 
-          <div class="log-card">
-            <div class="log-card__meta">
-              <span class="log-card__id">Aquarium Keycard</span>
-              <span class="log-card__author">EX</span>
+          <div class="chapter-divider"><span>// ORBIS</span></div>
+
+          <div class="narrative-chapter">
+            <div class="chapter-eyebrow">Chapter V</div>
+            <h2 class="chapter-title">The Secret Entity</h2>
+            <div class="chapter-body">
+              <p>They had almost missed it entirely. It appeared in areas of Black Matter without warning — a shape that was entirely black, indistinguishable from the surrounding darkness, until it opened its eye. Then it was there. When it closed its eye again, it was gone.</p>
+              <p>The researchers named it the Secret Entity. It moved freely through Black Matter. It could vanish not by being unobserved, but by ceasing to observe itself — closing its eye, it adopted the Vanishing as a voluntary act, slipping into the Internull at will and emerging elsewhere. It was not a creature of this dimension. It came from the other side.</p>
+              <p>Using the Gloamvine Core, the team managed to illuminate and trap one. The light, aimed directly at it, kept it present regardless of whether its eye was open. They studied it. They argued about it. Some believed it was dangerous. Others believed it was conscious, intelligent — that imprisoning it was a serious ethical violation. Both were probably right.</p>
+              <p>What the Secret Entity demonstrated, beyond everything else, was that the Internull could be navigated by a being with consciousness. The teleporter project was completed, in part, because of what the Secret Entity revealed.</p>
             </div>
-            <p class="log-card__text">"Shaduru, could you make me another blue keycard for the aquarium? Mine fell into the middle of the black lake and it's dangerous to get it back."</p>
+          </div>
+
+          <div class="chapter-divider"><span>// ORBIS</span></div>
+
+          <div class="narrative-chapter">
+            <div class="chapter-eyebrow">Chapter VI</div>
+            <h2 class="chapter-title">The Observer</h2>
+            <div class="chapter-body">
+              <p>Keeping the Secret Entity contained required uninterrupted observation. Camera systems alone were insufficient — passive recording did not count as conscious awareness. Human watch rotations were unsustainable. The solution was to build something that could observe continuously, without fatigue, without sleep, without distraction.</p>
+              <p>The Observer was the result: a large, artificial sphere, entirely black, housing a single ocular organ. It had no limbs. No voice. No apparent function beyond the sustained act of watching. It was positioned in the Aquarium — the main observation chamber at the heart of the laboratory — where it kept its gaze on the cameras monitoring the contained Secret Entities.</p>
+              <p>Whether it was truly conscious, or merely a sophisticated simulation of consciousness, became one of the project's central and unanswered questions. What was certain was that prolonged exposure to its gaze caused neurological damage. Those who stared back at it too long described visual distortion, a reddening of their perception, a sensation of being weighed and found wanting.</p>
+              <p>The Observer did not blink.</p>
+            </div>
+          </div>
+
+          <div class="chapter-divider"><span>// ORBIS</span></div>
+
+          <div class="narrative-chapter">
+            <div class="chapter-eyebrow">Chapter VII</div>
+            <h2 class="chapter-title">Contamination</h2>
+            <div class="chapter-body">
+              <p>Floor Three of the laboratory was where the chameleons were kept. They were large, intelligent, and exceptionally difficult to see — not because of conventional camouflage, but because they had absorbed enough Black Matter to blend seamlessly within it. They understood this. They used it deliberately.</p>
+              <p>When they escaped, they targeted researchers. Their bites introduced Black Matter directly into the bloodstream, where it interacted with the body's water content and began to alter cellular structure. The first symptoms were a heightened sensitivity to light and shadow. Then came perceptual distortion. Then something more fundamental shifted — the boundary between the person and the substance became unclear.</p>
+              <p>Floor Three was sealed. Quarantine protocols were enacted. Several team members evacuated the island. Others, in the early stages of contamination, chose to remain — both because they could not safely leave, and because they believed they were close to understanding something important.</p>
+            </div>
+          </div>
+
+          <div class="chapter-divider"><span>// ORBIS</span></div>
+
+          <div class="narrative-chapter">
+            <div class="chapter-eyebrow">Chapter VIII</div>
+            <h2 class="chapter-title">The Duck</h2>
+            <div class="chapter-body">
+              <p>Among the researchers who remained during the quarantine were those who had been studying the relationship between Black Matter and consciousness — specifically, what happened when a living mind became deeply integrated with the substance. They had observed that heavily contaminated organisms did not simply decay. They rebuilt. Black Matter, it seemed, had a regenerative property: given sufficient integration, a body composed of it would reconstruct itself after structural failure.</p>
+              <p>The question was whether a human consciousness could survive that reconstruction intact. One of the remaining team members — infected, deteriorating, and running out of time — volunteered. Their neural patterns were mapped and encoded into a stabilised Black Matter body synthesised within the laboratory. The body, upon structural failure, rebuilt itself. The consciousness persisted.</p>
+              <p>The form it stabilised into was a duck. Why? The researchers debated this at length in the notes they left behind. Some believed it was memory — that the mind, in trauma, reached for something simple and familiar. Others thought the duck's form was simply the most structurally stable configuration Black Matter could hold while still housing something as complex as a human consciousness. The answer, if there is one, is somewhere in the laboratory.</p>
+              <p>The Duck retained fragments of its former self: curiosity, a drive to explore, something that might be called empathy. It also retained the core property of its new body — when it died, the Black Matter reformed. It was, in some meaningful sense, immortal. It was also, in every way that mattered, alone.</p>
+            </div>
+          </div>
+
+          <div class="chapter-divider"><span>// ORBIS</span></div>
+
+          <div class="narrative-chapter">
+            <div class="chapter-eyebrow">Chapter IX</div>
+            <h2 class="chapter-title">The Stranger</h2>
+            <div class="chapter-body">
+              <p>Orbiting between the planet and its moon is a large black mass that the research team designated the Stranger. It is approximately the size of the moon. Every three nights, at midnight, it passes in front of the moon and plunges the island into total darkness.</p>
+              <p>Probes sent to its surface passed through it. Spectral analysis suggested compositional similarity to Black Matter. The leading theory among the researchers was that the Stranger was once a moon or planet of its own — one that had been entirely consumed by Black Matter long before human observation, and had since existed in a state of permanent Vanishing, visible only because something, somewhere, was always watching it.</p>
+              <p>A secondary theory proposed something larger: that the island was not the origin of Black Matter, but merely the place where it first surfaced. That the substance was older than the facility, older than the team, older perhaps than recorded human history. That the Stranger was not a source — but a warning of what Black Matter eventually produces.</p>
+            </div>
+          </div>
+
+          <div class="chapter-divider"><span>// ORBIS</span></div>
+
+          <div class="narrative-chapter">
+            <div class="chapter-eyebrow">Epilogue</div>
+            <h2 class="chapter-title">The Present</h2>
+            <div class="chapter-body">
+              <p>The facility is quiet now. The generators are offline. The teleporter coordinates have been lost. Floor Three remains sealed. The Aquarium is dark, except for one thing — the Observer has not stopped watching.</p>
+              <p>The Duck woke up beside a pool of Black Matter in a cave in the mountains. It does not know how long it was asleep. It does not know where the rest of the team went. The notes are still there, scattered across terminals and crumpled on floors. The creatures in the laboratory are still alive — still existing in their impossible way, half inside this world and half inside the Internull.</p>
+              <p>And somewhere above the island, every three nights, the Stranger passes across the moon — and for a moment, everything goes dark, and Black Matter is everywhere, and nothing is being observed, and the world, very briefly, is something other than what it appears to be.</p>
+              <p>Something is always watching. The question the facility never answered is what was watching first.</p>
+            </div>
           </div>
 
         </div>
-      </div>
+      </div><!-- /tab-lore -->
 
-      <!-- ── TERMINAL 1 — PRIMEIROS REGISTOS ── -->
-      <div data-category="discovery">
-        <div class="terminal">
-          <div class="terminal__titlebar">
-            <div class="terminal__dots">
-              <div class="terminal__dot terminal__dot--red"></div>
-              <div class="terminal__dot terminal__dot--yellow"></div>
-              <div class="terminal__dot terminal__dot--green"></div>
+
+      <!-- ════════════════════════════════════════════════
+           TAB: LOGS
+      ════════════════════════════════════════════════ -->
+      <div class="tab-panel" id="tab-logs">
+        <div class="logs-grid">
+
+          <div class="log-group-title">// Black Matter Research</div>
+
+          <div class="terminal">
+            <div class="terminal__titlebar">
+              <div class="terminal__dots">
+                <div class="terminal__dot terminal__dot--red"></div>
+                <div class="terminal__dot terminal__dot--yellow"></div>
+                <div class="terminal__dot terminal__dot--green"></div>
+              </div>
+              <span class="terminal__filename">black_matter.db — PE</span>
             </div>
-            <span class="terminal__filename">orbis_log_001.txt — Expedição Inicial</span>
+            <div class="terminal__body">
+              <div class="terminal__separator">// Black Matter [PE]</div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Black Matter, distinct from Dark Matter, is a mysterious material found exclusively in this island and its surrounding waters."></span></div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Properties:  (1) Produces no sound upon collision.  (2) Absorbs all external light, rendering it completely black.  (3) Light emanating from within can be seen from the outside."></span></div>
+              <div class="terminal__separator">// The Vanishing Principle [PE]</div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="One of the most fascinating aspects of Black Matter is the Vanishing Principle: If it is not seen, it does not exist."></span></div>
+              <div class="terminal__separator">// The Insides of Black Matter [PE]</div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Black Matter is hollow and can harbor unpredictable creatures, plants, and materials, some of which sometimes defy the rules of our world."></span></div>
+              <div class="terminal__separator">// Propagation in Water [PE]</div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="We hypothesize that many black matter spots were once locations containing water, suggesting it thrives in aquatic environments and propagates much faster in them."></span></div>
+              <div class="terminal__separator">// Island State [Pofinho]</div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Our new satellite photos reveal an increase in the area of surface covered by Black Matter in and around the island."></span></div>
+              <span class="terminal__cursor"></span>
+            </div>
           </div>
-          <div class="terminal__body">
-            <div class="terminal__separator">// REGISTO #001 — DIA 1</div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="Satélite detectou anomalias ópticas na ilha. Manchas pretas que não constam de nenhuma carta geográfica."></span>
-            </div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="Equipa de oito pessoas enviada para reconhecimento. Equipamento padrão de campo."></span>
-            </div>
 
-            <div class="terminal__separator">// REGISTO #003 — DIA 4</div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="Encontrámos o lago. A superfície é completamente negra. Não reflecte luz. Não faz ondas."></span>
+          <div class="terminal">
+            <div class="terminal__titlebar">
+              <div class="terminal__dots">
+                <div class="terminal__dot terminal__dot--red"></div>
+                <div class="terminal__dot terminal__dot--yellow"></div>
+                <div class="terminal__dot terminal__dot--green"></div>
+              </div>
+              <span class="terminal__filename">vanishing_notes.db — EX / PE</span>
             </div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="Atirei uma pedra. Não ouvi o impacto. Não vi qualquer perturbação. Como se a pedra simplesmente tivesse deixado de existir."></span>
+            <div class="terminal__body">
+              <div class="terminal__separator">// Difficulty in Crossing Black Matter</div>
+              <div class="terminal__line"><span class="terminal__prompt">EX &gt;</span><span class="terminal__text" data-type="According to the Vanishing Principle, I only need to close my eyes to make it disappear, right? But then why doesn't it work sometimes?"></span></div>
+              <div class="terminal__page-break"></div>
+              <div class="terminal__line"><span class="terminal__prompt">PE &gt;</span><span class="terminal__text" data-type="Well, you have to become unaware of its existence in order for it to disappear."></span></div>
+              <div class="terminal__line"><span class="terminal__prompt">PE &gt;</span><span class="terminal__text" data-type="Some people have demonstrated having problems crossing it with their eyes closed, be it because of remnants of light still entering the eyes or something else."></span></div>
+              <div class="terminal__line"><span class="terminal__prompt">PE &gt;</span><span class="terminal__text" data-type="The best alternative is to simply fall unconscious and cross it that way, but that is hardly convenient."></span></div>
+              <span class="terminal__cursor"></span>
             </div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="O Gorobi disse que a superfície parece sólida quando olhamos directamente para ela. Quando desviei o olhar, ouvi-o gritar."></span>
-            </div>
-
-            <div class="terminal__separator">// REGISTO #004 — DIA 4 (cont.)</div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="O Gorobi caiu para dentro do lago. Resgatámo-lo 40 minutos depois — estava em pé no interior, num espaço vazio e escuro."></span>
-            </div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="Disse que lá dentro o tempo não passa. Para ele, foram apenas segundos."></span>
-            </div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="Hipótese de trabalho: se não conseguimos ver algo, esse algo não existe."></span>
-            </div>
-            <span class="terminal__cursor"></span>
           </div>
+
+          <div class="terminal">
+            <div class="terminal__titlebar">
+              <div class="terminal__dots">
+                <div class="terminal__dot terminal__dot--red"></div>
+                <div class="terminal__dot terminal__dot--yellow"></div>
+                <div class="terminal__dot terminal__dot--green"></div>
+              </div>
+              <span class="terminal__filename">teleporter_research.db — PE / EE</span>
+            </div>
+            <div class="terminal__body">
+              <div class="terminal__separator">// Vanishing Research [PE]</div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Shaduru and I have been studying what happens to Black Matter and where it goes during the vanishing."></span></div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Our research not only holds potential for developing teleportation but also offers revolutionary insights into the fundamental workings of physics and the universe."></span></div>
+              <div class="terminal__separator">// Black Matter Generator [EE]</div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Black Matter Generator — Harnesses stored light within black matter and channels it through these tubes."></span></div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Activate it to power the lab and teleporter chambers."></span></div>
+              <span class="terminal__cursor"></span>
+            </div>
+          </div>
+
+          <div class="log-group-title">// Fauna Database — BIO</div>
+
+          <div class="terminal">
+            <div class="terminal__titlebar">
+              <div class="terminal__dots">
+                <div class="terminal__dot terminal__dot--red"></div>
+                <div class="terminal__dot terminal__dot--yellow"></div>
+                <div class="terminal__dot terminal__dot--green"></div>
+              </div>
+              <span class="terminal__filename">fauna_database.db — BIO</span>
+            </div>
+            <div class="terminal__body">
+              <div class="terminal__separator">// Black Anglerfish</div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="These creatures live inside Black Matter. Their black skin grants them perfect camouflage in this environment."></span></div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="A fake black gloamvine dangles from their head, attracting unsuspecting prey to their gaping maw."></span></div>
+              <div class="terminal__separator">// Jellyfish</div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="These creatures seem to be immune to the effects of Black Matter. While their heads are soft and bouncy, their tentacles are extremely dangerous due to their electrical charge."></span></div>
+              <div class="terminal__separator">// Gloamvines</div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Gloamvines grow in dark caves, hanging from ceilings with thin tendrils. Their sticky purple flowers glow to attract insects, which get trapped and become their food."></span></div>
+              <div class="terminal__separator">// Black Gloamvines</div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Gloamvines exposed to Black Matter for long periods become Black Gloamvines. Roots: (1) Always attached to Black Matter. (2) Remain solid after the vanishing. (3) Only visible under specific light sources."></span></div>
+              <div class="terminal__separator">// Physical Distortions</div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Absence of Black Matter above black gloamvines hints at hidden distortions in the ceiling. Be cautious of surfaces like dirt, rock, or metal that appear solid above them."></span></div>
+              <div class="terminal__separator">// Gloamvine Core</div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="We successfully created a light source capable of reflecting off materials inside black matter: The Gloamvine Core."></span></div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="This means we can finally see the roots of black gloamvines and distinguish them from anglerfish. I wonder what else we'll be able to see with this."></span></div>
+              <span class="terminal__cursor"></span>
+            </div>
+          </div>
+
+          <div class="log-group-title">// The Stranger — Acesso Restrito</div>
+
+          <div class="terminal">
+            <div class="terminal__titlebar">
+              <div class="terminal__dots">
+                <div class="terminal__dot terminal__dot--red"></div>
+                <div class="terminal__dot terminal__dot--yellow"></div>
+                <div class="terminal__dot terminal__dot--green"></div>
+              </div>
+              <span class="terminal__filename">stranger_classified.db — PE // ACESSO RESTRITO</span>
+            </div>
+            <div class="terminal__body">
+              <div class="terminal__separator">// The Stranger [PE]</div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="The Stranger is a large black sphere that orbits the Earth, situated between the Moon and our planet. It is estimated to be slightly larger than the Moon."></span></div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="We hypothesize that the Stranger might be composed of black matter — our attempt to land a scout on its surface failed, with the scout passing through it entirely."></span></div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Initially we thought it might be composed of gases, but after studying black matter, we realize it exhibits similar behaviors. The direct relationship between black matter on Earth and the Stranger remains to be studied."></span></div>
+              <div class="terminal__separator">// The Eclipse [PE]</div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Every three days, the Stranger emerges in front of the Moon, causing a lunar eclipse that entirely obscures the Moon and envelops the Earth in total darkness."></span></div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="This event occurs around midnight, when the Moon is at its highest point in the sky."></span></div>
+              <span class="terminal__cursor"></span>
+            </div>
+          </div>
+
+          <div class="log-group-title">// Expedição — Registos de Campo</div>
+
+          <div class="terminal">
+            <div class="terminal__titlebar">
+              <div class="terminal__dots">
+                <div class="terminal__dot terminal__dot--red"></div>
+                <div class="terminal__dot terminal__dot--yellow"></div>
+                <div class="terminal__dot terminal__dot--green"></div>
+              </div>
+              <span class="terminal__filename">orbis_log_001.txt — Expedição Inicial</span>
+            </div>
+            <div class="terminal__body">
+              <div class="terminal__separator">// REGISTO #001 — DIA 1</div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Satélite detectou anomalias ópticas na ilha. Manchas pretas que não constam de nenhuma carta geográfica."></span></div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Equipa de oito pessoas enviada para reconhecimento. Equipamento padrão de campo."></span></div>
+              <div class="terminal__separator">// REGISTO #003 — DIA 4</div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Encontrámos o lago. A superfície é completamente negra. Não reflecte luz. Não faz ondas."></span></div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Atirei uma pedra. Não ouvi o impacto. Não vi qualquer perturbação. Como se a pedra simplesmente tivesse deixado de existir."></span></div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="O Gorobi disse que a superfície parece sólida quando olhamos directamente para ela. Quando desviei o olhar, ouvi-o gritar."></span></div>
+              <div class="terminal__separator">// REGISTO #004 — DIA 4 (cont.)</div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="O Gorobi caiu para dentro do lago. Resgatámo-lo 40 minutos depois — estava em pé no interior, num espaço vazio e escuro."></span></div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Disse que lá dentro o tempo não passa. Para ele, foram apenas segundos."></span></div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Hipótese de trabalho: se não conseguimos ver algo, esse algo não existe."></span></div>
+              <span class="terminal__cursor"></span>
+            </div>
+          </div>
+
+          <div class="terminal">
+            <div class="terminal__titlebar">
+              <div class="terminal__dots">
+                <div class="terminal__dot terminal__dot--red"></div>
+                <div class="terminal__dot terminal__dot--yellow"></div>
+                <div class="terminal__dot terminal__dot--green"></div>
+              </div>
+              <span class="terminal__filename">orbis_incident_P3.txt — ENCRIPTADO PARCIALMENTE</span>
+            </div>
+            <div class="terminal__body">
+              <div class="terminal__separator">// ALERTA DE CONTENÇÃO — PISO 3</div>
+              <div class="terminal__line"><span class="terminal__prompt">!</span><span class="terminal__text" data-type="[FICHEIRO CORROMPIDO — RECUPERAÇÃO PARCIAL]"></span></div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Os camaleões escaparam. Não sabemos como. As câmeras mostram a sala vazia — mas as câmeras só registam o que olham directamente."></span></div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="Três membros da equipa foram atacados. O sangue deles... está a mudar. Fica preto nas bordas das feridas."></span></div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="O Piso 3 está permanentemente fechado. Não entrem. Não abram a porta."></span></div>
+              <div class="terminal__line"><span class="terminal__prompt">&gt;</span><span class="terminal__text" data-type="[RESTO DO FICHEIRO INACESSÍVEL]"></span></div>
+              <span class="terminal__cursor"></span>
+            </div>
+          </div>
+
         </div>
+      </div><!-- /tab-logs -->
 
-        <!-- Black Matter terminal (do JSON) -->
-        <div class="terminal">
-          <div class="terminal__titlebar">
-            <div class="terminal__dots">
-              <div class="terminal__dot terminal__dot--red"></div>
-              <div class="terminal__dot terminal__dot--yellow"></div>
-              <div class="terminal__dot terminal__dot--green"></div>
+
+      <!-- ════════════════════════════════════════════════
+           TAB: NOTAS — Scientific / Futuristic
+      ════════════════════════════════════════════════ -->
+      <div class="tab-panel" id="tab-notas">
+        <div class="notes-grid">
+
+          <div class="note-card">
+            <div class="note-card__corner"></div>
+            <div class="note-card__scan"></div>
+            <div class="note-card__header">
+              <span class="note-card__id">ORBIS-NOTE-0001</span>
+              <span class="note-card__author-badge">EX</span>
             </div>
-            <span class="terminal__filename">black_matter_research.db — PE</span>
+            <div class="note-card__body">
+              <div class="note-card__title">Perspective?</div>
+              <p class="note-card__text">Sometimes it's all about perspective...</p>
+            </div>
+            <div class="note-card__status">
+              <div class="note-card__status-dot active"></div>
+              <div class="note-card__status-dot"></div>
+              <div class="note-card__status-dot"></div>
+              <span class="note-card__status-label">Recovered · Intact</span>
+            </div>
           </div>
-          <div class="terminal__body">
-            <div class="terminal__separator">// Black Matter</div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="Black Matter, distinct from Dark Matter, is a mysterious material found exclusively in this island and its surrounding waters."></span>
-            </div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="Properties: Produces no sound upon collision. Absorbs all external light, rendering it completely black. Light emanating from within can be seen from the outside."></span>
-            </div>
 
-            <div class="terminal__separator">// The Vanishing Principle</div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="One of the most fascinating aspects of Black Matter is the Vanishing Principle: If it is not seen, it does not exist."></span>
+          <div class="note-card">
+            <div class="note-card__corner"></div>
+            <div class="note-card__scan"></div>
+            <div class="note-card__header">
+              <span class="note-card__id">ORBIS-NOTE-0002</span>
+              <span class="note-card__author-badge">EX</span>
             </div>
-
-            <div class="terminal__separator">// The Insides of Black Matter</div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="Black Matter is hollow and can harbor unpredictable creatures, plants, and materials, some of which sometimes defy the rules of our world."></span>
+            <div class="note-card__body">
+              <div class="note-card__title">Purple Sticky Material</div>
+              <p class="note-card__text">Do not eat this purple sticky liquid! Not only does it taste awful but it gets stuck in your tongue and it's a pain to get rid of!</p>
             </div>
-
-            <div class="terminal__separator">// Propagation in Water</div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="We hypothesize that many black matter spots were once locations containing water, suggesting it thrives in aquatic environments and propagates much faster in them."></span>
+            <div class="note-card__status">
+              <div class="note-card__status-dot active"></div>
+              <div class="note-card__status-dot"></div>
+              <div class="note-card__status-dot"></div>
+              <span class="note-card__status-label">Recovered · Intact</span>
             </div>
-
-            <div class="terminal__separator">// Island State — Pofinho</div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="Our new satellite photos reveal an increase in the area of surface covered by Black Matter in and around the island."></span>
-            </div>
-            <span class="terminal__cursor"></span>
           </div>
+
+          <div class="note-card">
+            <div class="note-card__corner"></div>
+            <div class="note-card__scan"></div>
+            <div class="note-card__header">
+              <span class="note-card__id">ORBIS-NOTE-0003</span>
+              <span class="note-card__author-badge">EE</span>
+            </div>
+            <div class="note-card__body">
+              <div class="note-card__title">Lab Door Closed</div>
+              <p class="note-card__text">For all of you who come in here and meet the door of the lab closed, cross this bridge and go into the facility ahead. I'll probably be working on the generator and it will soon power the entire lab and future projects.</p>
+            </div>
+            <div class="note-card__status">
+              <div class="note-card__status-dot active"></div>
+              <div class="note-card__status-dot active"></div>
+              <div class="note-card__status-dot"></div>
+              <span class="note-card__status-label">Recovered · Partial</span>
+            </div>
+          </div>
+
+          <div class="note-card">
+            <div class="note-card__corner"></div>
+            <div class="note-card__scan"></div>
+            <div class="note-card__header">
+              <span class="note-card__id">ORBIS-NOTE-0004</span>
+              <span class="note-card__author-badge">EX</span>
+            </div>
+            <div class="note-card__body">
+              <div class="note-card__title">Big Eye Creature</div>
+              <p class="note-card__text">I just came back from the aquarium.
+A big red eyed creature appeared in the dark out of nowhere and started quickly heating my body.
+This is very dangerous! Warn everyone immediately!</p>
+            </div>
+            <div class="note-card__status">
+              <div class="note-card__status-dot active"></div>
+              <div class="note-card__status-dot active"></div>
+              <div class="note-card__status-dot active"></div>
+              <span class="note-card__status-label">Priority · Unresolved</span>
+            </div>
+          </div>
+
+          <div class="note-card">
+            <div class="note-card__corner"></div>
+            <div class="note-card__scan"></div>
+            <div class="note-card__header">
+              <span class="note-card__id">ORBIS-NOTE-0005</span>
+              <span class="note-card__author-badge">EX</span>
+            </div>
+            <div class="note-card__body">
+              <div class="note-card__title">Aquarium Keycard</div>
+              <p class="note-card__text">Shaduru, could you make me another blue keycard for the aquarium? Mine fell into the middle of the black lake and it's dangerous to get it back.</p>
+            </div>
+            <div class="note-card__status">
+              <div class="note-card__status-dot active"></div>
+              <div class="note-card__status-dot"></div>
+              <div class="note-card__status-dot"></div>
+              <span class="note-card__status-label">Recovered · Intact</span>
+            </div>
+          </div>
+
         </div>
+      </div><!-- /tab-notas -->
 
-        <!-- Vanishing difficulty / crossing BM -->
-        <div class="terminal">
-          <div class="terminal__titlebar">
-            <div class="terminal__dots">
-              <div class="terminal__dot terminal__dot--red"></div>
-              <div class="terminal__dot terminal__dot--yellow"></div>
-              <div class="terminal__dot terminal__dot--green"></div>
-            </div>
-            <span class="terminal__filename">vanishing_principle_notes.db — EX / PE</span>
-          </div>
-          <div class="terminal__body">
-            <div class="terminal__separator">// Difficulty in Crossing Black Matter</div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">EX &gt;</span>
-              <span class="terminal__text" data-type="According to the Vanishing Principle, I only need to close my eyes to make it disappear, right? But then why doesn't it work sometimes?"></span>
-            </div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">PE &gt;</span>
-              <span class="terminal__text" data-type="You have to become unaware of its existence in order for it to disappear. Some people have problems crossing it with eyes closed, be it remnants of light or something else."></span>
-            </div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">PE &gt;</span>
-              <span class="terminal__text" data-type="The best alternative is to simply fall unconscious and cross it that way, but that is hardly convenient."></span>
-            </div>
-            <span class="terminal__cursor"></span>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- ── LOGS — CRIATURAS ── -->
-      <div data-category="creatures">
-        <div class="log-section">
-          <div class="log-section__title">// Ficheiro: Fauna Afectada</div>
-
-          <div class="log-card">
-            <div class="log-card__meta">
-              <span class="log-card__id">Registo #12 — Anglerfish</span>
-              <span class="log-card__author">Investigadora Marta V.</span>
-            </div>
-            <p class="log-card__text">"A criatura usa uma flor luminosa como isco — idêntica às glowvines que encontrámos nas paredes da gruta. Só percebemos a diferença quando o Gorobi tentou tocar numa. O corpo inteiro está oculto na matéria negra. Não faz qualquer som ao mover-se. Só o isco é visível. Nunca há raízes onde o isco aparece — essa é a única forma de distinguir o falso do real."</p>
-          </div>
-
-          <div class="log-card">
-            <div class="log-card__meta">
-              <span class="log-card__id">Registo #18 — Medusas</span>
-              <span class="log-card__author">Dr. Ramos</span>
-            </div>
-            <p class="log-card__text">"As medusas nadam na matéria negra como se fosse água. Não há explicação para isto — a matéria negra não é líquida. Parece que qualquer criatura suficientemente adaptada consegue mover-se dentro dela livremente. Os tentáculos ficam visíveis quando a observamos directamente. Quando desviamos o olhar, a criatura desaparece juntamente com a matéria que a rodeia."</p>
-          </div>
-
-          <div class="log-card">
-            <div class="log-card__meta">
-              <span class="log-card__id">Registo #23 — Glowvines</span>
-              <span class="log-card__author">Investigadora Marta V.</span>
-            </div>
-            <p class="log-card__text">"As plantas crescem sempre a partir de tectos de matéria negra. As raízes são invisíveis — rodeadas por matéria negra que as oculta. Mas ao iluminarmos com o núcleo, as raízes tornam-se visíveis. Descoberta mais estranha: a região entre as raízes e a flor parece sólida visualmente, mas não existe fisicamente. Atravessa-se como se fosse ar. A planta cria uma ilusão de solidez."</p>
-          </div>
-
-          <div class="log-card">
-            <div class="log-card__meta">
-              <span class="log-card__id">Registo #31 — Camaleões</span>
-              <span class="log-card__author">Dr. Ferreira — CONFIDENCIAL</span>
-            </div>
-            <p class="log-card__text">"Os camaleões negros são diferentes de tudo o que vimos até agora. São inteligentes. Observam-nos. Quando iluminados com o núcleo, ficam imóveis — sabem que foram detectados. Fazem sons que não consigo descrever. Graves, irregulares. Não são sons de animal. Recomendo contenção imediata no Piso 3. Não devem sair dali em circunstância alguma."</p>
-          </div>
-        </div>
-
-        <!-- Creatures from JSON as terminal -->
-        <div class="terminal">
-          <div class="terminal__titlebar">
-            <div class="terminal__dots">
-              <div class="terminal__dot terminal__dot--red"></div>
-              <div class="terminal__dot terminal__dot--yellow"></div>
-              <div class="terminal__dot terminal__dot--green"></div>
-            </div>
-            <span class="terminal__filename">fauna_database.db — BIO</span>
-          </div>
-          <div class="terminal__body">
-            <div class="terminal__separator">// Black Anglerfish</div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="These creatures live inside Black Matter. Their black skin grants them perfect camouflage in this environment."></span>
-            </div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="A fake black gloamvine dangles from their head, attracting unsuspecting prey to their gaping maw."></span>
-            </div>
-
-            <div class="terminal__separator">// Jellyfish</div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="These creatures seem to be immune to the effects of Black Matter. While their heads are soft and bouncy, their tentacles are extremely dangerous due to their electrical charge."></span>
-            </div>
-
-            <div class="terminal__separator">// Gloamvines</div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="Gloamvines grow in dark caves, hanging from ceilings with thin tendrils. Their sticky purple flowers glow to attract insects, which get trapped and become their food."></span>
-            </div>
-
-            <div class="terminal__separator">// Black Gloamvines</div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="Gloamvines exposed to Black Matter for long periods become Black Gloamvines. Their roots are always attached to Black Matter, remain solid even after vanishing, and are only visible under specific light sources."></span>
-            </div>
-
-            <div class="terminal__separator">// Physical Distortions</div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="Absence of Black Matter above black gloamvines hints at hidden distortions in the ceiling. Be cautious of surfaces like dirt, rock, or metal that appear solid above them."></span>
-            </div>
-            <span class="terminal__cursor"></span>
-          </div>
-        </div>
-
-        <!-- Gloamvine Core -->
-        <div class="log-section">
-          <div class="log-section__title">// Ficheiro: Ferramentas — Investigação BIO</div>
-          <div class="log-card">
-            <div class="log-card__meta">
-              <span class="log-card__id">Gloamvine Core</span>
-              <span class="log-card__author">BIO</span>
-            </div>
-            <p class="log-card__text">"We successfully created a light source capable of reflecting off materials inside black matter: The Gloamvine Core. This means we can finally see the roots of black gloamvines and distinguish them from anglerfish. I wonder what else we'll be able to see with this."</p>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- ── TERMINAL 2 — INCIDENTE PISO 3 ── -->
-      <div data-category="incident">
-        <div class="terminal">
-          <div class="terminal__titlebar">
-            <div class="terminal__dots">
-              <div class="terminal__dot terminal__dot--red"></div>
-              <div class="terminal__dot terminal__dot--yellow"></div>
-              <div class="terminal__dot terminal__dot--green"></div>
-            </div>
-            <span class="terminal__filename">orbis_incident_P3.txt — ENCRIPTADO PARCIALMENTE</span>
-          </div>
-          <div class="terminal__body">
-            <div class="terminal__separator">// ALERTA DE CONTENÇÃO — PISO 3</div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">!</span>
-              <span class="terminal__text" data-type="[FICHEIRO CORROMPIDO — RECUPERAÇÃO PARCIAL]"></span>
-            </div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="Os camaleões escaparam. Não sabemos como. As câmeras mostram a sala vazia — mas as câmeras só registam o que olham directamente."></span>
-            </div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="Três membros da equipa foram atacados. O sangue deles... está a mudar. Fica preto nas bordas das feridas."></span>
-            </div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="O Piso 3 está permanentemente fechado. Não entrem. Não abram a porta."></span>
-            </div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="[RESTO DO FICHEIRO INACESSÍVEL]"></span>
-            </div>
-            <span class="terminal__cursor"></span>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── LOGS — PROJECTO ORBIS ── -->
-      <div data-category="orbis">
-        <div class="log-section">
-          <div class="log-section__title">// Ficheiro: Projecto ORBIS — Classificado</div>
-
-          <div class="log-card">
-            <div class="log-card__meta">
-              <span class="log-card__id">Registo #47 — Entidade Secreta</span>
-              <span class="log-card__author">Director do Projecto</span>
-            </div>
-            <p class="log-card__text">"Capturámos uma. Completamente negra, abre e fecha um único olho. Quando fecha o olho, desaparece — ganha as propriedades da matéria negra que a rodeia. Só conseguimos capturá-la projectando luz directa de forma contínua. Enquanto iluminada, não consegue desaparecer. Parece... frustrada. Não com medo. Frustrada. Como se soubesse que estamos a estudá-la e não aprovasse."</p>
-          </div>
-
-          <div class="log-card">
-            <div class="log-card__meta">
-              <span class="log-card__id">Registo #52 — O Observer</span>
-              <span class="log-card__author">Director do Projecto</span>
-            </div>
-            <p class="log-card__text">"Criámos o Observer inspirados na Entidade Secreta. Uma esfera artificial com consciência — capaz de observar continuamente sem necessitar de um operador humano. Teoricamente, pode desaparecer na matéria negra quando fecha o olho, tal como a entidade original. O primeiro teste foi... perturbador. Quando o ligámos, a primeira coisa que fez foi procurar a câmara de contenção da Entidade Secreta e olhar para ela durante oito minutos sem desviar o olhar."</p>
-          </div>
-
-          <div class="log-card">
-            <div class="log-card__meta">
-              <span class="log-card__id">Registo #61 — Teleporter</span>
-              <span class="log-card__author">Investigadora Marta V.</span>
-            </div>
-            <p class="log-card__text">"Baseámo-nos no princípio da desaparição para construir o teleporter. Quando estás dentro da esfera e não consegues ver o exterior, o exterior deixa de te poder observar. Entras na outra dimensão — o lugar para onde vai toda a matéria negra quando não é observada. O problema é sair. Precisas de algo que te observe de volta para regressares. Por enquanto, usamos o Observer como âncora."</p>
-          </div>
-        </div>
-
-        <!-- The Stranger terminals (do JSON) -->
-        <div class="terminal">
-          <div class="terminal__titlebar">
-            <div class="terminal__dots">
-              <div class="terminal__dot terminal__dot--red"></div>
-              <div class="terminal__dot terminal__dot--yellow"></div>
-              <div class="terminal__dot terminal__dot--green"></div>
-            </div>
-            <span class="terminal__filename">stranger_classified.db — PE // ACESSO RESTRITO</span>
-          </div>
-          <div class="terminal__body">
-            <div class="terminal__separator">// The Stranger</div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="The Stranger is a large black sphere that orbits the Earth, situated between the Moon and our planet. It is estimated to be slightly larger than the Moon."></span>
-            </div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="We hypothesize that the Stranger might be composed of black matter — our attempt to land a scout on its surface failed, with the scout passing through it entirely."></span>
-            </div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="Initially we thought it might be composed of gases, but after studying black matter, we realize it exhibits similar behaviors. The direct relationship between black matter on Earth and the Stranger remains to be studied."></span>
-            </div>
-
-            <div class="terminal__separator">// The Eclipse</div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="Every three days, the Stranger emerges in front of the Moon, causing a lunar eclipse that entirely obscures the Moon and envelops the Earth in total darkness."></span>
-            </div>
-            <div class="terminal__line">
-              <span class="terminal__prompt">&gt;</span>
-              <span class="terminal__text" data-type="This event occurs around midnight, when the Moon is at its highest point in the sky."></span>
-            </div>
-            <span class="terminal__cursor"></span>
-          </div>
-        </div>
-
-        <!-- Vanishing Research -->
-        <div class="log-section" style="margin-top:16px;">
-          <div class="log-section__title">// Ficheiro: Investigação — Teleportação</div>
-          <div class="log-card">
-            <div class="log-card__meta">
-              <span class="log-card__id">Vanishing Research</span>
-              <span class="log-card__author">PE</span>
-            </div>
-            <p class="log-card__text">"Shaduru and I have been studying what happens to Black Matter and where it goes during the vanishing. Our research not only holds potential for developing teleportation but also offers revolutionary insights into the fundamental workings of physics and the universe."</p>
-          </div>
-          <div class="log-card">
-            <div class="log-card__meta">
-              <span class="log-card__id">Black Matter Generator</span>
-              <span class="log-card__author">EE</span>
-            </div>
-            <p class="log-card__text">"Black Matter Generator — Harnesses stored light within black matter and channels it through these tubes. Activate it to power the lab and teleporter chambers."</p>
-          </div>
-        </div>
-
-      </div>
-
-    </div><!-- fim lore-page -->
-  </div><!-- fim page-content -->
+    </div><!-- /lore-page -->
+  </div><!-- /page-content -->
 
   <script src="../js/main.js"></script>
   <script src="../js/lore.js"></script>
+  <script>
+  /* ═══════════════════════════════════════════════════════════
+     TAB SWITCHING
+  ═══════════════════════════════════════════════════════════ */
+  (function () {
+    const tabs   = document.querySelectorAll('.lore-tab');
+    const panels = document.querySelectorAll('.tab-panel');
+
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.tab;
+        tabs.forEach(b => b.classList.remove('active'));
+        panels.forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + target).classList.add('active');
+        if (target === 'logs') {
+          setTimeout(() => window.dispatchEvent(new Event('scroll')), 50);
+        }
+      });
+    });
+  })();
+
+
+  /* ═══════════════════════════════════════════════════════════
+     ANIMATED BACKGROUND — subtle floating particles + grid
+  ═══════════════════════════════════════════════════════════ */
+  (function () {
+    const canvas = document.getElementById('lore-bg');
+    const ctx    = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    /* Particles */
+    const PARTICLE_COUNT = 38;
+    const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      r: 0.6 + Math.random() * 1.4,
+      vx: (Math.random() - 0.5) * 0.12,
+      vy: (Math.random() - 0.5) * 0.12,
+      alpha: 0.04 + Math.random() * 0.1,
+    }));
+
+    /* Grid lines (static, drawn once effectively) */
+    const GRID = 72;
+
+    function drawGrid() {
+      ctx.strokeStyle = 'rgba(0, 180, 220, 0.025)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < canvas.width; x += GRID) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+      }
+      for (let y = 0; y < canvas.height; y += GRID) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+      }
+    }
+
+    function drawParticles() {
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 200, 255, ${p.alpha})`;
+        ctx.fill();
+      });
+    }
+
+    function updateParticles() {
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+      });
+    }
+
+    /* Very occasional dim "pulse" circles */
+    const pulses = [];
+    function maybeSpawnPulse() {
+      if (Math.random() < 0.003) {
+        pulses.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: 0, maxR: 60 + Math.random() * 80,
+          alpha: 0.06
+        });
+      }
+    }
+    function drawPulses() {
+      for (let i = pulses.length - 1; i >= 0; i--) {
+        const p = pulses[i];
+        p.r     += 0.5;
+        p.alpha -= 0.0012;
+        if (p.alpha <= 0) { pulses.splice(i, 1); continue; }
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(0, 200, 255, ${p.alpha})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+
+    function frame() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawGrid();
+      updateParticles();
+      drawParticles();
+      maybeSpawnPulse();
+      drawPulses();
+      requestAnimationFrame(frame);
+    }
+    frame();
+  })();
+
+
+  /* ═══════════════════════════════════════════════════════════
+     OBSERVER — Blue Front with rotating body and pupil following mouse
+  ═══════════════════════════════════════════════════════════ */
+  (function () {
+    const ghost  = document.getElementById('observer-ghost');
+    const canvas = document.getElementById('observer-canvas');
+    const ctx    = canvas.getContext('2d');
+    const W = 220, H = 220;
+
+    // Load images
+    let blueFrontImg = new Image();
+    blueFrontImg.src = '../assets/Observer/ObserverBlueFront.png';
+    let bluePupilImg = new Image();
+    bluePupilImg.src = '../assets/Observer/ObserverBlueFrontPupil.png';
+
+    let mouseX = window.innerWidth * 0.4;
+    let mouseY = window.innerHeight * 0.5;
+    let rotation = 0;
+    let lastTime = performance.now();
+
+    let targetY  = 50;
+    let currentY = 50;
+
+    /* Track mouse */
+    document.addEventListener('mousemove', e => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    function drawObserver() {
+      ctx.clearRect(0, 0, W, H);
+      const cx = W / 2, cy = H / 2;
+
+      /* Draw rotating blue front body */
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(rotation);
+      ctx.translate(-cx, -cy);
+      
+      if (blueFrontImg.complete) {
+        ctx.drawImage(blueFrontImg, 0, 0, W, H);
+      }
+      
+      ctx.restore();
+
+      /* Draw pupil following mouse */
+      const rect  = ghost.getBoundingClientRect();
+      const gCX   = rect.left + rect.width / 2;
+      const gCY   = rect.top  + rect.height / 2;
+      const dx    = (mouseX - gCX) / window.innerWidth;
+      const dy    = (mouseY - gCY) / window.innerHeight;
+      
+      const maxOff = 12;
+      const pupilOffX = Math.max(-maxOff, Math.min(maxOff, dx * 35));
+      const pupilOffY = Math.max(-maxOff, Math.min(maxOff, dy * 35));
+      
+      if (bluePupilImg.complete) {
+        ctx.save();
+        ctx.translate(cx + pupilOffX, cy + pupilOffY);
+        ctx.translate(-W/2, -H/2);
+        ctx.drawImage(bluePupilImg, 0, 0, W, H);
+        ctx.restore();
+      }
+    }
+
+    function tick(now) {
+      const dt = now - lastTime;
+      lastTime = now;
+
+      /* Continuous rotation */
+      rotation += (Math.PI * 2) / 8000; // Full rotation every 8 seconds
+      if (rotation > Math.PI * 2) rotation -= Math.PI * 2;
+
+      drawObserver();
+
+      /* Smooth vertical scroll tracking */
+      currentY += (targetY - currentY) * 0.035;
+      ghost.style.top = currentY + '%';
+      ghost.style.transform = `translateY(-50%)`;
+
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    /* Scroll → moves observer vertically */
+    window.addEventListener('scroll', () => {
+      const maxScroll = document.body.scrollHeight - window.innerHeight;
+      const pct = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+      targetY = 18 + pct * 64;
+    });
+  })();
+  </script>
 </body>
 </html>

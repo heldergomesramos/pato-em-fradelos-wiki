@@ -1475,7 +1475,7 @@
     const spr     = document.getElementById('spr-open');
     const ctx     = oc.getContext('2d');
     const FRAMES  = 13;
-    let ang=0, lt=null, opened=false, anim=false;
+    let ang=0, lt=null, opened=false, anim=false, mouseOverWrap=false;
 
     function resizeOC(){ const s=wrap.getBoundingClientRect().width||wrap.offsetWidth; oc.width=s; oc.height=s; }
     resizeOC(); addEventListener('resize', resizeOC);
@@ -1495,6 +1495,10 @@
     }
     addEventListener('scroll',onScroll,{passive:true}); onScroll();
 
+    /* Mouse enter/leave para rodar mais rápido */
+    wrap.addEventListener('mouseenter', ()=>{ mouseOverWrap=true; });
+    wrap.addEventListener('mouseleave', ()=>{ mouseOverWrap=false; });
+
     /* pupil tracking */
     addEventListener('mousemove',e=>{
       if(!opened)return;
@@ -1510,10 +1514,11 @@
       if(!opened){requestAnimationFrame(animEye);return;}
       if(!lt)lt=ts; const dt=ts-lt; lt=ts;
       const c=(ts%4000)/4000;
-      outer.style.filter=`drop-shadow(0 0 ${16+Math.sin(c*Math.PI*2)*12}px rgba(200,20,20,${.28+Math.sin(c*Math.PI*2)*.18}))`;
-      ang=(ang+.4*(dt/16.67))%360; outer.style.transform=`rotate(${ang}deg)`;
-      const gs=.12+Math.sin(c*Math.PI*2)*.06;
-      glow.style.background=`radial-gradient(ellipse 70% 70% at 50% 50%,rgba(120,10,10,${gs}) 0%,transparent 70%)`;
+      const speed = mouseOverWrap ? 1.2 : .4;
+      outer.style.filter=`drop-shadow(0 0 ${18+Math.sin(c*Math.PI*2)*14}px rgba(255,30,30,${.35+Math.sin(c*Math.PI*2)*.22}))`;
+      ang=(ang+speed*(dt/16.67))%360; outer.style.transform=`rotate(${ang}deg)`;
+      const gs=.18+Math.sin(c*Math.PI*2)*.08;
+      glow.style.background=`radial-gradient(ellipse 70% 70% at 50% 50%,rgba(180,20,20,${gs}) 0%,transparent 70%)`;
       requestAnimationFrame(animEye);
     }
     requestAnimationFrame(animEye);
@@ -1523,23 +1528,23 @@
       if(!spr.naturalWidth)return;
       const s=oc.width, fw=spr.naturalWidth/FRAMES, fh=spr.naturalHeight;
       ctx.clearRect(0,0,s,s);
-      const gA=.1+p*.5;
+      const gA=.15+p*.6;
       const g=ctx.createRadialGradient(s/2,s/2,s*.07,s/2,s/2,s*.62);
-      g.addColorStop(0,`rgba(255,60,60,${gA})`); g.addColorStop(.4,`rgba(200,30,30,${gA*.4})`); g.addColorStop(1,'transparent');
+      g.addColorStop(0,`rgba(255,70,70,${gA})`); g.addColorStop(.4,`rgba(220,40,40,${gA*.5})`); g.addColorStop(1,'transparent');
       ctx.fillStyle=g; ctx.fillRect(0,0,s,s);
       ctx.drawImage(spr,f*fw,0,fw,fh,0,0,s,s);
       if(p>.6){
         const rA=(p-.6)/.4;
-        ctx.strokeStyle=`rgba(255,80,40,${rA*.42})`; ctx.lineWidth=4*rA; ctx.shadowBlur=20*rA; ctx.shadowColor='rgba(255,60,30,.8)';
+        ctx.strokeStyle=`rgba(255,100,50,${rA*.5})`; ctx.lineWidth=4*rA; ctx.shadowBlur=20*rA; ctx.shadowColor='rgba(255,80,40,.9)';
         ctx.beginPath(); ctx.arc(s/2,s/2,s*.46,0,Math.PI*2); ctx.stroke();
-        ctx.shadowBlur=0; ctx.strokeStyle=`rgba(200,30,30,${rA*.2})`; ctx.lineWidth=2*rA;
+        ctx.shadowBlur=0; ctx.strokeStyle=`rgba(220,40,40,${rA*.3})`; ctx.lineWidth=2*rA;
         ctx.beginPath(); ctx.arc(s/2,s/2,s*.48,0,Math.PI*2); ctx.stroke();
       }
     }
 
     /* run animation */
     function run(){
-      if(anim||opened)return;
+      if(anim)return;
       anim=true; resizeOC(); drawFrame(0,0);
       let f=0;
       const iv=setInterval(()=>{
@@ -1554,7 +1559,7 @@
               outer.style.opacity='1'; pupil.style.opacity='1';
               opened=true; anim=false;
               txt.classList.add('show');
-              glow.style.background='radial-gradient(ellipse 70% 70% at 50% 50%,rgba(120,10,10,.15) 0%,transparent 70%)';
+              glow.style.background='radial-gradient(ellipse 70% 70% at 50% 50%,rgba(180,20,20,.2) 0%,transparent 70%)';
             },400);
           },200);
         }
@@ -1563,7 +1568,10 @@
 
     const io=new IntersectionObserver(en=>{ if(en[0].isIntersecting&&!opened&&!anim) setTimeout(run,1800); },{threshold:.35});
     io.observe(wrap);
-    wrap.addEventListener('click',()=>location.href='pages/observer.html');
+    wrap.addEventListener('click',()=>{
+      if(opened) location.href='pages/observer.html';
+      else if(!anim) run();
+    });
     if(wrap.getBoundingClientRect().top<innerHeight*.6) setTimeout(run,500);
   })();
   </script>
