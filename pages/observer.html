@@ -29,7 +29,7 @@
 
     #eye-container {
       position:relative;
-      width:340px; height:340px;
+      width:480px; height:480px;
     }
     #eye-container img {
       position:absolute; inset:0;
@@ -84,7 +84,7 @@
     #hud.show { opacity:1; }
 
     #exposure-bar-wrap {
-      width:280px; height:6px;
+      width:320px; height:7px;
       border:1px solid rgba(200,30,30,0.3);
       border-radius:3px;
       overflow:hidden;
@@ -103,6 +103,15 @@
       text-transform:uppercase;
       color:rgba(200,30,30,0.6);
     }
+    #shrink-warn {
+      font-size:0.42rem;
+      letter-spacing:0.3em;
+      text-transform:uppercase;
+      color:rgba(255,120,0,0);
+      transition:color 0.4s;
+      pointer-events:none;
+    }
+    #shrink-warn.active { color:rgba(255,120,0,0.85); }
 
     /* ─── DEATH SCREEN ─── */
     #death-screen {
@@ -166,7 +175,7 @@
   <div id="eye-container">
     <img id="intro-front" src="data:image/webp;base64,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" alt="">
     <img id="intro-pupil" src="data:image/webp;base64,UklGRuAAAABXRUJQVlA4TNQAAAAv/8A/ED+gqI0UaE/4418GYokESJNEZnjB7CQVso0A3Stw/hgHOP8BAGCsy7iR1T6eA+PUtuKIHbjKdupA7CDYQUgHIeu5f9Tt5f8wRvRfjdu2ETsl6Xy3HzD49vvv998VZKVXd9Lzwcqu7mMnOz+MwfKx42mOHR87PpcU6h+6Z+VSR/1D93Qud7z/oIc9lwe++x962C0H3vsfedgtB97vf/x95/2Pf+5+++O/O7j/8N8dqh//3bH+if/un//vgk/8fz/y//tS/r8/Y8Vnfv/9/rt/GA==" alt="">
-    <canvas id="intro-lid" width="340" height="340"></canvas>
+    <canvas id="intro-lid" width="480" height="480"></canvas>
   </div>
 </div>
 
@@ -181,6 +190,7 @@
   <div id="exposure-bar-wrap">
     <div id="exposure-bar"></div>
   </div>
+  <div id="shrink-warn">⚠ SOMBRAS A DESAPARECER</div>
 </div>
 
 <!-- ─── DEATH ─── -->
@@ -198,26 +208,29 @@
 
 <script>
 /* ============================================================
-   OBSERVER MINI-GAME
-   ============================================================
-   EXPOSURE SYSTEM:
-   - Max accumulation: 6 seconds at full exposure = 100%
-   - Falloff: 10x faster → 0.6s from 100% to 0% if hidden
-   - Every frame: exposure += dt/6000 if seen, else exposure -= dt/600
-   - At 100% → death
+   THE OBSERVER — VERSÃO DIFÍCIL
+   Mesma mecânica: esconde o rato nas sombras.
+   Novidades:
+   - Observer 3× maior (480px)
+   - Raios de scan rotativos que te apanham mesmo nas sombras
+   - Sombras encolhem com o tempo (aviso visual antes)
+   - 2º observer aparece aos 20s
+   - Exposição sobe muito mais depressa quanto mais perto estás
+   - Modo CAÇA: quando te vê, acelera a fundo + spin frenético
+   - Modo PATRULHA: quando estás escondido, faz padrão circular
    ============================================================ */
 
-// ── DOM refs ──
+// ── DOM ──
 const introEl    = document.getElementById('intro');
 const introFront = document.getElementById('intro-front');
 const introPupil = document.getElementById('intro-pupil');
 const introLid   = document.getElementById('intro-lid');
-const introText  = document.getElementById('intro-text');
 const gameLayer  = document.getElementById('game-layer');
 const gameCanvas = document.getElementById('game-canvas');
 const gCtx       = gameCanvas.getContext('2d');
 const hud        = document.getElementById('hud');
 const expBar     = document.getElementById('exposure-bar');
+const shrinkWarn = document.getElementById('shrink-warn');
 const deathScreen= document.getElementById('death-screen');
 const cursorDot  = document.getElementById('cursor-dot');
 const sprClose   = document.getElementById('spr-close');
@@ -227,428 +240,450 @@ const sprRedP    = document.getElementById('spr-red-pupil');
 const sprBluF    = document.getElementById('spr-blu-front');
 const sprBluP    = document.getElementById('spr-blu-pupil');
 
-// ── Global state ──
-let mouseX = window.innerWidth/2, mouseY = window.innerHeight/2;
-let gameRunning = false;
-let dead = false;
+const W = () => gameCanvas.width;
+const H = () => gameCanvas.height;
 
+// ── Input ──
+let mouseX = window.innerWidth/2, mouseY = window.innerHeight/2;
 document.addEventListener('mousemove', e => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
-  cursorDot.style.left = mouseX + 'px';
-  cursorDot.style.top  = mouseY + 'px';
+  mouseX = e.clientX; mouseY = e.clientY;
+  cursorDot.style.left = mouseX+'px'; cursorDot.style.top = mouseY+'px';
 });
 
-// ── Canvas resize ──
-function resizeGame() {
-  gameCanvas.width  = window.innerWidth;
-  gameCanvas.height = window.innerHeight;
-}
+// ── Canvas ──
+function resizeGame() { gameCanvas.width=window.innerWidth; gameCanvas.height=window.innerHeight; }
 resizeGame();
 window.addEventListener('resize', resizeGame);
 
-// ── INTRO: open-eye animation ──
-const CLOSE_FRAMES = 8;
-const OPEN_FRAMES  = 13;
+// ── INTRO ──
+const CLOSE_FRAMES=8, OPEN_FRAMES=13;
 const lidCtx = introLid.getContext('2d');
+let introSpinRaf=null, introSpinAngle=0;
 
-function drawLidFrame(img, frame, total) {
-  const fw = img.naturalWidth / total;
-  const fh = img.naturalHeight;
-  lidCtx.clearRect(0,0,340,340);
-  lidCtx.drawImage(img, frame*fw, 0, fw, fh, 0, 0, 340, 340);
+function drawLidFrame(img,frame,total) {
+  const fw=img.naturalWidth/total;
+  lidCtx.clearRect(0,0,480,480);
+  lidCtx.drawImage(img, frame*fw,0, fw,img.naturalHeight, 0,0,480,480);
 }
-
-let introSpinAngle = 0;
-let introSpinRaf = null;
 function startIntroSpin() {
-  function spin() {
-    introSpinAngle = (introSpinAngle + 1.2) % 360;
-    introFront.style.transform = 'rotate(' + introSpinAngle + 'deg)';
-    introSpinRaf = requestAnimationFrame(spin);
-  }
+  function spin(){ introSpinAngle=(introSpinAngle+1.2)%360; introFront.style.transform='rotate('+introSpinAngle+'deg)'; introSpinRaf=requestAnimationFrame(spin); }
   spin();
 }
-
 function runOpenAnim() {
-  // Start at closed
-  drawLidFrame(sprClose, CLOSE_FRAMES-1, CLOSE_FRAMES);
+  drawLidFrame(sprClose,CLOSE_FRAMES-1,CLOSE_FRAMES);
   startIntroSpin();
-
-  // Open eye immediately
-  setTimeout(() => {
-    let frame = 0;
-    const iv = setInterval(() => {
-      drawLidFrame(sprOpen, frame, OPEN_FRAMES);
-      frame++;
-      if (frame >= OPEN_FRAMES) {
-        clearInterval(iv);
-        lidCtx.clearRect(0,0,340,340);
-        // Transition straight to game
-        setTimeout(transitionToGame, 400);
-      }
-    }, 80);
-  }, 600);
+  setTimeout(()=>{
+    let f=0; const iv=setInterval(()=>{
+      drawLidFrame(sprOpen,f,OPEN_FRAMES); f++;
+      if(f>=OPEN_FRAMES){ clearInterval(iv); lidCtx.clearRect(0,0,480,480); setTimeout(transitionToGame,400); }
+    },80);
+  },600);
 }
-
 function transitionToGame() {
   cancelAnimationFrame(introSpinRaf);
   introEl.classList.add('fade-out');
   gameLayer.classList.add('show');
   hud.classList.add('show');
-  setTimeout(() => {
-    introEl.style.display = 'none';
-    gameRunning = true;
-    requestAnimationFrame(gameLoop);
-  }, 1000);
+  setTimeout(()=>{ introEl.style.display='none'; gameRunning=true; requestAnimationFrame(gameLoop); },1000);
 }
 
-// ── GAME WORLD ──
-// Level: array of shelter zones (caves/rocks)
-// Each shelter: { x, y, w, h, type: 'cave'|'rock' }
-// Player is the cursor — we check if cursor is inside shelter
-
-const W = () => gameCanvas.width;
-const H = () => gameCanvas.height;
-
-// Generate shelters relative to canvas size
+// ── SHELTERS ──
+// life: 1.0→0, encolhe com o tempo; shrinkStartMs = quando começa a encolher
 function makeShelters() {
   return [
-    // Caves (darker, more protection)
-    { type:'cave', x:0.05, y:0.70, w:0.12, h:0.20 },
-    { type:'cave', x:0.82, y:0.65, w:0.13, h:0.22 },
-    { type:'cave', x:0.40, y:0.78, w:0.15, h:0.18 },
-    { type:'cave', x:0.20, y:0.12, w:0.10, h:0.15 },
-    { type:'cave', x:0.72, y:0.10, w:0.12, h:0.14 },
-    // Rocks (partial cover)
-    { type:'rock', x:0.28, y:0.55, w:0.08, h:0.10 },
-    { type:'rock', x:0.60, y:0.50, w:0.09, h:0.10 },
-    { type:'rock', x:0.12, y:0.42, w:0.07, h:0.09 },
-    { type:'rock', x:0.80, y:0.38, w:0.08, h:0.09 },
-    { type:'rock', x:0.48, y:0.35, w:0.07, h:0.08 },
-    { type:'rock', x:0.35, y:0.20, w:0.09, h:0.10 },
-    { type:'rock', x:0.62, y:0.28, w:0.08, h:0.09 },
+    { type:'cave', x:0.05, y:0.70, w:0.13, h:0.21, life:1, shrinkStart:18000 },
+    { type:'cave', x:0.82, y:0.65, w:0.14, h:0.23, life:1, shrinkStart:25000 },
+    { type:'cave', x:0.40, y:0.78, w:0.15, h:0.19, life:1, shrinkStart:32000 },
+    { type:'cave', x:0.20, y:0.12, w:0.11, h:0.16, life:1, shrinkStart:14000 },
+    { type:'cave', x:0.72, y:0.10, w:0.12, h:0.15, life:1, shrinkStart:22000 },
+    { type:'rock', x:0.28, y:0.55, w:0.09, h:0.11, life:1, shrinkStart:10000 },
+    { type:'rock', x:0.60, y:0.50, w:0.10, h:0.11, life:1, shrinkStart:15000 },
+    { type:'rock', x:0.12, y:0.42, w:0.08, h:0.10, life:1, shrinkStart:19000 },
+    { type:'rock', x:0.80, y:0.38, w:0.09, h:0.10, life:1, shrinkStart:12000 },
+    { type:'rock', x:0.48, y:0.35, w:0.08, h:0.09, life:1, shrinkStart:28000 },
+    { type:'rock', x:0.35, y:0.20, w:0.09, h:0.11, life:1, shrinkStart:20000 },
+    { type:'rock', x:0.62, y:0.28, w:0.09, h:0.10, life:1, shrinkStart:16000 },
   ];
 }
-
 let shelters = makeShelters();
+const SHRINK_RATE = 1/12000; // perde toda a vida em 12s após começar
 
 function getShelterAbs(s) {
-  return {
-    type: s.type,
-    x: s.x * W(),
-    y: s.y * H(),
-    w: s.w * W(),
-    h: s.h * H()
-  };
+  // Scale shelter from centre based on life
+  const cx=s.x+s.w/2, cy=s.y+s.h/2;
+  const sw=s.w*s.life, sh=s.h*s.life;
+  return { type:s.type, x:(cx-sw/2)*W(), y:(cy-sh/2)*H(), w:sw*W(), h:sh*H(), life:s.life };
 }
 
-function isInShelter(mx, my) {
-  for (const s of shelters) {
-    const a = getShelterAbs(s);
-    if (mx >= a.x && mx <= a.x+a.w && my >= a.y && my <= a.y+a.h) {
-      return true;
+function isInShelter(mx,my) {
+  for(const s of shelters) {
+    if(s.life<0.04) continue;
+    const a=getShelterAbs(s);
+    if(s.type==='cave') {
+      const ex=(mx-(a.x+a.w/2))/(a.w/2||1);
+      const ey=(my-(a.y+a.h/2))/(a.h/2||1);
+      if(ex*ex+ey*ey<=1) return true;
+    } else {
+      if(mx>=a.x&&mx<=a.x+a.w&&my>=a.y&&my<=a.y+a.h) return true;
     }
   }
   return false;
 }
 
-// ── Observer entity ──
-const OBS_SIZE = 160; // px on screen
-let obsX, obsY;         // center in canvas coords (0-1)
-let obsAngle = 0;       // spin angle
-let obsSpeed = 0;
-let obsPhase = 'hunt';  // hunt | calm
-let obsMoveAngle = 0;   // direction of movement
-let obsMoveTimer = 0;
+// ── OBSERVERS ──
+// Cada observer: { x, y, angle, speed, moveAngle, moveTimer, phase, puOffX, puOffY, scanAngle, patrolAngle, patrolR }
+const OBS_SIZE = 480;
 
-function initObserver() {
-  obsX = 0.5; obsY = 0.5;
-  obsSpeed = 0.00008; // fraction of screen per ms
-  obsMoveAngle = Math.random() * Math.PI * 2;
+function makeObserver(x,y) {
+  return {
+    x,y, angle:Math.random()*360, speed:0,
+    moveAngle:Math.random()*Math.PI*2, moveTimer:0,
+    phase:'calm',
+    puOffX:0, puOffY:0,
+    scanAngle:Math.random()*360,   // rotating scan beam
+    patrolCX:x, patrolCY:y,        // patrol orbit centre
+    patrolAngle:Math.random()*Math.PI*2,
+    patrolR:0.12,                  // orbit radius (normalised)
+    patrolMode:false,
+  };
+}
+
+let observers = [];
+let gameTime = 0; // ms elapsed since game start
+let secondObserverSpawned = false;
+
+function initObservers() {
+  observers = [ makeObserver(0.5, 0.5) ];
+  secondObserverSpawned = false;
 }
 
 // ── EXPOSURE ──
-// 0..1 range; death at 1
-let exposure = 0;
-const EXPOSURE_FILL   = 1/6000; // per ms at full visibility
-const EXPOSURE_DRAIN  = 1/600;  // per ms while hidden (10x faster)
+let exposure=0;
+const BASE_FILL  = 1/4500;  // faster than before
+const BASE_DRAIN = 1/550;
+
+// ── STATE ──
+let gameRunning=false, dead=false, lastTs=null;
 
 // ── GAME LOOP ──
-let lastTs = null;
-
-// Observer pupil tracking offset
-let puOffX = 0, puOffY = 0;
-
 function gameLoop(ts) {
-  if (!gameRunning || dead) return;
-  if (!lastTs) lastTs = ts;
-  const dt = Math.min(ts - lastTs, 50); // cap dt at 50ms
-  lastTs = ts;
+  if(!gameRunning||dead) return;
+  if(!lastTs) lastTs=ts;
+  const dt=Math.min(ts-lastTs,50);
+  lastTs=ts;
+  gameTime+=dt;
 
-  const cw = W(), ch = H();
-  const hidden = isInShelter(mouseX, mouseY);
+  const cw=W(), ch=H();
+  const hidden=isInShelter(mouseX,mouseY);
 
-  // ── Update exposure ──
-  if (!hidden) {
-    exposure = Math.min(1, exposure + EXPOSURE_FILL * dt);
+  // ── Spawn second observer at 20s ──
+  if(!secondObserverSpawned && gameTime>20000) {
+    secondObserverSpawned=true;
+    // Spawn far from player
+    const sx = mouseX/cw < 0.5 ? 0.85 : 0.15;
+    const sy = mouseY/ch < 0.5 ? 0.85 : 0.15;
+    observers.push(makeObserver(sx,sy));
+  }
+
+  // ── Shrink shelters ──
+  let anyShrinking=false;
+  for(const s of shelters) {
+    if(gameTime>s.shrinkStart && s.life>0) {
+      s.life=Math.max(0, s.life-SHRINK_RATE*dt);
+      if(s.life>0) anyShrinking=true;
+    }
+  }
+  shrinkWarn.classList.toggle('active', anyShrinking);
+
+  // ── Exposure ──
+  // Sobe mais depressa quanto mais perto o observer mais próximo estiver
+  let seen=false, nearDist=999;
+  for(const obs of observers) {
+    const dx=mouseX/cw-obs.x, dy=mouseY/ch-obs.y;
+    const d=Math.sqrt(dx*dx+dy*dy);
+    if(d<nearDist) nearDist=d;
+    // Scan beam hit — mesmo escondido sofres exposição parcial
+    if(isInScanBeam(obs,mouseX,mouseY,cw,ch)) seen=true;
+    if(!hidden) seen=true;
+  }
+
+  const proxFactor = hidden ? 1 : Math.max(0.4, 1.8-nearDist*2); // closer = faster
+  if(seen) {
+    exposure=Math.min(1, exposure+BASE_FILL*dt*proxFactor);
   } else {
-    exposure = Math.max(0, exposure - EXPOSURE_DRAIN * dt);
+    exposure=Math.max(0, exposure-BASE_DRAIN*dt);
   }
 
-  // ── Update HUD ──
-  const pct = (exposure * 100).toFixed(0);
-  expBar.style.width = pct + '%';
-  if (exposure > 0.7) {
-    expBar.classList.add('danger');
-  } else {
-    expBar.classList.remove('danger');
+  expBar.style.width=(exposure*100).toFixed(0)+'%';
+  expBar.classList.toggle('danger',exposure>0.65);
+  cursorDot.classList.toggle('hidden-mode', hidden&&!seen);
+
+  if(exposure>=1){ triggerDeath(); return; }
+
+  // ── Update each observer ──
+  for(const obs of observers) {
+    // Scan beam rotates — faster when hunting
+    const isHunt = obs.phase==='hunt';
+    obs.scanAngle=(obs.scanAngle+(isHunt?1.4+exposure*3:0.7))%360;
+
+    // Phase
+    if(!hidden) {
+      obs.phase='hunt';
+      obs.patrolMode=false;
+    } else {
+      // Stays hunt for 2s after losing sight
+      if(!obs._lostSightTimer) obs._lostSightTimer=0;
+      if(obs.phase==='hunt') { obs._lostSightTimer+=dt; if(obs._lostSightTimer>2000){ obs.phase='calm'; obs._lostSightTimer=0; } }
+      else obs._lostSightTimer=0;
+    }
+
+    if(obs.phase==='calm') {
+      // Patrol: orbit around last known area
+      obs.patrolMode=true;
+      obs.patrolAngle=(obs.patrolAngle+0.0006*dt)%(Math.PI*2);
+      const tx=obs.patrolCX+Math.cos(obs.patrolAngle)*obs.patrolR;
+      const ty=obs.patrolCY+Math.sin(obs.patrolAngle)*obs.patrolR;
+      obs.x+=(tx-obs.x)*0.012;
+      obs.y+=(ty-obs.y)*0.012;
+    } else {
+      // Hunt: aggressive pursuit
+      obs.patrolCX=mouseX/cw; obs.patrolCY=mouseY/ch; // update last known pos
+      obs.moveTimer-=dt;
+      if(obs.moveTimer<=0) {
+        const px=mouseX/cw, py=mouseY/ch;
+        const toP=Math.atan2(py-obs.y,px-obs.x);
+        const bias=0.82;
+        obs.moveAngle=toP+(Math.random()-0.5)*Math.PI*2*(1-bias);
+        obs.moveTimer=250+Math.random()*350;
+      }
+      const tSpeed=0.00022+exposure*0.0003;
+      obs.speed+=(tSpeed-obs.speed)*0.04;
+      obs.x+=Math.cos(obs.moveAngle)*obs.speed*dt;
+      obs.y+=Math.sin(obs.moveAngle)*obs.speed*dt;
+    }
+
+    // Bounce
+    if(obs.x<0.04){obs.x=0.04;obs.moveAngle=Math.PI-obs.moveAngle;}
+    if(obs.x>0.96){obs.x=0.96;obs.moveAngle=Math.PI-obs.moveAngle;}
+    if(obs.y<0.04){obs.y=0.04;obs.moveAngle=-obs.moveAngle;}
+    if(obs.y>0.96){obs.y=0.96;obs.moveAngle=-obs.moveAngle;}
+
+    // Spin
+    obs.angle=(obs.angle+(isHunt?2.5+exposure*6:0.5))%360;
+
+    // Pupil tracks mouse
+    const ox=obs.x*cw, oy=obs.y*ch;
+    const ddx=mouseX-ox, ddy=mouseY-oy;
+    const dd=Math.sqrt(ddx*ddx+ddy*ddy)||1;
+    const maxShift=22;
+    const ratio=Math.min(dd,260)/260;
+    obs.puOffX+=(ddx/dd*ratio*maxShift-obs.puOffX)*0.1;
+    obs.puOffY+=(ddy/dd*ratio*maxShift-obs.puOffY)*0.1;
   }
-  cursorDot.classList.toggle('hidden-mode', hidden);
-
-  // ── Check death ──
-  if (exposure >= 1) {
-    triggerDeath();
-    return;
-  }
-
-  // ── Move observer ──
-  obsMoveTimer -= dt;
-  if (obsMoveTimer <= 0) {
-    // New direction, biased towards player
-    const px = mouseX/cw, py = mouseY/ch;
-    const toPlayerAngle = Math.atan2(py - obsY, px - obsX);
-    const bias = hidden ? 0.1 : 0.7;
-    obsMoveAngle = toPlayerAngle + (Math.random()-0.5) * Math.PI * 2 * (1-bias);
-    obsMoveTimer = 600 + Math.random() * 800;
-  }
-
-  // Observer moves faster when player is exposed
-  const targetSpeed = hidden ? 0.00004 : 0.00012;
-  obsSpeed += (targetSpeed - obsSpeed) * 0.02;
-
-  obsX += Math.cos(obsMoveAngle) * obsSpeed * dt;
-  obsY += Math.sin(obsMoveAngle) * obsSpeed * dt;
-  // Bounce off edges
-  if (obsX < 0.05) { obsX = 0.05; obsMoveAngle = Math.PI - obsMoveAngle; }
-  if (obsX > 0.95) { obsX = 0.95; obsMoveAngle = Math.PI - obsMoveAngle; }
-  if (obsY < 0.05) { obsY = 0.05; obsMoveAngle = -obsMoveAngle; }
-  if (obsY > 0.95) { obsY = 0.95; obsMoveAngle = -obsMoveAngle; }
-
-  // ── Spin observer front ──
-  const spinSpeed = hidden ? 0.4 : 1.5 + exposure * 4;
-  obsAngle = (obsAngle + spinSpeed) % 360;
-
-  // ── Observer phase ──
-  obsPhase = hidden ? 'calm' : 'hunt';
-
-  // ── Observer pupil looks at mouse ──
-  const ox = obsX * cw, oy = obsY * ch;
-  const ddx = mouseX - ox, ddy = mouseY - oy;
-  const dd = Math.sqrt(ddx*ddx+ddy*ddy) || 1;
-  const maxShift = 12;
-  const ratio = Math.min(dd, 200)/200;
-  puOffX += ((ddx/dd)*ratio*maxShift - puOffX) * 0.08;
-  puOffY += ((ddy/dd)*ratio*maxShift - puOffY) * 0.08;
 
   // ── DRAW ──
   gCtx.clearRect(0,0,cw,ch);
+  gCtx.fillStyle='#000'; gCtx.fillRect(0,0,cw,ch);
 
-  // Pure black background
-  gCtx.fillStyle = '#000';
-  gCtx.fillRect(0,0,cw,ch);
+  // Scan beams (removido para ter observer mais limpo)
+  // for(const obs of observers) drawScanBeams(obs,cw,ch);
 
-  // Draw observer FIRST (behind shelters)
-  drawObserver(ox, oy, obsPhase);
+  // Observers behind shelters
+  for(const obs of observers) drawObserver(obs.x*cw,obs.y*ch,obs);
 
-  // Draw shelters ON TOP (observer hides behind them)
-  drawShelters(cw, ch);
+  // Shelters on top
+  drawShelters(cw,ch);
 
-  // Draw exposure vignette
-  drawVignette(cw, ch, exposure, hidden);
+  // Vignette
+  drawVignette(cw,ch,exposure,hidden&&!seen);
 
-  // Draw player cursor hint
-  drawPlayerHint(mouseX, mouseY, hidden);
+  // Player hint when hidden
+  if(hidden&&!seen) {
+    gCtx.strokeStyle='rgba(0,200,255,0.28)';
+    gCtx.lineWidth=1;
+    gCtx.beginPath();
+    gCtx.arc(mouseX,mouseY,20,0,Math.PI*2);
+    gCtx.stroke();
+  }
 
   requestAnimationFrame(gameLoop);
 }
 
-function drawBackground(cw, ch) {
-  // Dark rocky ground
-  gCtx.fillStyle = '#000';
-  gCtx.fillRect(0,0,cw,ch);
+// ── SCAN BEAM ──
+function isInScanBeam(obs,mx,my,cw,ch) {
+  const ox=obs.x*cw, oy=obs.y*ch;
+  const beamLen=Math.min(cw,ch)*0.42;
+  const halfDeg=15;
+  // Two beams, 180° apart
+  for(let b=0;b<2;b++) {
+    const ang=(obs.scanAngle+b*180)*Math.PI/180;
+    const dx=mx-ox, dy=my-oy;
+    const d=Math.sqrt(dx*dx+dy*dy);
+    if(d>beamLen) continue;
+    const dot=(dx*Math.cos(ang)+dy*Math.sin(ang))/d;
+    const diff=Math.acos(Math.min(1,Math.max(-1,dot)))*180/Math.PI;
+    if(diff<halfDeg) return true;
+  }
+  return false;
 }
 
-function drawShelters(cw, ch) {
-  for (const s of shelters) {
-    const a = getShelterAbs(s);
-    if (s.type === 'cave') {
-      // Solid black — fully covers observer underneath
-      gCtx.fillStyle = '#000';
+function drawScanBeams(obs,cw,ch) {
+  const ox=obs.x*cw, oy=obs.y*ch;
+  const beamLen=Math.min(cw,ch)*0.42;
+  const halfRad=15*Math.PI/180;
+  const isHunt=obs.phase==='hunt';
+  for(let b=0;b<2;b++) {
+    const ang=(obs.scanAngle+b*180)*Math.PI/180;
+    const a1=ang-halfRad, a2=ang+halfRad;
+    gCtx.save();
+    gCtx.beginPath();
+    gCtx.moveTo(ox,oy);
+    gCtx.arc(ox,oy,beamLen,a1,a2);
+    gCtx.closePath();
+    // Gradient along the beam
+    const grad=gCtx.createRadialGradient(ox,oy,0,ox,oy,beamLen);
+    if(isHunt) {
+      grad.addColorStop(0,'rgba(255,40,0,0.18)');
+      grad.addColorStop(0.5,'rgba(255,40,0,0.06)');
+      grad.addColorStop(1,'rgba(255,40,0,0)');
+    } else {
+      grad.addColorStop(0,'rgba(0,160,255,0.10)');
+      grad.addColorStop(0.5,'rgba(0,160,255,0.03)');
+      grad.addColorStop(1,'rgba(0,160,255,0)');
+    }
+    gCtx.fillStyle=grad;
+    gCtx.fill();
+    // Edge lines
+    gCtx.beginPath();
+    gCtx.moveTo(ox,oy);
+    gCtx.lineTo(ox+Math.cos(a1)*beamLen,oy+Math.sin(a1)*beamLen);
+    gCtx.moveTo(ox,oy);
+    gCtx.lineTo(ox+Math.cos(a2)*beamLen,oy+Math.sin(a2)*beamLen);
+    gCtx.strokeStyle=isHunt?'rgba(255,80,0,0.22)':'rgba(0,180,255,0.12)';
+    gCtx.lineWidth=1;
+    gCtx.stroke();
+    gCtx.restore();
+  }
+}
+
+// ── DRAW OBSERVER ──
+function drawObserver(ox,oy,obs) {
+  const size=OBS_SIZE;
+  const isHunt=obs.phase==='hunt';
+  gCtx.save();
+  gCtx.translate(ox,oy);
+
+  // Outer glow — huge
+  const glowR=size*0.75;
+  const g=gCtx.createRadialGradient(0,0,0,0,0,glowR);
+  g.addColorStop(0, isHunt?'rgba(200,20,0,0.22)':'rgba(0,140,255,0.14)');
+  g.addColorStop(1,'transparent');
+  gCtx.fillStyle=g;
+  gCtx.beginPath(); gCtx.arc(0,0,glowR,0,Math.PI*2); gCtx.fill();
+
+  // Spinning front ring
+  gCtx.save();
+  gCtx.rotate(obs.angle*Math.PI/180);
+  gCtx.drawImage(isHunt?sprRedF:sprBluF,-size/2,-size/2,size,size);
+  gCtx.restore();
+
+  // Pupil (tracks mouse)
+  gCtx.drawImage(isHunt?sprRedP:sprBluP,-size/2+obs.puOffX,-size/2+obs.puOffY,size,size);
+
+  gCtx.restore();
+}
+
+// ── DRAW SHELTERS ──
+function drawShelters(cw,ch) {
+  const now=Date.now();
+  for(const s of shelters) {
+    if(s.life<0.02) continue;
+    const a=getShelterAbs(s);
+    const dying=s.life<0.30;
+    // Pulsing warning when nearly gone
+    const pulse=dying?(0.55+0.45*Math.sin(now*0.007)):1;
+
+    gCtx.save();
+    gCtx.globalAlpha=Math.min(1,s.life*2.5)*pulse;
+
+    if(s.type==='cave') {
+      gCtx.fillStyle='#000';
       gCtx.beginPath();
-      gCtx.ellipse(a.x+a.w/2, a.y+a.h/2, a.w/2, a.h/2, 0, 0, Math.PI*2);
+      gCtx.ellipse(a.x+a.w/2,a.y+a.h/2,a.w/2,a.h/2,0,0,Math.PI*2);
       gCtx.fill();
-      gCtx.strokeStyle = 'rgba(80,20,20,0.6)';
-      gCtx.lineWidth = 2;
+      gCtx.strokeStyle=dying?`rgba(255,80,0,0.65)`:'rgba(80,20,20,0.6)';
+      gCtx.lineWidth=dying?2.5:2;
       gCtx.beginPath();
-      gCtx.ellipse(a.x+a.w/2, a.y+a.h/2, a.w/2, a.h/2, 0, 0, Math.PI*2);
+      gCtx.ellipse(a.x+a.w/2,a.y+a.h/2,a.w/2,a.h/2,0,0,Math.PI*2);
       gCtx.stroke();
     } else {
-      // Solid black rock
-      const rx = a.x+a.w/2, ry = a.y+a.h/2;
-      gCtx.fillStyle = '#000';
+      const rx=a.x+a.w/2,ry=a.y+a.h/2;
+      gCtx.fillStyle='#000';
       gCtx.beginPath();
-      gCtx.moveTo(rx - a.w*0.4, ry + a.h*0.4);
-      gCtx.lineTo(rx - a.w*0.5, ry - a.h*0.1);
-      gCtx.lineTo(rx - a.w*0.1, ry - a.h*0.5);
-      gCtx.lineTo(rx + a.w*0.3, ry - a.h*0.4);
-      gCtx.lineTo(rx + a.w*0.5, ry + a.h*0.1);
-      gCtx.lineTo(rx + a.w*0.2, ry + a.h*0.4);
-      gCtx.closePath();
-      gCtx.fill();
-      gCtx.strokeStyle = 'rgba(70,20,20,0.5)';
-      gCtx.lineWidth = 1.5;
-      gCtx.stroke();
+      gCtx.moveTo(rx-a.w*0.4,ry+a.h*0.4);
+      gCtx.lineTo(rx-a.w*0.5,ry-a.h*0.1);
+      gCtx.lineTo(rx-a.w*0.1,ry-a.h*0.5);
+      gCtx.lineTo(rx+a.w*0.3,ry-a.h*0.4);
+      gCtx.lineTo(rx+a.w*0.5,ry+a.h*0.1);
+      gCtx.lineTo(rx+a.w*0.2,ry+a.h*0.4);
+      gCtx.closePath(); gCtx.fill();
+      gCtx.strokeStyle=dying?'rgba(255,70,0,0.55)':'rgba(70,20,20,0.5)';
+      gCtx.lineWidth=dying?2:1.5; gCtx.stroke();
     }
+    gCtx.restore();
   }
 }
 
-function drawObserver(ox, oy, phase) {
-  const size = OBS_SIZE;
-  gCtx.save();
-  gCtx.translate(ox, oy);
-
-  // Glow
-  const glowColor = phase === 'calm' ? 'rgba(0,180,255,0.15)' : 'rgba(180,0,0,0.18)';
-  const glowGrad = gCtx.createRadialGradient(0,0,0,0,0,size);
-  glowGrad.addColorStop(0, glowColor);
-  glowGrad.addColorStop(1, 'transparent');
-  gCtx.fillStyle = glowGrad;
-  gCtx.beginPath();
-  gCtx.arc(0,0,size,0,Math.PI*2);
-  gCtx.fill();
-
-  // Front ring (spinning)
-  gCtx.save();
-  gCtx.rotate(obsAngle * Math.PI/180);
-  const frontImg = phase === 'calm' ? sprBluF : sprRedF;
-  gCtx.drawImage(frontImg, -size/2, -size/2, size, size);
-  gCtx.restore();
-
-  // Pupil (looks at mouse)
-  const pupilImg = phase === 'calm' ? sprBluP : sprRedP;
-  gCtx.drawImage(pupilImg, -size/2 + puOffX, -size/2 + puOffY, size, size);
-
-  gCtx.restore();
-}
-
-function drawVignette(cw, ch, exp, hidden) {
-  // Pulsing red vignette based on exposure
-  if (exp < 0.1) return;
-  const alpha = hidden ? exp*0.15 : exp*0.4;
-  const grad = gCtx.createRadialGradient(cw/2,ch/2,ch*0.2, cw/2,ch/2,ch*0.8);
-  grad.addColorStop(0,'transparent');
-  grad.addColorStop(1, `rgba(180,0,0,${alpha.toFixed(2)})` );
-  gCtx.fillStyle = grad;
-  gCtx.fillRect(0,0,cw,ch);
-
-  // Pulse at high exposure
-  if (exp > 0.75) {
-    const pulse = 0.05 * Math.sin(Date.now()*0.008) + 0.05;
-    gCtx.fillStyle = `rgba(200,0,0,${pulse.toFixed(3)})`;
-    gCtx.fillRect(0,0,cw,ch);
-  }
-}
-
-function drawPlayerHint(mx, my, hidden) {
-  // Small dot + ring around cursor to indicate being seen/hidden
-  if (hidden) {
-    gCtx.strokeStyle = 'rgba(0,200,255,0.3)';
-    gCtx.lineWidth = 1;
-    gCtx.beginPath();
-    gCtx.arc(mx, my, 18, 0, Math.PI*2);
-    gCtx.stroke();
+function drawVignette(cw,ch,exp,safelyHidden) {
+  if(exp<0.08) return;
+  const alpha=safelyHidden?exp*0.14:exp*0.44;
+  const g=gCtx.createRadialGradient(cw/2,ch/2,ch*0.18,cw/2,ch/2,ch*0.82);
+  g.addColorStop(0,'transparent');
+  g.addColorStop(1,`rgba(180,0,0,${alpha.toFixed(2)})`);
+  gCtx.fillStyle=g; gCtx.fillRect(0,0,cw,ch);
+  if(exp>0.72){
+    const p=0.06*Math.sin(Date.now()*0.009)+0.06;
+    gCtx.fillStyle=`rgba(200,0,0,${p.toFixed(3)})`; gCtx.fillRect(0,0,cw,ch);
   }
 }
 
 // ── DEATH ──
-let deathAnim = null;
 function triggerDeath() {
-  gameRunning = false;
-  dead = true;
-
-  // Flash effect
-  let flashes = 0;
-  const flashIv = setInterval(() => {
-    gCtx.fillStyle = 'rgba(255,0,0,0.15)';
-    gCtx.fillRect(0,0,W(),H());
-    flashes++;
-    if (flashes > 6) {
-      clearInterval(flashIv);
-      // Explode the cursor
-      drawDeathExplosion();
-      setTimeout(() => {
-        deathScreen.classList.add('show');
-        setTimeout(() => {
-          window.location.href = '../index.html';
-        }, 2000);
-      }, 600);
-    }
-  }, 80);
+  gameRunning=false; dead=true;
+  let fl=0;
+  const iv=setInterval(()=>{
+    gCtx.fillStyle='rgba(255,0,0,0.16)'; gCtx.fillRect(0,0,W(),H());
+    if(++fl>6){ clearInterval(iv); drawDeathExplosion();
+      setTimeout(()=>{ deathScreen.classList.add('show');
+        setTimeout(()=>{ window.location.href='../index.html'; },2200); },600); }
+  },80);
 }
 
 function drawDeathExplosion() {
-  const cx = mouseX, cy = mouseY;
-  let t = 0;
-  function frame() {
-    t += 0.06;
-    if (t > 1) return;
-    gCtx.clearRect(0,0,W(),H());
-    gCtx.fillStyle = '#000';
-    gCtx.fillRect(0,0,W(),H());
-    drawObserver(obsX*W(), obsY*H(), 'hunt');
+  const cx=mouseX,cy=mouseY; let t=0;
+  function frame(){
+    t+=0.055; if(t>1) return;
+    gCtx.clearRect(0,0,W(),H()); gCtx.fillStyle='#000'; gCtx.fillRect(0,0,W(),H());
+    for(const obs of observers) drawObserver(obs.x*W(),obs.y*H(),obs);
     drawShelters(W(),H());
-
-    // Particle explosion
-    for (let i=0; i<24; i++) {
-      const a = (i/24)*Math.PI*2;
-      const r = t * 80;
-      const px = cx + Math.cos(a)*r;
-      const py = cy + Math.sin(a)*r;
-      const alpha = 1-t;
-      gCtx.fillStyle = `rgba(0,200,255,${alpha.toFixed(2)})`;
-      gCtx.beginPath();
-      gCtx.arc(px, py, 3*(1-t), 0, Math.PI*2);
-      gCtx.fill();
+    for(let i=0;i<32;i++){
+      const a=(i/32)*Math.PI*2,r=t*110;
+      gCtx.fillStyle=`rgba(0,200,255,${(1-t).toFixed(2)})`;
+      gCtx.beginPath(); gCtx.arc(cx+Math.cos(a)*r,cy+Math.sin(a)*r,4*(1-t),0,Math.PI*2); gCtx.fill();
     }
-    // Shockwave
-    gCtx.strokeStyle = `rgba(200,0,0,${(1-t).toFixed(2)})`;
-    gCtx.lineWidth = 2;
-    gCtx.beginPath();
-    gCtx.arc(cx, cy, t*120, 0, Math.PI*2);
-    gCtx.stroke();
-
+    gCtx.strokeStyle=`rgba(220,0,0,${(1-t).toFixed(2)})`; gCtx.lineWidth=2;
+    gCtx.beginPath(); gCtx.arc(cx,cy,t*150,0,Math.PI*2); gCtx.stroke();
     requestAnimationFrame(frame);
   }
   frame();
 }
 
 // ── INIT ──
-let spritesLoaded = 0;
-const totalSprites = 6;
-function onSpriteLoad() {
-  spritesLoaded++;
-  if (spritesLoaded >= totalSprites) startIntro();
-}
-[sprClose, sprOpen, sprRedF, sprRedP, sprBluF, sprBluP].forEach(img => {
-  if (img.complete) onSpriteLoad();
-  else img.addEventListener('load', onSpriteLoad);
+let spritesLoaded=0;
+function onSpriteLoad(){ if(++spritesLoaded>=6){ initObservers(); runOpenAnim(); } }
+[sprClose,sprOpen,sprRedF,sprRedP,sprBluF,sprBluP].forEach(img=>{
+  if(img.complete) onSpriteLoad(); else img.addEventListener('load',onSpriteLoad);
 });
-
-function startIntro() {
-  initObserver();
-  runOpenAnim();
-}
 </script>
 </body>
 </html>

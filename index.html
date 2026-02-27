@@ -3,18 +3,663 @@
 <head>
   <link rel="icon" type="image/png" sizes="80x80" href="favicon.ico">
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
-  <link rel="apple-touch-icon" href="favicon.ico">
-  <meta charset="UTF-8">  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pato em Fradelos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/global.css">
-  <link rel="stylesheet" href="css/index.css">
+  <style>
+    /* ══════════════════════════════════════════
+       RESET & BASE
+    ══════════════════════════════════════════ */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    :root {
+      --bg:           #060a0f;
+      --bg-panel:     #0a1018;
+      --border:       #1a2a3a;
+      --border-light: #243444;
+      --text:         #c8d8e8;
+      --text-dim:     #4a6070;
+      --text-muted:   rgba(200,216,232,0.5);
+      --cyan:         #00ccff;
+      --red:          #ff1a4a;
+      --nav-height:   56px;
+      --font-mono:    'Share Tech Mono', monospace;
+      --font-display: 'Orbitron', monospace;
+      --transition:   0.2s ease;
+    }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    /* Body com fundo base — o canvas fixed vai por cima */
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      min-height: 100vh;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    /* Scanlines CRT */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px);
+      pointer-events: none; z-index: 9999;
+    }
+
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-track { background:#0a1a2e; }
+    ::-webkit-scrollbar-thumb { background:var(--cyan); border-radius:3px; }
+
+    /* ══════════════════════════════════════════
+       FUNDO — canvas único fixo que cobre tudo
+       Todas as secções TÊM de ser transparentes
+       para este canvas aparecer atrás de tudo
+    ══════════════════════════════════════════ */
+    #bg-canvas {
+      position: fixed; top:0; left:0;
+      width:100%; height:100%;
+      pointer-events:none; z-index:0;
+    }
+
+    /* Holofote + feixe vertical */
+    #spotlight-canvas {
+      position: fixed; top:0; left:0;
+      width:100%; height:100%;
+      pointer-events:none; z-index:2;
+      transition: opacity 1s ease;
+    }
+
+    /* HUD hex grid */
+    #hud-layer {
+      position: fixed; inset:0;
+      pointer-events:none; z-index:1; overflow:hidden;
+    }
+    .hud-hex-grid {
+      position:absolute; inset:-20%; width:140%; height:140%;
+      background-image:
+        repeating-linear-gradient(0deg,   transparent,transparent 39px,rgba(0,204,255,0.012) 39px,rgba(0,204,255,0.012) 40px),
+        repeating-linear-gradient(60deg,  transparent,transparent 39px,rgba(0,204,255,0.012) 39px,rgba(0,204,255,0.012) 40px),
+        repeating-linear-gradient(120deg, transparent,transparent 39px,rgba(0,204,255,0.012) 39px,rgba(0,204,255,0.012) 40px);
+      animation: hexRot 120s linear infinite;
+    }
+    @keyframes hexRot { to{transform:rotate(360deg)} }
+
+    /* HUD corners */
+    .hud-c { position:fixed; width:70px; height:70px; pointer-events:none; z-index:3; opacity:0.2; }
+    .hud-c::before,.hud-c::after { content:''; position:absolute; background:var(--cyan); }
+    .hud-c.tl{top:14px;left:14px} .hud-c.tl::before{top:0;left:0;width:2px;height:24px} .hud-c.tl::after{top:0;left:0;width:24px;height:2px}
+    .hud-c.tr{top:14px;right:14px} .hud-c.tr::before{top:0;right:0;width:2px;height:24px} .hud-c.tr::after{top:0;right:0;width:24px;height:2px}
+    .hud-c.bl{bottom:14px;left:14px} .hud-c.bl::before{bottom:0;left:0;width:2px;height:24px} .hud-c.bl::after{bottom:0;left:0;width:24px;height:2px}
+    .hud-c.br{bottom:14px;right:14px} .hud-c.br::before{bottom:0;right:0;width:2px;height:24px} .hud-c.br::after{bottom:0;right:0;width:24px;height:2px}
+
+    /* Data streams */
+    .ds { position:fixed; width:1px; top:0; bottom:0; pointer-events:none; z-index:1; overflow:hidden; opacity:0.09; }
+    .ds::after { content:''; position:absolute; top:-100px; left:0; width:1px; height:90px; background:linear-gradient(to bottom,transparent,var(--cyan),transparent); animation:dsFlow var(--d,4s) linear infinite; animation-delay:var(--dl,0s); }
+    @keyframes dsFlow { from{top:-100px} to{top:100%} }
+
+    /* Vinheta */
+    #vignette {
+      position:fixed; inset:0; pointer-events:none; z-index:1;
+      background: radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(0,0,0,0.35) 100%);
+    }
+
+    /* ══════════════════════════════════════════
+       OVERLAY SCROLL PRETO (para o observer)
+    ══════════════════════════════════════════ */
+    #dark-overlay {
+      position:fixed; inset:0; background:#000;
+      opacity:0; pointer-events:none; z-index:801;
+      transition: opacity 0.5s ease;
+    }
+
+    /* ══════════════════════════════════════════
+       NAVBAR
+    ══════════════════════════════════════════ */
+    .navbar {
+      position:fixed; top:0; left:0; right:0; height:var(--nav-height);
+      background:rgba(6,10,15,0.92);
+      border-bottom:1px solid var(--border);
+      backdrop-filter:blur(12px);
+      z-index:1000;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 24px;
+      transition: opacity 0.8s ease;
+    }
+    .navbar__logo { font-family:var(--font-display); font-weight:900; font-size:0.85rem; letter-spacing:0.25em; color:#fff; text-decoration:none; white-space:nowrap; }
+    .navbar__logo span { color:var(--cyan); }
+    .navbar__links { display:flex; align-items:center; gap:2px; list-style:none; }
+    .navbar__links a { display:block; padding:8px 14px; font-size:0.72rem; letter-spacing:0.18em; text-transform:uppercase; text-decoration:none; color:var(--text-dim); position:relative; transition:color var(--transition); white-space:nowrap; }
+    .navbar__links a::after { content:''; position:absolute; bottom:0; left:14px; right:14px; height:2px; background:var(--cyan); transform:scaleX(0); transform-origin:right; transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+    .navbar__links a:hover,.navbar__links a.active { color:#fff; }
+    .navbar__links a:hover::after,.navbar__links a.active::after { transform:scaleX(1); transform-origin:left; }
+    .navbar__hamburger { display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer; padding:4px; }
+    .navbar__hamburger span { display:block; width:22px; height:2px; background:var(--text-dim); border-radius:1px; transition:all 0.3s ease; }
+    .navbar__mobile-menu { display:none; position:fixed; top:var(--nav-height); left:0; right:0; background:rgba(6,10,15,0.98); border-bottom:1px solid var(--border); padding:12px 0; z-index:999; flex-direction:column; }
+    .navbar__mobile-menu.open { display:flex; }
+    .navbar__mobile-menu a { display:block; padding:14px 24px; font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase; text-decoration:none; color:var(--text-dim); border-left:2px solid transparent; transition:all var(--transition); }
+    .navbar__mobile-menu a:hover,.navbar__mobile-menu a.active { color:#fff; border-left-color:var(--cyan); background:rgba(255,255,255,0.03); }
+    @media(max-width:768px){ .navbar__links{display:none} .navbar__hamburger{display:flex} }
+
+    /* ══════════════════════════════════════════
+       HERO — fundo transparente, ver canvas
+    ══════════════════════════════════════════ */
+    .hero {
+      position:relative; z-index:10;
+      min-height:100vh;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      overflow:hidden; padding:80px 24px 60px;
+      text-align:center;
+      background: transparent; /* TRANSPARENTE — canvas fica visível */
+    }
+
+    /* grid subtil */
+    .hero__grid {
+      position:absolute; inset:0;
+      background-image: linear-gradient(rgba(0,204,255,0.02) 1px,transparent 1px), linear-gradient(90deg,rgba(0,204,255,0.02) 1px,transparent 1px);
+      background-size: 60px 60px; pointer-events:none;
+    }
+
+    /* fade suave para baixo — mistura com a galeria sem corte */
+    .hero::after {
+      content:''; position:absolute; bottom:0; left:0; right:0; height:200px;
+      background:linear-gradient(to bottom, transparent, rgba(6,10,15,0.5));
+      pointer-events:none; z-index:2;
+    }
+
+    .hero__content { position:relative; z-index:3; max-width:800px; animation:fadeInUp 0.8s ease both; }
+    .hero__eyebrow { font-size:0.6rem; letter-spacing:0.4em; text-transform:uppercase; color:var(--cyan); margin-bottom:20px; opacity:0.8; }
+    .hero__eyebrow::after { content:'_'; animation:cursorBlink 1s step-end infinite; color:var(--cyan); }
+    @keyframes cursorBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+    .hero__title { font-family:var(--font-display); font-weight:900; font-size:clamp(2.5rem,8vw,6rem); line-height:1; color:#fff; text-shadow:0 0 60px rgba(0,204,255,0.35),0 0 120px rgba(0,204,255,0.12); margin-bottom:12px; }
+    .hero__title span { color:var(--cyan); }
+    .hero__subtitle { font-family:var(--font-display); font-size:clamp(0.7rem,2vw,1rem); letter-spacing:0.5em; text-transform:uppercase; color:var(--text-dim); margin-bottom:32px; }
+    .hero__desc { font-size:0.85rem; line-height:1.9; color:var(--text-muted); max-width:520px; margin:0 auto 40px; }
+    .hero__cta { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+    .btn { display:inline-flex; align-items:center; gap:8px; padding:10px 24px; font-family:var(--font-mono); font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; text-decoration:none; border-radius:2px; cursor:pointer; transition:all var(--transition); border:1px solid transparent; }
+    .btn--primary { background:var(--cyan); color:var(--bg); border-color:var(--cyan); }
+    .btn--primary:hover { background:#33ddff; box-shadow:0 0 20px rgba(0,204,255,0.4); }
+    .btn--outline { background:transparent; color:var(--text); border-color:var(--border-light); }
+    .btn--outline:hover { border-color:var(--cyan); color:var(--cyan); }
+    .hero__scroll { position:absolute; bottom:28px; left:50%; transform:translateX(-50%); font-size:0.55rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--text-dim); animation:scrollBounce 2s ease-in-out infinite alternate; z-index:3; }
+    @keyframes scrollBounce { 0%{opacity:0.3;transform:translateX(-50%) translateY(0)} 100%{opacity:0.8;transform:translateX(-50%) translateY(6px)} }
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ══════════════════════════════════════════
+       GALERIA
+    ══════════════════════════════════════════ */
+    .gallery-section {
+      position:relative; z-index:10;
+      padding:80px 24px 0;
+      max-width:1400px; margin:0 auto;
+      background: transparent;
+    }
+    .section-header { text-align:center; margin-bottom:40px; }
+    .section-eyebrow { font-size:0.55rem; letter-spacing:0.35em; text-transform:uppercase; color:var(--cyan); opacity:0.7; margin-bottom:10px; }
+    .section-title { font-family:var(--font-display); font-size:clamp(1.2rem,3vw,1.8rem); font-weight:700; color:#fff; letter-spacing:0.1em; }
+
+    .metal-room { position:relative; width:100%; max-width:1100px; margin:0 auto; }
+
+    /* ─── PAREDE METÁLICA REALISTA ─── */
+    .metal-wall {
+      position:relative; width:100%;
+      border:2px solid #181e28; border-bottom:none; border-radius:3px 3px 0 0;
+      padding:28px 28px 0; overflow:hidden;
+      background:
+        /* Riscos de desgaste horizontais finos */
+        repeating-linear-gradient(180deg,
+          transparent 0,transparent 1px,
+          rgba(255,255,255,0.007) 1px,rgba(255,255,255,0.007) 2px,
+          transparent 2px,transparent 22px,
+          rgba(0,0,0,0.05) 22px,rgba(0,0,0,0.05) 23px,
+          transparent 23px,transparent 44px
+        ),
+        /* Junções verticais dos painéis soldados */
+        repeating-linear-gradient(90deg,
+          transparent 0,transparent 109px,
+          rgba(0,0,0,0.4) 109px,rgba(0,0,0,0.4) 110px,
+          rgba(255,255,255,0.045) 110px,rgba(255,255,255,0.045) 111px,
+          transparent 111px,transparent 220px
+        ),
+        /* Junções horizontais dos painéis soldados */
+        repeating-linear-gradient(180deg,
+          transparent 0,transparent 89px,
+          rgba(0,0,0,0.35) 89px,rgba(0,0,0,0.35) 90px,
+          rgba(255,255,255,0.04) 90px,rgba(255,255,255,0.04) 91px,
+          transparent 91px,transparent 180px
+        ),
+        /* Base — gradiente metálico realista com variações de luz */
+        linear-gradient(160deg,
+          #252930 0%,#1e2228 12%,#1a1e26 25%,
+          #222630 38%,#191d25 50%,
+          #1e2228 62%,#181c24 75%,
+          #1c2028 88%,#14181e 100%
+        );
+      background-size: 100% 44px, 110px 100%, 100% 90px, 100% 100%;
+      box-shadow:
+        inset 8px 0 22px rgba(0,0,0,0.55),
+        inset -8px 0 22px rgba(0,0,0,0.55),
+        inset 0 10px 28px rgba(0,0,0,0.65),
+        inset 0 1px 0 rgba(255,255,255,0.055),
+        0 -4px 16px rgba(0,0,0,0.4);
+    }
+    /* Reflexo de luz metálico no topo */
+    .metal-wall::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:3px;
+      background:linear-gradient(90deg,
+        transparent 0%,
+        rgba(160,185,210,0.05) 8%,
+        rgba(210,228,248,0.22) 28%,
+        rgba(235,248,255,0.32) 50%,
+        rgba(210,228,248,0.22) 72%,
+        rgba(160,185,210,0.05) 92%,
+        transparent 100%
+      );
+      border-radius:3px 3px 0 0;
+    }
+    /* Rebites nas intersecções dos painéis */
+    .metal-wall::after {
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background:
+        radial-gradient(circle 2.5px at 110px 90px,  rgba(255,255,255,0.14) 1.5px,rgba(0,0,0,0.2) 2px,transparent 2.5px),
+        radial-gradient(circle 2.5px at 220px 90px,  rgba(255,255,255,0.14) 1.5px,rgba(0,0,0,0.2) 2px,transparent 2.5px),
+        radial-gradient(circle 2.5px at 330px 90px,  rgba(255,255,255,0.14) 1.5px,rgba(0,0,0,0.2) 2px,transparent 2.5px),
+        radial-gradient(circle 2.5px at 440px 90px,  rgba(255,255,255,0.14) 1.5px,rgba(0,0,0,0.2) 2px,transparent 2.5px),
+        radial-gradient(circle 2.5px at 550px 90px,  rgba(255,255,255,0.14) 1.5px,rgba(0,0,0,0.2) 2px,transparent 2.5px),
+        radial-gradient(circle 2.5px at 660px 90px,  rgba(255,255,255,0.14) 1.5px,rgba(0,0,0,0.2) 2px,transparent 2.5px),
+        radial-gradient(circle 2.5px at 770px 90px,  rgba(255,255,255,0.14) 1.5px,rgba(0,0,0,0.2) 2px,transparent 2.5px),
+        radial-gradient(circle 2.5px at 880px 90px,  rgba(255,255,255,0.14) 1.5px,rgba(0,0,0,0.2) 2px,transparent 2.5px),
+        radial-gradient(circle 2.5px at 110px 180px, rgba(255,255,255,0.12) 1.5px,rgba(0,0,0,0.2) 2px,transparent 2.5px),
+        radial-gradient(circle 2.5px at 220px 180px, rgba(255,255,255,0.12) 1.5px,rgba(0,0,0,0.2) 2px,transparent 2.5px),
+        radial-gradient(circle 2.5px at 330px 180px, rgba(255,255,255,0.12) 1.5px,rgba(0,0,0,0.2) 2px,transparent 2.5px),
+        radial-gradient(circle 2.5px at 440px 180px, rgba(255,255,255,0.12) 1.5px,rgba(0,0,0,0.2) 2px,transparent 2.5px),
+        radial-gradient(circle 2.5px at 550px 180px, rgba(255,255,255,0.12) 1.5px,rgba(0,0,0,0.2) 2px,transparent 2.5px),
+        radial-gradient(circle 2.5px at 660px 180px, rgba(255,255,255,0.12) 1.5px,rgba(0,0,0,0.2) 2px,transparent 2.5px),
+        radial-gradient(circle 2.5px at 770px 180px, rgba(255,255,255,0.12) 1.5px,rgba(0,0,0,0.2) 2px,transparent 2.5px),
+        radial-gradient(circle 2.5px at 880px 180px, rgba(255,255,255,0.12) 1.5px,rgba(0,0,0,0.2) 2px,transparent 2.5px),
+        radial-gradient(circle 2.5px at 110px 270px, rgba(255,255,255,0.10) 1.5px,rgba(0,0,0,0.2) 2px,transparent 2.5px),
+        radial-gradient(circle 2.5px at 330px 270px, rgba(255,255,255,0.10) 1.5px,rgba(0,0,0,0.2) 2px,transparent 2.5px),
+        radial-gradient(circle 2.5px at 550px 270px, rgba(255,255,255,0.10) 1.5px,rgba(0,0,0,0.2) 2px,transparent 2.5px),
+        radial-gradient(circle 2.5px at 770px 270px, rgba(255,255,255,0.10) 1.5px,rgba(0,0,0,0.2) 2px,transparent 2.5px);
+    }
+
+    .wall-content { position:relative; display:flex; flex-direction:column; }
+
+    /* ÁREA POSTERS — acima das TVs, completamente separada */
+    .wall-poster-area { position:relative; width:100%; height:200px; margin-bottom:0; overflow:visible; padding-top:18px; }
+
+    /* TVs */
+    .tv-wall { display:flex; flex-direction:column; gap:6px; width:100%; }
+    .tv-row  { display:flex; align-items:stretch; gap:6px; width:100%; }
+    /* Linha 1 — posters ficam na zona livre à esquerda (TV ocupa 58% à direita) */
+    .tv-row-1-wrap { overflow:visible; }
+    .tv-row-1-wrap .poster { position:absolute; z-index:10; }
+    .tv { position:relative; flex-shrink:0; cursor:pointer; transition:filter 0.2s; }
+    .tv:hover { filter:brightness(1.1); }
+    .tv__body {
+      position:relative;
+      background:linear-gradient(160deg,#484848 0%,#383838 40%,#2c2c2c 100%);
+      border-radius:6px; border:2px solid #525252;
+      box-shadow:inset 0 2px 5px rgba(255,255,255,0.07),inset 0 -2px 4px rgba(0,0,0,0.5),0 4px 20px rgba(0,0,0,0.8),0 0 0 1px #1e1e1e;
+      padding:10px 10px 0 10px;
+    }
+    .tv__bottom-bar { display:flex;align-items:center;justify-content:space-between;padding:5px 8px 6px;height:28px; }
+    .tv__brand { font-family:var(--font-mono);font-size:0.28rem;letter-spacing:0.18em;color:rgba(200,200,200,0.2);text-transform:uppercase; }
+    .tv__controls { display:flex;align-items:center;gap:7px; }
+    .tv__led {
+      width:5px;height:5px;border-radius:50%;
+      background:rgba(0,200,60,.9);
+      box-shadow:0 0 7px rgba(0,200,60,.8);
+      animation:blink 3s ease-in-out infinite;
+      flex-shrink:0;transition:background 0.3s,box-shadow 0.3s;
+    }
+    .tv__led.off { background:rgba(255,30,30,0.8);box-shadow:0 0 7px rgba(255,30,30,0.6);animation:none; }
+    /* Botão power — idêntico ao do maps.html */
+    .tv__power-btn {
+      width:22px;height:22px;border-radius:50%;
+      background:linear-gradient(145deg,#2e2e3a,#1a1a22);
+      border:1px solid rgba(255,255,255,0.1);
+      box-shadow:0 2px 6px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.08),inset 0 -1px 0 rgba(0,0,0,0.4);
+      cursor:pointer;display:flex;align-items:center;justify-content:center;
+      transition:box-shadow 0.15s,transform 0.1s;
+      position:relative;flex-shrink:0;
+    }
+    .tv__power-btn:hover { box-shadow:0 0 10px rgba(255,50,50,0.45),0 2px 6px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.08);border-color:rgba(255,60,60,0.4); }
+    .tv__power-btn:active { transform:scale(0.88); }
+    .tv__power-btn::before { content:'';width:9px;height:9px;border:1.5px solid rgba(255,255,255,0.35);border-radius:50%;border-top-color:transparent;position:absolute; }
+    .tv__power-btn::after  { content:'';width:1.5px;height:6px;background:rgba(255,255,255,0.35);border-radius:1px;position:absolute;top:3.5px; }
+    .tv__bezel {
+      position:relative;background:#020202;border-radius:3px;overflow:hidden;
+      border:3px solid #181818;
+      box-shadow:inset 0 0 14px rgba(0,0,0,0.98),inset 2px 2px 8px rgba(0,0,0,0.7);
+    }
+    .tv__bezel::before { content:'';position:absolute;top:0;left:0;right:0;height:38%;background:linear-gradient(to bottom,rgba(255,255,255,0.025),transparent);z-index:10;pointer-events:none; }
+    /* Overlay TV-off */
+    .tv__off-overlay { position:absolute;inset:0;z-index:200;pointer-events:none;border-radius:2px;overflow:hidden;display:none; }
+    .tv__off-overlay.active { display:block; }
+    .tv__off-overlay canvas { position:absolute;inset:0;width:100%;height:100%; }
+    .tv__screen { display:block;width:100%;height:100%;object-fit:cover; }
+    .tv__scanlines { position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.1) 2px,rgba(0,0,0,0.1) 4px);pointer-events:none;z-index:6; }
+    .tv__glow { position:absolute;inset:-4px;border-radius:8px;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:-1; }
+    .tv:hover .tv__glow { opacity:1; }
+    .tv__hud { position:absolute;inset:0;pointer-events:none;z-index:8;font-family:var(--font-mono); }
+    .tv__hud-tl { position:absolute;top:6px;left:8px;font-size:0.38rem;letter-spacing:0.1em;text-transform:uppercase;line-height:1.4; }
+    .tv__hud-tr { position:absolute;top:6px;right:8px;display:flex;align-items:center;gap:4px;font-size:0.38rem;letter-spacing:0.1em; }
+    .tv__hud-bl { position:absolute;bottom:6px;left:8px;font-size:0.33rem;letter-spacing:0.1em;color:rgba(180,180,180,0.45);text-transform:uppercase; }
+    .tv__hud-br { position:absolute;bottom:6px;right:8px;font-size:0.33rem;letter-spacing:0.08em;color:rgba(180,180,180,0.35); }
+    .tv__rec-dot { width:4px;height:4px;border-radius:50%;animation:recBlink 1.4s ease-in-out infinite; }
+    @keyframes recBlink { 0%,100%{opacity:1} 50%{opacity:0.08} }
+    .tv__corner { position:absolute;width:9px;height:9px;z-index:9; }
+    .tv__corner--tl { top:4px;left:4px;border-top:1px solid;border-left:1px solid; }
+    .tv__corner--tr { top:4px;right:4px;border-top:1px solid;border-right:1px solid; }
+    .tv__corner--bl { bottom:4px;left:4px;border-bottom:1px solid;border-left:1px solid; }
+    .tv__corner--br { bottom:4px;right:4px;border-bottom:1px solid;border-right:1px solid; }
+    .tv--row1-a{flex:1;} .tv--row1-a .tv__bezel{height:220px;}
+    .tv--row2-a{flex:0.55;} .tv--row2-a .tv__bezel{height:200px;}
+    .tv--row2-b{flex:1;} .tv--row2-b .tv__bezel{height:200px;}
+    .tv--row3-a{flex:1;} .tv--row3-a .tv__bezel{height:185px;}
+    .tv--row3-b{flex:0.6;} .tv--row3-b .tv__bezel{height:185px;}
+
+    /* MESA */
+    .metal-desk {
+      position:relative; width:calc(100% + 56px); margin-left:-28px; height:28px;
+      background:linear-gradient(180deg,#42321e 0%,#2e2212 35%,#1e1710 70%,#130d07 100%);
+      border-top:4px solid #604228;
+      box-shadow:inset 0 3px 10px rgba(255,180,80,0.06),inset 0 -2px 4px rgba(0,0,0,0.8),0 10px 32px rgba(0,0,0,0.9);
+      z-index:5;
+    }
+    .metal-desk::before { content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 70px,rgba(255,160,50,0.02) 70px,rgba(255,160,50,0.02) 71px),linear-gradient(180deg,rgba(255,200,120,0.04) 0%,transparent 40%); }
+    .metal-desk::after  { content:'';position:absolute;top:3px;left:3%;right:3%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,210,120,0.14),transparent); }
+    .desk-legs { display:flex;justify-content:space-between;padding:0 50px;width:calc(100% + 56px);margin-left:-28px; }
+    .desk-leg { width:16px;height:48px;background:linear-gradient(90deg,#120c06,#2e2212 40%,#0e0906);border:1px solid #3a2810;border-top:none;position:relative; }
+    .desk-leg::after { content:'';position:absolute;bottom:0;left:-5px;right:-5px;height:6px;background:#2e2212;border:1px solid #3a2810;border-radius:0 0 3px 3px; }
+
+    /* POSTERS — Estilo Polaroid com fita cola */
+    .poster { 
+      position:absolute;
+      background:#fefdfb;
+      overflow:visible;
+      cursor:pointer;
+      transition:transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease;
+      box-shadow:0 8px 24px rgba(0,0,0,0.45);
+      aspect-ratio: auto;
+      padding:12px;
+      box-sizing:border-box;
+    }
+    /* Fita cola em cima (center) */
+    .poster::before {
+      content:'';
+      position:absolute;
+      top:-14px;
+      left:25%;
+      right:25%;
+      height:20px;
+      background:linear-gradient(135deg, transparent, rgba(220,200,120,0.6), rgba(220,200,120,0.7), transparent);
+      border-radius:2px;
+      z-index:10;
+      box-shadow:0 2px 5px rgba(0,0,0,0.3);
+      transform:rotateZ(-2deg);
+    }
+    /* Fita cola lado direito (top-right) */
+    .poster::after {
+      content:'';
+      position:absolute;
+      top:-12px;
+      right:20%;
+      width:12%;
+      min-width:30px;
+      height:18px;
+      background:linear-gradient(45deg, transparent, rgba(220,200,120,0.5));
+      border-radius:1px;
+      z-index:10;
+      box-shadow:0 2px 4px rgba(0,0,0,0.25);
+      transform:rotateZ(8deg);
+    }
+    .poster:hover { 
+      transform:translateY(-14px) rotateZ(-2deg) scale(1.06);
+      box-shadow:0 18px 45px rgba(0,0,0,0.6);
+    }
+    .poster img { width:100%; height:100%; object-fit:cover; display:block; }
+    .poster__frame { position:absolute; inset:0; pointer-events:none; z-index:3; }
+    .poster__screw { display:none; }
+    .poster__label { position:absolute; bottom:6px; left:8px; font-family:cursive; font-size:0.3rem; font-weight:600; color:#666; z-index:4; text-shadow:0 1px 2px rgba(255,255,255,0.9); }
+    .poster__scan { display:none; }
+
+    /* ── Zona de posters no topo da parede (acima das TVs) ──
+       5 posters pequenos, espalhados, NUNCA por cima de nenhuma TV.
+       A wall-poster-area é separada e fica completamente acima do tv-wall. */
+
+    /* p1 — esquerda, inclinado */
+    .poster--p1{ left:1%;   top:30px; width:13%; height:130px; transform:rotate(-9deg); }
+    .poster--p1:hover{ transform:rotate(-9deg) translateY(-12px) scale(1.05); }
+    /* p2 — centro-esquerda, maior, mais em cima */
+    .poster--p2{ left:17%;  top:10px; width:18%; height:155px; transform:rotate(7deg); }
+    .poster--p2:hover{ transform:rotate(7deg) translateY(-12px) scale(1.05); }
+    /* p3 — centro, pequeno, mais baixo */
+    .poster--p3{ left:38%;  top:55px; width:11%; height:115px; transform:rotate(-5deg); }
+    .poster--p3:hover{ transform:rotate(-5deg) translateY(-12px) scale(1.05); }
+    /* p4 — centro-direita */
+    .poster--p4{ left:52%;  top:15px; width:16%; height:145px; transform:rotate(8deg); }
+    .poster--p4:hover{ transform:rotate(8deg) translateY(-12px) scale(1.05); }
+    /* p5 — direita, inclinado */
+    .poster--p5{ left:71%;  top:40px; width:12%; height:125px; transform:rotate(-6deg); }
+    .poster--p5:hover{ transform:rotate(-6deg) translateY(-12px) scale(1.05); }
+    /* p6 — extrema direita, pequenino */
+    .poster--p6{ right:1%;  top:20px; width:9%;  height:105px; transform:rotate(10deg); }
+    .poster--p6:hover{ transform:rotate(10deg) translateY(-12px) scale(1.05); }
+
+    /* side1/side2/side3 — ficam na zona esquerda livre da linha 1 das TVs
+       (a TV da linha 1 ocupa 58% alinhado à direita → sobram ~40% à esquerda)
+       Estes posters são position:absolute dentro da .tv-row-1-wrap */
+    .poster--side1{ left:2%;  top:18px; width:16%; height:130px; transform:rotate(-11deg); }
+    .poster--side1:hover{ transform:rotate(-11deg) translateY(-12px) scale(1.06); }
+    .poster--side2{ left:20%; top:35px; width:13%; height:110px; transform:rotate(9deg); }
+    .poster--side2:hover{ transform:rotate(9deg) translateY(-12px) scale(1.06); }
+    .poster--side3{ left:35%; top:12px; width:10%; height:95px;  transform:rotate(-7deg); }
+    .poster--side3:hover{ transform:rotate(-7deg) translateY(-12px) scale(1.06); }
+
+    /* Esconde p7/p8 que não têm posição definida */
+    .poster--p7, .poster--p8 { display:none; }
+
+    @media(max-width:950px){
+      .wall-poster-area{height:195px;}
+      .poster--p1{width:18%;height:158px;top:20px;transform:rotate(-1.5deg);}
+      .poster--p1:hover{transform:rotate(-1.5deg) translateY(-8px) scale(1.02);}
+      .poster--p2{left:21%;width:29%;height:180px;top:5px;transform:rotate(1deg);}
+      .poster--p2:hover{transform:rotate(1deg) translateY(-8px) scale(1.02);}
+      .poster--p3{left:53%;width:16%;height:140px;top:42px;transform:rotate(-1deg);}
+      .poster--p3:hover{transform:rotate(-1deg) translateY(-8px) scale(1.02);}
+      .poster--p4{left:72%;width:21%;height:168px;top:10px;transform:rotate(1.5deg);}
+      .poster--p4:hover{transform:rotate(1.5deg) translateY(-8px) scale(1.02);}
+      .poster--p5,.poster--p6,.poster--p7,.poster--p8,.poster--side1,.poster--side2,.poster--side3{display:none;}
+      .tv--row1-a .tv__bezel{height:180px;}
+      .tv--row2-a .tv__bezel,.tv--row2-b .tv__bezel{height:165px;}
+      .tv--row3-a .tv__bezel,.tv--row3-b .tv__bezel{height:152px;}
+    }
+    @media(max-width:700px){
+      .wall-poster-area{height:130px;}
+      .metal-wall{padding:14px 12px 0;}
+      .poster--p1{width:22%;height:110px;top:15px;transform:rotate(-0.5deg);}
+      .poster--p1:hover{transform:rotate(-0.5deg) translateY(-5px) scale(1.01);}
+      .poster--p2{left:25%;width:34%;height:122px;top:5px;transform:rotate(0.5deg);}
+      .poster--p2:hover{transform:rotate(0.5deg) translateY(-5px) scale(1.01);}
+      .poster--p3{left:62%;width:21%;height:102px;top:22px;transform:rotate(-0.3deg);}
+      .poster--p3:hover{transform:rotate(-0.3deg) translateY(-5px) scale(1.01);}
+      .poster--p4,.poster--p5,.poster--p6,.poster--p7,.poster--p8,.poster--side1,.poster--side2,.poster--side3{display:none;}
+      .tv-row{flex-direction:column;}
+      .tv--row1-a .tv__bezel,.tv--row2-a .tv__bezel,.tv--row2-b .tv__bezel,
+      .tv--row3-a .tv__bezel,.tv--row3-b .tv__bezel{height:170px;}
+      .tv-wall{gap:4px;}
+      .desk-legs{padding:0 14px;}
+    }
+
+    /* ══════════════════════════════════════════
+       FEATURES — transparente, sem caixa
+    ══════════════════════════════════════════ */
+    .features-section {
+      position:relative; z-index:10;
+      padding:60px 24px 80px;
+      max-width:1400px; margin:0 auto;
+      background: transparent; /* VER O CANVAS */
+    }
+
+    /* Fade suave para preto antes do observer */
+    .features-section::after {
+      content:''; position:absolute; bottom:0; left:0; right:0; height:350px;
+      background:linear-gradient(to bottom, transparent 0%, rgba(6,10,15,0.6) 40%, rgba(0,0,0,0.95) 100%);
+      pointer-events:none; z-index:0;
+    }
+
+    .features-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; align-items:start; }
+
+    /* Feature cards — bordas finas, fundo muito translúcido */
+    .feature-card {
+      padding:24px 20px;
+      /* fundo muito leve — quase transparente para ver o espaço */
+      background: rgba(6,10,15,0.6);
+      backdrop-filter: blur(6px);
+      border:1px solid var(--border);
+      border-radius:2px;
+      transition:border-color 0.2s;
+    }
+    .feature-card:hover { border-color:rgba(0,204,255,0.2); }
+    .feature-card__icon { font-size:1.6rem; margin-bottom:12px; display:block; }
+    .feature-card__title { font-family:var(--font-display); font-size:0.7rem; font-weight:700; letter-spacing:0.1em; color:#fff; margin-bottom:8px; }
+    .feature-card__desc { font-size:0.7rem; line-height:1.7; color:var(--text-muted); }
+
+    @media(max-width:900px){ .features-grid{grid-template-columns:repeat(2,1fr)} }
+    @media(max-width:600px){ .features-grid{grid-template-columns:1fr} }
+
+    /* ══════════════════════════════════════════
+       BARRA DIVISÓRIA SCI-FI
+    ══════════════════════════════════════════ */
+    .scifi-divider {
+      position: relative; z-index: 15;
+      width: 100%; height: 32px;
+      display: flex; align-items: center;
+      overflow: hidden;
+      margin: 0;
+    }
+    /* linha principal neon */
+    .scifi-divider::before {
+      content: '';
+      position: absolute; left: 0; right: 0; top: 50%;
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(0,204,255,0.15) 8%,
+        rgba(0,204,255,0.7) 30%,
+        rgba(0,204,255,1) 50%,
+        rgba(0,204,255,0.7) 70%,
+        rgba(0,204,255,0.15) 92%,
+        transparent 100%
+      );
+      box-shadow: 0 0 8px rgba(0,204,255,0.6), 0 0 20px rgba(0,204,255,0.2);
+    }
+    /* glow suave acima e abaixo */
+    .scifi-divider::after {
+      content: '';
+      position: absolute; left: 10%; right: 10%; top: 50%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,204,255,0.25), transparent);
+      transform: translateY(3px);
+      filter: blur(3px);
+    }
+    /* texto central da barra */
+    .scifi-divider__label {
+      position: relative; z-index: 2;
+      margin: 0 auto;
+      padding: 0 20px;
+      background: var(--bg); /* tapa a linha atrás do texto */
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.5rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: rgba(0,204,255,0.7);
+      white-space: nowrap;
+    }
+    /* losangos decorativos */
+    .scifi-divider__deco {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      width: 6px; height: 6px;
+      background: var(--cyan);
+      clip-path: polygon(50% 0%,100% 50%,50% 100%,0% 50%);
+      box-shadow: 0 0 10px var(--cyan);
+    }
+    .scifi-divider__deco:nth-child(1) { left: calc(50% - 160px); }
+    .scifi-divider__deco:nth-child(2) { right: calc(50% - 160px); }
+    /* marcadores laterais */
+    .scifi-divider__tick {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 1px; height: 8px;
+      background: rgba(0,204,255,0.5);
+    }
+
+    @keyframes dividerPulse {
+      0%,100% { opacity: 0.7; }
+      50%      { opacity: 1; }
+    }
+    .scifi-divider::before { animation: dividerPulse 3s ease-in-out infinite; }
+    #obs-section {
+      position:relative; z-index:10;
+      min-height:100vh; background:#000;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      overflow:hidden; padding:60px 24px;
+    }
+
+    /* grid vermelho subtil */
+    #obs-section::before {
+      content:''; position:absolute; inset:0;
+      background-image: linear-gradient(rgba(200,30,30,0.02) 1px,transparent 1px), linear-gradient(90deg,rgba(200,30,30,0.02) 1px,transparent 1px);
+      background-size:40px 40px; pointer-events:none; z-index:0;
+    }
+
+    /* glow vermelho atrás do olho */
+    #obs-glow {
+      position:absolute; inset:0;
+      background:radial-gradient(ellipse 60% 60% at 50% 50%,rgba(120,10,10,0) 0%,transparent 70%);
+      transition:background 1.2s ease; pointer-events:none; z-index:1;
+    }
+
+    #obs-wrap {
+      position:relative; z-index:100;
+      width:min(640px,88vw); height:min(640px,88vw);
+      cursor:crosshair;
+    }
+    #obs-ring { position:absolute; inset:-8%; border-radius:50%; border:1px solid rgba(200,30,30,0.08); animation:rPulse 3s ease-in-out infinite; }
+    #obs-ring::after { content:''; position:absolute; inset:-12%; border-radius:50%; border:1px solid rgba(200,30,30,0.04); animation:rPulse 3s ease-in-out infinite reverse; }
+    @keyframes rPulse { 0%,100%{opacity:0.3;transform:scale(1)} 50%{opacity:1;transform:scale(1.015)} }
+    #obs-outer { position:absolute; inset:0; width:100%; height:100%; image-rendering:pixelated; opacity:0; }
+    #obs-pupil-wrap { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:66%; height:66%; pointer-events:none; opacity:0; }
+    #obs-pupil-wrap img { position:absolute; inset:0; width:100%; height:100%; image-rendering:pixelated; }
+    #obs-canvas { position:absolute; inset:0; width:100%; height:100%; image-rendering:pixelated; filter:drop-shadow(0 0 50px rgba(200,30,30,0.8)); }
+
+    #obs-text { position:relative; z-index:10; margin-top:40px; text-align:center; opacity:0; transition:opacity 1.5s ease; }
+    #obs-text.show { opacity:1; }
+    #obs-text .lore-tag { font-family:var(--font-mono); font-size:0.65rem; letter-spacing:0.35em; text-transform:uppercase; color:rgba(200,30,30,0.55); margin-bottom:6px; }
+    #obs-text .lore-name { font-family:var(--font-display); font-size:clamp(1rem,3vw,1.6rem); font-weight:900; letter-spacing:0.2em; color:#fff; text-shadow:0 0 30px rgba(200,30,30,0.5); margin-bottom:12px; }
+    #obs-text .lore-desc { font-size:0.75rem; color:rgba(200,216,232,0.4); letter-spacing:0.1em; max-width:400px; line-height:1.8; }
+    #obs-text .lore-btn { display:inline-flex; align-items:center; gap:8px; margin-top:24px; padding:10px 28px; font-family:var(--font-mono); font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; text-decoration:none; color:rgba(200,30,30,0.9); border:1px solid rgba(200,30,30,0.4); border-radius:2px; transition:all 0.3s ease; }
+    #obs-text .lore-btn:hover { color:#fff; border-color:rgba(200,30,30,0.9); background:rgba(200,30,30,0.08); box-shadow:0 0 20px rgba(200,30,30,0.3); }
+
+    .obs-ticker { position:absolute; bottom:24px; left:0; right:0; display:flex; justify-content:center; gap:32px; font-family:var(--font-mono); font-size:0.5rem; letter-spacing:0.2em; color:rgba(200,30,30,0.22); text-transform:uppercase; pointer-events:none; z-index:5; }
+    .obs-ticker span { animation:tkBlink 3s ease-in-out infinite; }
+    .obs-ticker span:nth-child(2){animation-delay:1s} .obs-ticker span:nth-child(3){animation-delay:2s}
+    @keyframes tkBlink { 0%,100%{opacity:0.22} 50%{opacity:0.65} }
+  </style>
 </head>
 <body>
 
+  <!-- ── OVERLAY PRETO (scroll para observer) ── -->
+  <div id="dark-overlay"></div>
+
   <!-- ── NAVBAR ── -->
-  <nav class="navbar">
+  <nav class="navbar" id="main-navbar">
     <a href="index.html" class="navbar__logo">PATO <span>//</span> FRADELOS</a>
     <ul class="navbar__links">
       <li><a href="index.html" class="active">Início</a></li>
@@ -25,12 +670,12 @@
       <li><a href="pages/video.html">Vídeo</a></li>
       <li><a href="pages/team.html">Equipa</a></li>
     </ul>
-    <button class="navbar__hamburger" aria-label="Abrir menu">
+    <button class="navbar__hamburger" aria-label="Menu" id="burger">
       <span></span><span></span><span></span>
     </button>
   </nav>
-  <div class="navbar__mobile-menu">
-    <a href="index.html" class="active">Início</a>
+  <div class="navbar__mobile-menu" id="mobile-menu">
+    <a href="index.html">Início</a>
     <a href="pages/maps.html">Mapas</a>
     <a href="pages/entities.html">Entidades</a>
     <a href="pages/skills.html">Skills</a>
@@ -39,225 +684,887 @@
     <a href="pages/team.html">Equipa</a>
   </div>
 
-  <div class="page-content">
+  <!-- ── FUNDO: canvas estrelas + nebulosas ── -->
+  <canvas id="bg-canvas"></canvas>
 
-    <!-- ── HERO ── -->
-    <section class="hero">
-      <div class="hero__bg"></div>
-      <div class="hero__grid"></div>
+  <!-- ── HOLOFOTES + FEIXE ── -->
+  <canvas id="spotlight-canvas"></canvas>
 
-      <div class="hero__content">
-        <div class="hero__eyebrow">Projecto ORBIS // 2D Platformer</div>
-        <h1 class="hero__title">Pato em<br><span>Fradelos</span></h1>
-        <p class="hero__subtitle">Observe. Descubra. Sobreviva.</p>
-        <p class="hero__desc">
-          Um jogo de plataformas 2D onde o que vês determina o que existe.
-          A matéria negra desaparece quando não é observada — e algo lá dentro
-          está a observar de volta.
-        </p>
-        <div class="hero__cta">
-          <a href="pages/video.html" class="btn btn--primary">▶ Ver Trailer</a>
-          <a href="pages/lore.html" class="btn btn--outline">Ler a Lore</a>
-        </div>
+  <!-- ── HUD LAYER ── -->
+  <div id="hud-layer"><div class="hud-hex-grid"></div></div>
+  <div class="hud-c tl"></div><div class="hud-c tr"></div>
+  <div class="hud-c bl"></div><div class="hud-c br"></div>
+  <div class="ds" style="left:7%;--d:5s;--dl:0s"></div>
+  <div class="ds" style="left:22%;--d:7.5s;--dl:1.8s"></div>
+  <div class="ds" style="left:78%;--d:6s;--dl:0.6s"></div>
+  <div class="ds" style="left:93%;--d:4.5s;--dl:2.2s"></div>
+  <div id="vignette"></div>
+
+  <!-- ══════════════════════════════════════
+       HERO
+  ══════════════════════════════════════ -->
+  <section class="hero" style="padding-top:calc(var(--nav-height) + 40px)">
+    <div class="hero__grid"></div>
+    <div class="hero__content">
+      <div class="hero__eyebrow">Projecto ORBIS // 2D Platformer</div>
+      <h1 class="hero__title">Pato em<br><span>Fradelos</span></h1>
+      <p class="hero__subtitle">Observe. Descubra. Sobreviva.</p>
+      <p class="hero__desc">
+        Um jogo de plataformas 2D onde o que vês determina o que existe.
+        A matéria negra desaparece quando não é observada — e algo lá dentro
+        está a observar de volta.
+      </p>
+      <div class="hero__cta">
+        <a href="pages/video.html" class="btn btn--primary">▶ Ver Trailer</a>
+        <a href="pages/lore.html" class="btn btn--outline">Ler a Lore</a>
       </div>
+    </div>
+    <div class="hero__scroll">↓ explorar</div>
+  </section>
 
-      <div class="hero__scroll">↓ explorar</div>
-    </section>
+  <!-- ── DIVISÓRIA: Hero → Galeria ── -->
+  <div class="scifi-divider">
+    <div class="scifi-divider__deco"></div>
+    <div class="scifi-divider__tick" style="left:15%"></div>
+    <div class="scifi-divider__tick" style="left:20%"></div>
+    <div class="scifi-divider__tick" style="left:80%"></div>
+    <div class="scifi-divider__tick" style="left:85%"></div>
+    <span class="scifi-divider__label">// SECTOR 02 — VISUAL LOG //</span>
+    <div class="scifi-divider__deco"></div>
+  </div>
 
-    <!-- ── GALERIA DE SCREENSHOTS ── -->
-    <section class="gallery-section">
-      <div class="section-header">
-        <div class="section-eyebrow">Capturas de Ecrã</div>
-        <h2 class="section-title">Gameplay</h2>
-      </div>
+  <!-- ══════════════════════════════════════
+       GALERIA — SALA METÁLICA
+  ══════════════════════════════════════ -->
+  <section class="gallery-section">
+    <div class="section-header">
+      <div class="section-eyebrow">Sistema de Monitorização // ORBIS-CC</div>
+      <h2 class="section-title">Câmeras de Vigilância</h2>
+    </div>
 
-      <div class="gallery-grid">
-        <!-- Card largo — screenshot principal -->
-        <div class="gallery-card gallery-card--wide">
-          <div class="gallery-card__placeholder">
-            <span class="gallery-card__placeholder-icon">🎮</span>
-            <span class="gallery-card__placeholder-label">Screenshot Principal — 16:9</span>
-          </div>
-          <div class="gallery-card__overlay">+ ver</div>
-        </div>
+    <div class="metal-room">
+      <div class="metal-wall">
+        <div class="wall-content">
 
-        <!-- Card normal -->
-        <div class="gallery-card">
-          <div class="gallery-card__placeholder">
-            <span class="gallery-card__placeholder-icon">🌑</span>
-            <span class="gallery-card__placeholder-label">Matéria Negra</span>
-          </div>
-          <div class="gallery-card__overlay">+ ver</div>
-        </div>
+          <!-- ══ ZONA DOS POSTERS — espalhados absolutamente na parede ══ -->
+          <div class="wall-poster-area">
 
-        <!-- Card normal -->
-        <div class="gallery-card">
-          <div class="gallery-card__placeholder">
-            <span class="gallery-card__placeholder-icon">🪼</span>
-            <span class="gallery-card__placeholder-label">Aquário</span>
-          </div>
-          <div class="gallery-card__overlay">+ ver</div>
-        </div>
-
-        <!-- Card Observer — clicável -->
-        <div id="obs-card" class="gallery-card gallery-card--observer" onclick="window.location.href='pages/observer.html'" style="cursor:crosshair;position:relative;overflow:hidden;background:#000;">          <!-- Observer eye that follows mouse inside the card -->
-          <div id="obs-card-eye" style="
-            position:absolute;
-            left:50%;top:50%;
-            width:120px;height:120px;
-            transform:translate(-50%,-50%);
-            pointer-events:none;
-            z-index:2;
-          ">
-            <!-- Outer red part (ObserverRedFront) -->
-            <img id="obs-card-outer" src="assets/ObserverRedFront.png" style="
-              position:absolute;inset:0;
-              width:100%;height:100%;
-              image-rendering:pixelated;
-              transition: filter 0.3s ease;
-            ">
-            <!-- Pupil that tracks mouse -->
-            <div id="obs-card-pupil-wrap" style="
-              position:absolute;
-              left:50%;top:50%;
-              transform:translate(-50%,-50%);
-              width:75px;height:75px;
-              pointer-events:none;
-            ">
-              <img id="obs-card-pupil" src="assets/ObserverRedFrontPupil.png" style="
-                position:absolute;inset:0;
-                width:100%;height:100%;
-                image-rendering:pixelated;
-              ">
+            <!-- Poster 1 — Lab -->
+            <div class="poster poster--p1">
+              <img src="assets/Lab/Gloamvine Floor.png" alt="Lab">
+              <div class="poster__frame"></div>
+              <div class="poster__screw poster__screw--tl"></div>
+              <div class="poster__screw poster__screw--tr"></div>
+              <div class="poster__screw poster__screw--bl"></div>
+              <div class="poster__screw poster__screw--br"></div>
+              <div class="poster__scan"></div>
+              <div class="poster__label">LAB</div>
             </div>
-          </div>          <div class="gallery-card__overlay" style="cursor:crosshair;font-size:0.7rem;letter-spacing:0.2em;color:rgba(200,30,30,0.9);z-index:3;">👁 ENTRAR</div>
-        </div>
 
-        <!-- Card largo -->
-        <div class="gallery-card gallery-card--wide">
-          <div class="gallery-card__placeholder">
-            <span class="gallery-card__placeholder-icon">🌿</span>
-            <span class="gallery-card__placeholder-label">Câmara das Profundezas — 16:9</span>
-          </div>
-          <div class="gallery-card__overlay">+ ver</div>
-        </div>
+            <!-- Poster 2 — Aquarium -->
+            <div class="poster poster--p2">
+              <img src="assets/Aquarium/Aquarium.png" alt="Aquarium">
+              <div class="poster__frame"></div>
+              <div class="poster__screw poster__screw--tl"></div>
+              <div class="poster__screw poster__screw--tr"></div>
+              <div class="poster__screw poster__screw--bl"></div>
+              <div class="poster__screw poster__screw--br"></div>
+              <div class="poster__scan"></div>
+              <div class="poster__label">AQUARIUM</div>
+            </div>
+
+            <!-- Poster 3 — Facility -->
+            <div class="poster poster--p3">
+              <img src="assets/Facility/Facility Gameplay.png" alt="Facility">
+              <div class="poster__frame"></div>
+              <div class="poster__screw poster__screw--tl"></div>
+              <div class="poster__screw poster__screw--tr"></div>
+              <div class="poster__screw poster__screw--bl"></div>
+              <div class="poster__screw poster__screw--br"></div>
+              <div class="poster__scan"></div>
+              <div class="poster__label">FACILITY</div>
+            </div>
+
+            <!-- Poster 4 — Western Mountain -->
+            <div class="poster poster--p4">
+              <img src="assets/Western Mountain/Green Scenery.png" alt="Western Mountain">
+              <div class="poster__frame"></div>
+              <div class="poster__screw poster__screw--tl"></div>
+              <div class="poster__screw poster__screw--tr"></div>
+              <div class="poster__screw poster__screw--bl"></div>
+              <div class="poster__screw poster__screw--br"></div>
+              <div class="poster__scan"></div>
+              <div class="poster__label">WESTERN MOUNTAIN</div>
+            </div>
+
+            <!-- Poster 5 — Observer -->
+            <div class="poster poster--p5">
+              <img src="assets/Observer/Observer.png" alt="Observer">
+              <div class="poster__frame"></div>
+              <div class="poster__screw poster__screw--tl"></div>
+              <div class="poster__screw poster__screw--tr"></div>
+              <div class="poster__screw poster__screw--bl"></div>
+              <div class="poster__screw poster__screw--br"></div>
+              <div class="poster__scan"></div>
+              <div class="poster__label">OBSERVER</div>
+            </div>
+
+            <!-- Poster 6 — Anglerfish Fall -->
+            <div class="poster poster--p6">
+              <img src="assets/Aquarium/Anglerfish Fall.png" alt="Anglerfish">
+              <div class="poster__frame"></div>
+              <div class="poster__label">AQ-06</div>
+            </div>
+
+
+            
+          </div><!-- /wall-poster-area -->
+
+          <!-- ══ TVs ══ -->
+          <div class="tv-wall">
+
+            <!-- LINHA 1 — TV à direita + zona de posters à esquerda -->
+            <div class="tv-row tv-row-1-wrap" style="justify-content:flex-end; position:relative;">
+
+              <!-- Posters na zona esquerda livre (não há TV aqui) -->
+              <div class="poster poster--side1">
+                <img src="assets/Aquarium/Anglerfish Fall.png" alt="Anglerfish">
+                <div class="poster__frame"></div>
+                <div class="poster__label">AQ-S1</div>
+              </div>
+              <div class="poster poster--side2">
+                <img src="assets/Western Mountain/Elevator.png" alt="Elevator">
+                <div class="poster__frame"></div>
+                <div class="poster__label">WM-S2</div>
+              </div>
+              <div class="poster poster--side3">
+                <img src="assets/Facility/Generator.png" alt="Generator">
+                <div class="poster__frame"></div>
+                <div class="poster__label">FAC-S3</div>
+              </div>
+
+              <div class="tv tv--row1-a" style="max-width:58%">
+                <div class="tv__glow" style="background:radial-gradient(ellipse,rgba(220,30,30,0.2),transparent 70%)"></div>
+                <div class="tv__body">
+                  <div class="tv__bezel">
+                    <img class="tv__screen" src="assets/Gifs/Lab Gameplay.gif" alt="Lab Gameplay">
+                    <div class="tv__scanlines"></div>
+                    <div class="tv__off-overlay"><canvas></canvas></div>
+                    <div class="tv__hud">
+                      <div class="tv__hud-tl" style="color:rgba(220,30,30,0.85)">CAM-01 // LAB SECTOR B</div>
+                      <div class="tv__hud-tr" style="color:rgba(220,30,30,0.9)"><div class="tv__rec-dot" style="background:rgba(220,30,30,0.95)"></div>REC</div>
+                      <div class="tv__hud-bl">FEED ESTÁVEL // 00:14:32</div>
+                      <div class="tv__hud-br">ORBIS-CC</div>
+                    </div>
+                    <div class="tv__corner tv__corner--tl" style="border-color:rgba(220,30,30,0.5)"></div>
+                    <div class="tv__corner tv__corner--tr" style="border-color:rgba(220,30,30,0.5)"></div>
+                    <div class="tv__corner tv__corner--bl" style="border-color:rgba(220,30,30,0.5)"></div>
+                    <div class="tv__corner tv__corner--br" style="border-color:rgba(220,30,30,0.5)"></div>
+                  </div>
+                  <div class="tv__bottom-bar">
+                    <span class="tv__brand">ORBIS-V</span>
+                    <div class="tv__controls">
+                      <div class="tv__led"></div>
+                      <button class="tv__power-btn" aria-label="Power"></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- LINHA 2 -->
+            <div class="tv-row">
+              <div class="tv tv--row2-a">
+                <div class="tv__glow" style="background:radial-gradient(ellipse,rgba(0,220,100,0.18),transparent 70%)"></div>
+                <div class="tv__body">
+                  <div class="tv__bezel">
+                    <img class="tv__screen" src="assets/Gifs/Tongue.gif" alt="Aquário">
+                    <div class="tv__scanlines"></div>
+                    <div class="tv__off-overlay"><canvas></canvas></div>
+                    <div class="tv__hud">
+                      <div class="tv__hud-tl" style="color:rgba(0,220,100,0.8)">CAM-03<br>AQUÁRIO</div>
+                      <div class="tv__hud-tr" style="color:rgba(0,220,100,0.9)"><div class="tv__rec-dot" style="background:rgba(0,220,100,0.9);animation-delay:0.7s"></div>REC</div>
+                      <div class="tv__hud-bl">ENTIDADE DETECTADA</div>
+                      <div class="tv__hud-br">⚠ MOVIMENTO</div>
+                    </div>
+                    <div class="tv__corner tv__corner--tl" style="border-color:rgba(0,220,100,0.45)"></div>
+                    <div class="tv__corner tv__corner--tr" style="border-color:rgba(0,220,100,0.45)"></div>
+                    <div class="tv__corner tv__corner--bl" style="border-color:rgba(0,220,100,0.45)"></div>
+                    <div class="tv__corner tv__corner--br" style="border-color:rgba(0,220,100,0.45)"></div>
+                  </div>
+                  <div class="tv__bottom-bar">
+                    <span class="tv__brand">ORBIS-V</span>
+                    <div class="tv__controls">
+                      <div class="tv__led" style="animation-delay:0.8s"></div>
+                      <button class="tv__power-btn" aria-label="Power"></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="tv tv--row2-b">
+                <div class="tv__glow" style="background:radial-gradient(ellipse,rgba(0,180,255,0.16),transparent 70%)"></div>
+                <div class="tv__body">
+                  <div class="tv__bezel">
+                    <img class="tv__screen" src="assets/Gifs/Map.gif" alt="Map">
+                    <div class="tv__scanlines"></div>
+                    <div class="tv__off-overlay"><canvas></canvas></div>
+                    <div class="tv__hud">
+                      <div class="tv__hud-tl" style="color:rgba(0,180,255,0.8)">CAM-02 // PROFUNDEZAS</div>
+                      <div class="tv__hud-tr" style="color:rgba(0,180,255,0.9)"><div class="tv__rec-dot" style="background:rgba(0,180,255,0.95);animation-delay:0.5s"></div>REC</div>
+                      <div class="tv__hud-bl">MATÉRIA INSTÁVEL</div>
+                      <div class="tv__hud-br">ZONA-04</div>
+                    </div>
+                    <div class="tv__corner tv__corner--tl" style="border-color:rgba(0,180,255,0.5)"></div>
+                    <div class="tv__corner tv__corner--tr" style="border-color:rgba(0,180,255,0.5)"></div>
+                    <div class="tv__corner tv__corner--bl" style="border-color:rgba(0,180,255,0.5)"></div>
+                    <div class="tv__corner tv__corner--br" style="border-color:rgba(0,180,255,0.5)"></div>
+                  </div>
+                  <div class="tv__bottom-bar">
+                    <span class="tv__brand">ORBIS-V</span>
+                    <div class="tv__controls">
+                      <div class="tv__led" style="animation-delay:1.2s"></div>
+                      <button class="tv__power-btn" aria-label="Power"></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- LINHA 3 -->
+            <div class="tv-row">
+              <div class="tv tv--row3-a">
+                <div class="tv__glow" style="background:radial-gradient(ellipse,rgba(255,200,0,0.16),transparent 70%)"></div>
+                <div class="tv__body">
+                  <div class="tv__bezel">
+                    <img class="tv__screen" src="assets/Gifs/Dash Upgrade.gif" alt="Dash">
+                    <div class="tv__scanlines"></div>
+                    <div class="tv__off-overlay"><canvas></canvas></div>
+                    <div class="tv__hud">
+                      <div class="tv__hud-tl" style="color:rgba(255,200,0,0.8)">CAM-04 // CORREDOR NORTE</div>
+                      <div class="tv__hud-tr" style="color:rgba(255,200,0,0.9)"><div class="tv__rec-dot" style="background:rgba(255,200,0,0.9);animation-delay:0.3s"></div>REC</div>
+                      <div class="tv__hud-bl">SINAL DEGRADADO</div>
+                      <div class="tv__hud-br">ZONA-02</div>
+                    </div>
+                    <div class="tv__corner tv__corner--tl" style="border-color:rgba(255,200,0,0.45)"></div>
+                    <div class="tv__corner tv__corner--tr" style="border-color:rgba(255,200,0,0.45)"></div>
+                    <div class="tv__corner tv__corner--bl" style="border-color:rgba(255,200,0,0.45)"></div>
+                    <div class="tv__corner tv__corner--br" style="border-color:rgba(255,200,0,0.45)"></div>
+                  </div>
+                  <div class="tv__bottom-bar">
+                    <span class="tv__brand">ORBIS-V</span>
+                    <div class="tv__controls">
+                      <div class="tv__led" style="animation-delay:0.4s"></div>
+                      <button class="tv__power-btn" aria-label="Power"></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="tv tv--row3-b">
+                <div class="tv__glow" style="background:radial-gradient(ellipse,rgba(180,60,255,0.16),transparent 70%)"></div>
+                <div class="tv__body">
+                  <div class="tv__bezel" style="background:#020204">
+                    <img class="tv__screen" src="assets/Gifs/Lab Gameplay.gif" alt="Lab 2" style="filter:hue-rotate(240deg) saturate(0.7)">
+                    <div class="tv__scanlines"></div>
+                    <div class="tv__off-overlay"><canvas></canvas></div>
+                    <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(120,60,255,0.04),rgba(120,60,255,0.04) 2px,transparent 2px,transparent 8px);z-index:7;pointer-events:none"></div>
+                    <div class="tv__hud">
+                      <div class="tv__hud-tl" style="color:rgba(180,60,255,0.75)">CAM-05<br>SECTOR X</div>
+                      <div class="tv__hud-tr" style="color:rgba(180,60,255,0.8)"><div class="tv__rec-dot" style="background:rgba(180,60,255,0.85);animation-delay:1.1s"></div>REC</div>
+                      <div class="tv__hud-bl" style="color:rgba(255,80,80,0.6)">⚠ SINAL CORROMPIDO</div>
+                    </div>
+                    <div class="tv__corner tv__corner--tl" style="border-color:rgba(180,60,255,0.4)"></div>
+                    <div class="tv__corner tv__corner--tr" style="border-color:rgba(180,60,255,0.4)"></div>
+                    <div class="tv__corner tv__corner--bl" style="border-color:rgba(180,60,255,0.4)"></div>
+                    <div class="tv__corner tv__corner--br" style="border-color:rgba(180,60,255,0.4)"></div>
+                  </div>
+                  <div class="tv__bottom-bar">
+                    <span class="tv__brand">ORBIS-V</span>
+                    <div class="tv__controls">
+                      <div class="tv__led" style="background:rgba(180,60,255,.9);box-shadow:0 0 6px rgba(180,60,255,.7);animation-delay:1.5s"></div>
+                      <button class="tv__power-btn" aria-label="Power"></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /tv-wall -->
+
+          <!-- MESA -->
+          <div class="metal-desk"></div>
+
+        </div><!-- /wall-content -->
+      </div><!-- /metal-wall -->
+
+      <!-- Pés da mesa -->
+      <div class="desk-legs">
+        <div class="desk-leg"></div>
+        <div class="desk-leg"></div>
       </div>
-    </section>
 
-    <!-- ── CARACTERÍSTICAS DO JOGO ── -->
-    <section class="features-section">
-      <div class="section-header">
-        <div class="section-eyebrow">Mecânicas</div>
-        <h2 class="section-title">Como Funciona</h2>
+    </div><!-- /metal-room -->
+  </section>
+
+  <!-- ── DIVISÓRIA: Galeria → Features ── -->
+  <div class="scifi-divider">
+    <div class="scifi-divider__deco"></div>
+    <div class="scifi-divider__tick" style="left:12%"></div>
+    <div class="scifi-divider__tick" style="left:17%"></div>
+    <div class="scifi-divider__tick" style="left:83%"></div>
+    <div class="scifi-divider__tick" style="left:88%"></div>
+    <span class="scifi-divider__label">// SECTOR 03 — MECHANICS DATA //</span>
+    <div class="scifi-divider__deco"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       FEATURES
+  ══════════════════════════════════════ -->
+  <section class="features-section">
+    <div class="section-header">
+      <div class="section-eyebrow">Mecânicas</div>
+      <h2 class="section-title">Como Funciona</h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-card__icon">👁️</span>
+        <div class="feature-card__title">Observação</div>
+        <p class="feature-card__desc">O que o jogador vê no ecrã determina o que existe fisicamente. A matéria negra desaparece quando sai do campo de visão.</p>
       </div>
-
-      <div class="features-grid">
-        <div class="feature-card" data-animate>
-          <span class="feature-card__icon">👁️</span>
-          <div class="feature-card__title">Observação</div>
-          <p class="feature-card__desc">
-            O que o jogador vê no ecrã determina o que existe fisicamente.
-            A matéria negra desaparece quando sai do campo de visão.
-          </p>
-        </div>
-
-        <div class="feature-card" data-animate>
-          <span class="feature-card__icon">🌑</span>
-          <div class="feature-card__title">Matéria Negra</div>
-          <p class="feature-card__desc">
-            Absorve toda a luz, não emite som, e esconde criaturas no seu interior.
-            Sólida quando observada, inexistente quando ignorada.
-          </p>
-        </div>
-
-        <div class="feature-card" data-animate>
-          <span class="feature-card__icon">💜</span>
-          <div class="feature-card__title">Núcleo de Glowvine</div>
-          <p class="feature-card__desc">
-            Bola de luz roxa e pegajosa. Ilumina a matéria negra,
-            revela criaturas ocultas e activa mecanismos.
-          </p>
-        </div>
-
-        <div class="feature-card" data-animate>
-          <span class="feature-card__icon">🌀</span>
-          <div class="feature-card__title">Teleporter</div>
-          <p class="feature-card__desc">
-            Deixa uma sombra no ar e teletransporta de volta a ela,
-            conservando o momentum do ponto de origem.
-          </p>
-        </div>
+      <div class="feature-card">
+        <span class="feature-card__icon">🌑</span>
+        <div class="feature-card__title">Matéria Negra</div>
+        <p class="feature-card__desc">Absorve toda a luz, não emite som, e esconde criaturas no seu interior. Sólida quando observada, inexistente quando ignorada.</p>
       </div>
-    </section>
+      <div class="feature-card">
+        <span class="feature-card__icon">💜</span>
+        <div class="feature-card__title">Núcleo de Glowvine</div>
+        <p class="feature-card__desc">Bola de luz roxa e pegajosa. Ilumina a matéria negra, revela criaturas ocultas e activa mecanismos.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-card__icon">🌀</span>
+        <div class="feature-card__title">Teleporter</div>
+        <p class="feature-card__desc">Deixa uma sombra no ar e teletransporta de volta a ela, conservando o momentum do ponto de origem.</p>
+      </div>
+    </div>
+  </section>
 
-    <!-- ── FOOTER ── -->
-    <footer class="footer">
-      <p>Pato em Fradelos &mdash; <span>Projecto ORBIS</span> &mdash; Em desenvolvimento</p>
-    </footer>
+  <!-- ── DIVISÓRIA: Features → Observer ── -->
+  <div class="scifi-divider" style="background:linear-gradient(to bottom,transparent,rgba(0,0,0,0.5))">
+    <div class="scifi-divider__deco"></div>
+    <div class="scifi-divider__tick" style="left:10%"></div>
+    <div class="scifi-divider__tick" style="left:90%"></div>
+    <span class="scifi-divider__label" style="color:rgba(200,30,30,0.7);background:#000">// SECTOR 04 — ENTITY DETECTED //</span>
+    <div class="scifi-divider__deco" style="background:rgba(200,30,30,0.8);box-shadow:0 0 10px rgba(200,30,30,0.8)"></div>
+  </div>
 
-  </div><!-- fim page-content -->
+  <!-- ══════════════════════════════════════
+       OBSERVER SECTION
+  ══════════════════════════════════════ -->
+  <section id="obs-section">
+    <div id="obs-glow"></div>
+    <div id="obs-wrap">
+      <div id="obs-ring"></div>
+      <canvas id="obs-canvas"></canvas>
+      <img id="obs-outer" src="assets/observer/ObserverRedFront.png" alt="">
+      <div id="obs-pupil-wrap"><img src="assets/observer/ObserverRedFrontPupil.png" alt=""></div>
+    </div>
+    <div id="obs-text">
+      <div class="lore-tag">Entidade Classificada // ORBIS-07</div>
+      <div class="lore-name">O OBSERVER</div>
+      <p class="lore-desc">Ele não persegue. Ele observa.<br>E enquanto observa — você existe.</p>
+      <a href="pages/observer.html" class="lore-btn">→ Ficheiro da Entidade</a>
+    </div>
+    <div class="obs-ticker">
+      <span>THREAT LEVEL: ABSOLUTE</span>
+      <span>STATUS: ACTIVE</span>
+      <span>CONTAINMENT: FAILED</span>
+    </div>
+  </section>
 
-  <script src="js/main.js"></script>
+  <!-- sprite preloads -->
+  <img id="spr-open" src="assets/observer/Observer-Open.png" style="display:none" alt="">
 
-  <style>
-  /* Default cursor: crosshair (+) for the whole page */
-  body { cursor: crosshair; }
-  </style>
-
+  <!-- ══════════════════════════════════════
+       JS — TV POWER BUTTONS (animação real do maps.html)
+  ══════════════════════════════════════ -->
   <script>
   (function(){
-    const card       = document.getElementById('obs-card');
-    const outerImg   = document.getElementById('obs-card-outer');
-    const pupilWrap  = document.getElementById('obs-card-pupil-wrap');
+    /* Liga o botão power de cada TV individualmente */
+    document.querySelectorAll('.tv__power-btn').forEach(function(btn) {
+      var bezel   = btn.closest('.tv__body').querySelector('.tv__bezel');
+      var led     = btn.closest('.tv__body').querySelector('.tv__led');
+      var overlay = bezel.querySelector('.tv__off-overlay');
+      var cvs     = overlay.querySelector('canvas');
+      var ctx     = cvs.getContext('2d');
+      var animFrame = null;
+      var powered = true;
 
-    let angle = 0;
-    let rotSpeed = 0.5; // deg/frame
-    let lastTS = null;
+      function runTvOff() {
+        cvs.width  = bezel.offsetWidth  || 400;
+        cvs.height = bezel.offsetHeight || 300;
+        var W = cvs.width, H = cvs.height;
+        ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
+        overlay.classList.add('active');
+        var phase=0, progress=0;
 
-    // Max glow intensity config
-    const MAX_GLOW_PX = 40;
-    const MAX_SPEED = 12; // deg/frame max
+        function frame() {
+          ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
 
-    // Pupil track radius (max offset from center)
-    const PUPIL_RADIUS = 20;
+          if(phase===0){
+            var a=1-progress/0.3;
+            var id=ctx.createImageData(W,H); var d=id.data;
+            for(var i=0;i<d.length;i+=4){var v=Math.random();var br=Math.floor(v*255);d[i]=br;d[i+1]=br;d[i+2]=br;d[i+3]=Math.floor(a*200);}
+            ctx.putImageData(id,0,0);
+            progress+=0.04;
+            if(progress>=0.3){phase=1;progress=0;}
 
-    // Track mouse globally (even outside the card)
-    document.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const mx = e.clientX - cx;
-      const my = e.clientY - cy;
+          } else if(phase===1){
+            var ease=1-Math.pow(1-progress,3);
+            var lineH=H*(1-ease);
+            var top=H/2-lineH/2;
+            ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
+            if(lineH>1){
+              ctx.save(); ctx.beginPath(); ctx.rect(0,top,W,lineH); ctx.clip();
+              var id2=ctx.createImageData(W,Math.max(1,Math.floor(lineH))); var d2=id2.data;
+              for(var i=0;i<d2.length;i+=4){var v=Math.random()*0.6+0.2;var br=Math.floor(v*200);d2[i]=br;d2[i+1]=br;d2[i+2]=br;d2[i+3]=180;}
+              ctx.putImageData(id2,0,top);
+              var lg=ctx.createLinearGradient(0,top,0,top+lineH);
+              lg.addColorStop(0,'rgba(255,255,255,0.6)'); lg.addColorStop(0.1,'rgba(255,255,255,0)');
+              lg.addColorStop(0.9,'rgba(255,255,255,0)'); lg.addColorStop(1,'rgba(255,255,255,0.6)');
+              ctx.fillStyle=lg; ctx.fillRect(0,top,W,lineH); ctx.restore();
+            }
+            progress+=0.035;
+            if(progress>=1){phase=2;progress=0;}
 
-      // Pupil tracking — clamp to PUPIL_RADIUS
-      const dist = Math.sqrt(mx * mx + my * my);
-      const norm = dist > 0 ? Math.min(dist, PUPIL_RADIUS) / dist : 0;
-      const px = mx * norm;
-      const py = my * norm;
-      pupilWrap.style.transform = `translate(calc(-50% + ${px}px), calc(-50% + ${py}px))`;
+          } else if(phase===2){
+            var ease=1-Math.pow(1-Math.min(progress,1),2);
+            var curW=W*(1-ease);
+            var lx=(W-curW)/2; var cy=H/2;
+            var thick=Math.max(1,3*(1-progress*0.8));
+            ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
+            if(curW>2){
+              var lg2=ctx.createLinearGradient(0,cy-12,0,cy+12);
+              lg2.addColorStop(0,'rgba(255,255,255,0)');
+              lg2.addColorStop(0.35,'rgba(255,255,255,'+(0.15*(1-progress))+')');
+              lg2.addColorStop(0.5,'rgba(255,255,255,'+(0.6*(1-progress*0.5))+')');
+              lg2.addColorStop(0.65,'rgba(255,255,255,'+(0.15*(1-progress))+')');
+              lg2.addColorStop(1,'rgba(255,255,255,0)');
+              ctx.fillStyle=lg2; ctx.fillRect(lx,cy-12,curW,24);
+              ctx.fillStyle='rgba(255,255,255,'+(0.95-progress*0.4)+')';
+              ctx.fillRect(lx,cy-thick/2,curW,thick);
+            }
+            progress+=0.028;
+            if(progress>=1){
+              ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
+              cancelAnimationFrame(animFrame);
+              powered=false;
+              if(led){led.classList.add('off');}
+              btn.style.boxShadow='0 0 8px rgba(255,30,30,0.6),0 1px 3px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.4)';
+              return;
+            }
+          }
+          animFrame=requestAnimationFrame(frame);
+        }
+        cancelAnimationFrame(animFrame); frame();
+      }
+
+      function runTvOn() {
+        cvs.width  = bezel.offsetWidth  || 400;
+        cvs.height = bezel.offsetHeight || 300;
+        var W=cvs.width, H=cvs.height;
+        ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
+        var progress=0;
+
+        function frame() {
+          var ease=1-Math.pow(1-Math.min(progress*2,1),3);
+          var lineW=W*ease; var lx=(W-lineW)/2; var cy=H/2;
+          ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
+          if(lineW>2){
+            var lg=ctx.createLinearGradient(0,cy-14,0,cy+14);
+            lg.addColorStop(0,'rgba(255,255,255,0)');
+            lg.addColorStop(0.4,'rgba(255,255,255,'+(0.25*Math.min(progress*3,1))+')');
+            lg.addColorStop(0.5,'rgba(255,255,255,'+(0.8*Math.min(progress*3,1))+')');
+            lg.addColorStop(0.6,'rgba(255,255,255,'+(0.25*Math.min(progress*3,1))+')');
+            lg.addColorStop(1,'rgba(255,255,255,0)');
+            ctx.fillStyle=lg; ctx.fillRect(lx,cy-14,lineW,28);
+            ctx.fillStyle='rgba(255,255,255,'+Math.min(progress*4,0.9)+')';
+            ctx.fillRect(lx,cy-1.5,lineW,3);
+          }
+          if(progress>0.4){
+            var p2=(progress-0.4)/0.6;
+            var ease2=1-Math.pow(1-p2,2);
+            var lH=H*ease2; var top=cy-lH/2;
+            ctx.save(); ctx.beginPath(); ctx.rect(0,top,W,lH); ctx.clip();
+            var id=ctx.createImageData(W,Math.max(1,Math.floor(lH))); var d=id.data;
+            for(var i=0;i<d.length;i+=4){var v=Math.random()*0.4+0.1;var br=Math.floor(v*180);d[i]=br;d[i+1]=br;d[i+2]=br;d[i+3]=Math.floor(p2*160);}
+            ctx.putImageData(id,0,top); ctx.restore();
+            if(p2>0.8){ctx.fillStyle='rgba(0,0,0,'+((p2-0.8)/0.2)+')';ctx.fillRect(0,0,W,H);}
+          }
+          progress+=0.025;
+          if(progress>=1){
+            overlay.classList.remove('active');
+            cancelAnimationFrame(animFrame);
+            powered=true;
+            if(led){led.classList.remove('off');}
+            btn.style.boxShadow='';
+            return;
+          }
+          animFrame=requestAnimationFrame(frame);
+        }
+        cancelAnimationFrame(animFrame); frame();
+      }
+
+      btn.addEventListener('click', function(){
+        if(powered) runTvOff(); else runTvOn();
+      });
     });
+  })();
+  </script>
 
-    function animate(ts) {
-      if (!lastTS) lastTS = ts;
-      const dt = ts - lastTS;
-      lastTS = ts;
+  <!-- ══════════════════════════════════════
+       JS — NAVBAR BURGER
+  ══════════════════════════════════════ -->
+  <script>
+  (function(){
+    const burger = document.getElementById('burger');
+    const menu   = document.getElementById('mobile-menu');
+    burger.addEventListener('click', () => {
+      const open = menu.classList.toggle('open');
+      const bars = burger.querySelectorAll('span');
+      bars[0].style.transform = open ? 'rotate(45deg) translate(5px,5px)'  : '';
+      bars[1].style.opacity   = open ? '0' : '';
+      bars[2].style.transform = open ? 'rotate(-45deg) translate(5px,-5px)' : '';
+    });
+  })();
+  </script>
 
-      // Pulsing glow effect
-      const timeMS = ts % 3000; // Cycle every 3 seconds
-      const cycleT = timeMS / 3000;
-      
-      const glowPx = 15 + Math.sin(cycleT * Math.PI * 2) * 10;
-      const glowOpacity = 0.3 + Math.sin(cycleT * Math.PI * 2) * 0.2;
-      outerImg.style.filter = `drop-shadow(0 0 ${glowPx}px rgba(200, 20, 20, ${glowOpacity})) drop-shadow(0 0 ${glowPx * 1.5}px rgba(255, 60, 0, ${glowOpacity * 0.5}))`;
+  <!-- ══════════════════════════════════════
+       JS — FUNDO: ESPAÇO + SCAN DO TÍTULO
+  ══════════════════════════════════════ -->
+  <script>
+  (function(){
+    const cv  = document.getElementById('bg-canvas');
+    const ctx = cv.getContext('2d');
 
-      // Gentle rotation
-      angle = (angle + rotSpeed * (dt / 16.67)) % 360;
-      outerImg.style.transform = `rotate(${angle}deg)`;
+    function resize(){ cv.width=innerWidth; cv.height=innerHeight; }
+    resize(); addEventListener('resize', resize);
 
-      requestAnimationFrame(animate);
+    /* Origem FIXA no viewport — o canvas é position:fixed por isso estas
+       coordenadas são sempre relativas ao viewport, nunca ao scroll.
+       ~45vh corresponde ao centro do título "Pato em Fradelos" no hero.   */
+    function origin(){
+      return { x: cv.width*0.5, y: cv.height*0.45 };
     }
 
-    requestAnimationFrame(animate);
+    /* ── ESTRELAS ── */
+    const stars = Array.from({length:320}, ()=>({
+      px: Math.random(), py: Math.random(),
+      r:  Math.random()*1.4+0.15,
+      a:  Math.random()*0.65+0.1,
+      ts: Math.random()*0.016+0.004,
+      ph: Math.random()*Math.PI*2,
+      col: Math.random()>0.82 ? 'rgba(150,200,255,' : 'rgba(200,218,235,'
+    }));
+
+    /* ── NEBULOSAS ── */
+    const hues = [[20,60,130],[65,0,130],[0,85,110],[85,20,65],[0,55,100]];
+    class Neb {
+      constructor(){
+        const o=origin();
+        const sp=Math.random()*cv.width*0.75, a=Math.random()*Math.PI*2;
+        this.x  = o.x + Math.cos(a)*sp*Math.random();
+        this.y  = o.y + Math.sin(a)*sp*0.65*Math.random();
+        this.vx = (Math.random()-.5)*0.026;
+        this.vy = (Math.random()-.5)*0.013;
+        this.r  = Math.random()*120+55;
+        this.op = Math.random()*0.072+0.012;
+        this.ph = Math.random()*Math.PI*2;
+        this.c  = hues[Math.floor(Math.random()*hues.length)];
+      }
+      tick(){
+        this.x+=this.vx; this.y+=this.vy; this.ph+=0.0018;
+        if(this.x> cv.width+220)this.x=-220; if(this.x<-220)this.x=cv.width+220;
+        if(this.y>cv.height+220)this.y=-220; if(this.y<-220)this.y=cv.height+220;
+      }
+      draw(){
+        const op=this.op*(0.5+Math.sin(this.ph)*.5);
+        const [r,g,b]=this.c;
+        const g2=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r);
+        g2.addColorStop(0,`rgba(${r},${g},${b},${op})`);
+        g2.addColorStop(.5,`rgba(${r},${g},${b},${op*.3})`);
+        g2.addColorStop(1,'transparent');
+        ctx.fillStyle=g2; ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2); ctx.fill();
+      }
+    }
+    const nebs = Array.from({length:14}, ()=>new Neb());
+
+    /* ── STREAKS ── */
+    const streaks = Array.from({length:8}, ()=>({
+      x1:Math.random(),y1:Math.random(),x2:Math.random(),y2:Math.random(),
+      a:Math.random()*0.03+0.006, ph:Math.random()*Math.PI*2
+    }));
+
+    /* ── DOIS SCAN SWEEPS — 180° opostos, fixos no título ── */
+    let swAng = 0;
+    function drawOneSweep(ang){
+      const o  = origin();
+      const len= Math.max(cv.width,cv.height)*2.4;
+      const hw = 0.040;
+      ctx.save();
+      ctx.translate(o.x, o.y);
+      /* cone de luz */
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.arc(0,0,len, ang-hw, ang+hw);
+      ctx.closePath();
+      const g=ctx.createRadialGradient(0,0,0,0,0,len);
+      g.addColorStop(0,   'rgba(0,204,255,0.11)');
+      g.addColorStop(0.05,'rgba(0,204,255,0.05)');
+      g.addColorStop(0.30,'rgba(0,180,255,0.014)');
+      g.addColorStop(1,   'transparent');
+      ctx.fillStyle=g; ctx.fill();
+      /* linha brilhante de frente */
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.lineTo(Math.cos(ang)*len, Math.sin(ang)*len);
+      ctx.strokeStyle='rgba(0,230,255,0.08)'; ctx.lineWidth=1.3; ctx.stroke();
+      ctx.restore();
+    }
+    function drawSweep(){
+      drawOneSweep(swAng);
+      drawOneSweep(swAng + Math.PI); /* oposto exato — 180° */
+      swAng += 0.006;
+    }
+
+    /* ── GLOW RADIAL DO TÍTULO ── */
+    function drawOriginGlow(){
+      const o=origin();
+      const g=ctx.createRadialGradient(o.x,o.y,0,o.x,o.y,cv.width*.52);
+      g.addColorStop(0,  'rgba(0,90,180,0.08)');
+      g.addColorStop(.18,'rgba(0,55,140,0.04)');
+      g.addColorStop(.5, 'rgba(0,30,80,0.018)');
+      g.addColorStop(1,  'transparent');
+      ctx.fillStyle=g; ctx.fillRect(0,0,cv.width,cv.height);
+    }
+
+    function frame(){
+      ctx.clearRect(0,0,cv.width,cv.height);
+      drawOriginGlow();
+      drawSweep();
+      nebs.forEach(n=>{n.tick();n.draw();});
+      streaks.forEach(s=>{
+        s.ph+=0.002;
+        const a=s.a*(0.4+Math.sin(s.ph)*.6);
+        const g=ctx.createLinearGradient(s.x1*cv.width,s.y1*cv.height,s.x2*cv.width,s.y2*cv.height);
+        g.addColorStop(0,'transparent'); g.addColorStop(.5,`rgba(0,204,255,${a})`); g.addColorStop(1,'transparent');
+        ctx.strokeStyle=g; ctx.lineWidth=.5;
+        ctx.beginPath(); ctx.moveTo(s.x1*cv.width,s.y1*cv.height); ctx.lineTo(s.x2*cv.width,s.y2*cv.height); ctx.stroke();
+      });
+      stars.forEach(s=>{
+        s.ph+=s.ts;
+        ctx.fillStyle=s.col+(s.a*(0.42+Math.sin(s.ph)*.58))+')';
+        ctx.beginPath(); ctx.arc(s.px*cv.width,s.py*cv.height,s.r,0,Math.PI*2); ctx.fill();
+      });
+      requestAnimationFrame(frame);
+    }
+    frame();
+  })();
+  </script>
+
+  <!-- ══════════════════════════════════════
+       JS — HOLOFOTES + FEIXE VERTICAL
+  ══════════════════════════════════════ -->
+  <script>
+  (function(){
+    const cv  = document.getElementById('spotlight-canvas');
+    const ctx = cv.getContext('2d');
+    const NAV = 56;
+
+    function resize(){ cv.width=innerWidth; cv.height=innerHeight; }
+    resize(); addEventListener('resize', resize);
+
+    const lights = [
+      { ph:0,        spd:0.00072, col:[0,195,255], al:0.052, hw:0.15 },
+      { ph:Math.PI,  spd:0.00054, col:[0,110,215], al:0.034, hw:0.11 }
+    ];
+    let bph = 0;
+
+    function beam(){
+      const cx=cv.width/2, top=NAV, bot=cv.height;
+      const ba=0.032+Math.sin(bph*.55)*.016;
+      const tw=cv.width*.0022, bw=cv.width*.0005;
+      const g=ctx.createLinearGradient(cx,top,cx,bot);
+      g.addColorStop(0,  `rgba(0,215,255,${ba*2.8})`);
+      g.addColorStop(.2, `rgba(0,185,255,${ba*1.2})`);
+      g.addColorStop(.6, `rgba(0,125,205,${ba*.45})`);
+      g.addColorStop(1,  'rgba(0,65,165,0)');
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(cx-tw,top); ctx.lineTo(cx+tw,top);
+      ctx.lineTo(cx+bw,bot); ctx.lineTo(cx-bw,bot);
+      ctx.closePath(); ctx.fillStyle=g; ctx.fill();
+      const lg=ctx.createLinearGradient(cx,top,cx,bot);
+      lg.addColorStop(0,  `rgba(130,245,255,${ba*4})`);
+      lg.addColorStop(.3, `rgba(65,215,255,${ba*2})`);
+      lg.addColorStop(.7, `rgba(0,155,225,${ba})`);
+      lg.addColorStop(1,  'rgba(0,85,185,0)');
+      ctx.strokeStyle=lg; ctx.lineWidth=.75;
+      ctx.beginPath(); ctx.moveTo(cx,top); ctx.lineTo(cx,bot); ctx.stroke();
+      ctx.restore();
+    }
+
+    function spot(l){
+      const cx=cv.width/2;
+      const ox=cx+Math.sin(l.ph)*(cv.width*.42);
+      const oy=NAV, len=cv.height-oy;
+      const [r,g,b]=l.col;
+      const lx=ox-Math.tan(l.hw)*len, rx=ox+Math.tan(l.hw)*len;
+      ctx.save();
+      ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(lx,oy+len); ctx.lineTo(rx,oy+len); ctx.closePath();
+      const gr=ctx.createRadialGradient(ox,oy,0,ox,oy,len);
+      gr.addColorStop(0,   `rgba(${r},${g},${b},${l.al*2.1})`);
+      gr.addColorStop(.1,  `rgba(${r},${g},${b},${l.al})`);
+      gr.addColorStop(.5,  `rgba(${r},${g},${b},${l.al*.25})`);
+      gr.addColorStop(1,   `rgba(${r},${g},${b},0)`);
+      ctx.fillStyle=gr; ctx.fill();
+      ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(lx,oy+len);
+      ctx.strokeStyle=`rgba(${r},${g},${b},${l.al*.5})`; ctx.lineWidth=.7; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(rx,oy+len); ctx.stroke();
+      const sg=ctx.createRadialGradient(ox,oy,0,ox,oy,9);
+      sg.addColorStop(0,`rgba(${r},${g},${b},0.85)`); sg.addColorStop(.5,`rgba(${r},${g},${b},.3)`); sg.addColorStop(1,'transparent');
+      ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(ox,oy,9,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+
+    function frame(){
+      ctx.clearRect(0,0,cv.width,cv.height);
+      bph+=.013; beam();
+      lights.forEach(l=>{ l.ph+=l.spd; spot(l); });
+      requestAnimationFrame(frame);
+    }
+    frame();
+
+    /* fade out ao aproximar do observer */
+    const obs = document.getElementById('obs-section');
+    function check(){
+      const scrollY=scrollY||window.scrollY;
+      const top=obs.getBoundingClientRect().top+window.scrollY;
+      const fs=top-innerHeight*1.3, fe=top-innerHeight*.2;
+      const t=Math.min(1,Math.max(0,(window.scrollY-fs)/(fe-fs)));
+      cv.style.opacity=(1-t).toFixed(3);
+    }
+    addEventListener('scroll', check, {passive:true});
+    check();
+  })();
+  </script>
+
+  <!-- ══════════════════════════════════════
+       JS — SCROLL DARK + OBSERVER ANIMAÇÃO
+  ══════════════════════════════════════ -->
+  <script>
+  (function(){
+    const overlay = document.getElementById('dark-overlay');
+    const navbar  = document.getElementById('main-navbar');
+    const sec     = document.getElementById('obs-section');
+    const wrap    = document.getElementById('obs-wrap');
+    const outer   = document.getElementById('obs-outer');
+    const pupil   = document.getElementById('obs-pupil-wrap');
+    const oc      = document.getElementById('obs-canvas');
+    const glow    = document.getElementById('obs-glow');
+    const txt     = document.getElementById('obs-text');
+    const spr     = document.getElementById('spr-open');
+    const ctx     = oc.getContext('2d');
+    const FRAMES  = 13;
+    let ang=0, lt=null, opened=false, anim=false;
+
+    function resizeOC(){ const s=wrap.getBoundingClientRect().width||wrap.offsetWidth; oc.width=s; oc.height=s; }
+    resizeOC(); addEventListener('resize', resizeOC);
+
+    /* scroll darkening */
+    function onScroll(){
+      const sy=window.scrollY;
+      const gal=document.querySelector('.gallery-section');
+      if(!gal)return;
+      const gb=gal.getBoundingClientRect().bottom+sy;
+      const start=gb, end=sec.getBoundingClientRect().top+sy+innerHeight*.5;
+      const raw=Math.min(1,Math.max(0,(sy-start)/(end-start)));
+      const e=raw<.5?2*raw*raw:1-Math.pow(-2*raw+2,2)/2;
+      overlay.style.opacity=e;
+      navbar.style.opacity=e>.55?'0':'';
+      navbar.style.pointerEvents=e>.55?'none':'';
+    }
+    addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+    /* pupil tracking */
+    addEventListener('mousemove',e=>{
+      if(!opened)return;
+      const rc=wrap.getBoundingClientRect(); if(!rc.width)return;
+      const mx=e.clientX-(rc.left+rc.width/2), my=e.clientY-(rc.top+rc.height/2);
+      const d=Math.sqrt(mx*mx+my*my), R=rc.width*.11;
+      const n=d>0?Math.min(d,R)/d:0;
+      pupil.style.transform=`translate(calc(-50% + ${mx*n}px),calc(-50% + ${my*n}px))`;
+    });
+
+    /* rotate + glow after open */
+    function animEye(ts){
+      if(!opened){requestAnimationFrame(animEye);return;}
+      if(!lt)lt=ts; const dt=ts-lt; lt=ts;
+      const c=(ts%4000)/4000;
+      outer.style.filter=`drop-shadow(0 0 ${16+Math.sin(c*Math.PI*2)*12}px rgba(200,20,20,${.28+Math.sin(c*Math.PI*2)*.18}))`;
+      ang=(ang+.4*(dt/16.67))%360; outer.style.transform=`rotate(${ang}deg)`;
+      const gs=.12+Math.sin(c*Math.PI*2)*.06;
+      glow.style.background=`radial-gradient(ellipse 70% 70% at 50% 50%,rgba(120,10,10,${gs}) 0%,transparent 70%)`;
+      requestAnimationFrame(animEye);
+    }
+    requestAnimationFrame(animEye);
+
+    /* draw sprite frame */
+    function drawFrame(f,p){
+      if(!spr.naturalWidth)return;
+      const s=oc.width, fw=spr.naturalWidth/FRAMES, fh=spr.naturalHeight;
+      ctx.clearRect(0,0,s,s);
+      const gA=.1+p*.5;
+      const g=ctx.createRadialGradient(s/2,s/2,s*.07,s/2,s/2,s*.62);
+      g.addColorStop(0,`rgba(255,60,60,${gA})`); g.addColorStop(.4,`rgba(200,30,30,${gA*.4})`); g.addColorStop(1,'transparent');
+      ctx.fillStyle=g; ctx.fillRect(0,0,s,s);
+      ctx.drawImage(spr,f*fw,0,fw,fh,0,0,s,s);
+      if(p>.6){
+        const rA=(p-.6)/.4;
+        ctx.strokeStyle=`rgba(255,80,40,${rA*.42})`; ctx.lineWidth=4*rA; ctx.shadowBlur=20*rA; ctx.shadowColor='rgba(255,60,30,.8)';
+        ctx.beginPath(); ctx.arc(s/2,s/2,s*.46,0,Math.PI*2); ctx.stroke();
+        ctx.shadowBlur=0; ctx.strokeStyle=`rgba(200,30,30,${rA*.2})`; ctx.lineWidth=2*rA;
+        ctx.beginPath(); ctx.arc(s/2,s/2,s*.48,0,Math.PI*2); ctx.stroke();
+      }
+    }
+
+    /* run animation */
+    function run(){
+      if(anim||opened)return;
+      anim=true; resizeOC(); drawFrame(0,0);
+      let f=0;
+      const iv=setInterval(()=>{
+        drawFrame(f,f/(FRAMES-1)); f++;
+        if(f>=FRAMES){
+          clearInterval(iv);
+          setTimeout(()=>{
+            oc.style.transition='opacity .4s ease'; oc.style.opacity='0';
+            setTimeout(()=>{
+              oc.style.display='none';
+              outer.style.transition='opacity .6s ease'; pupil.style.transition='opacity .6s ease';
+              outer.style.opacity='1'; pupil.style.opacity='1';
+              opened=true; anim=false;
+              txt.classList.add('show');
+              glow.style.background='radial-gradient(ellipse 70% 70% at 50% 50%,rgba(120,10,10,.15) 0%,transparent 70%)';
+            },400);
+          },200);
+        }
+      },80);
+    }
+
+    const io=new IntersectionObserver(en=>{ if(en[0].isIntersecting&&!opened&&!anim) setTimeout(run,1800); },{threshold:.35});
+    io.observe(wrap);
+    wrap.addEventListener('click',()=>location.href='pages/observer.html');
+    if(wrap.getBoundingClientRect().top<innerHeight*.6) setTimeout(run,500);
   })();
   </script>
 
