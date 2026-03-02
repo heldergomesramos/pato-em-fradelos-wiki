@@ -19,8 +19,14 @@ Requires the Teleporter. The sequence:
 - **Shadow Wisps** — small undeveloped Shadow entities. Teach "darkness = safety" before the boss fight.
 - Unique environment teaching the player that darkness is protection, not just obstacle.
 
-→ See `creatures/bosses.md` for The Shadow
-→ See `creatures/enemies.md` for Lurker and Shadow Wisp
+### The Deep Portal
+The hidden portal to The Stranger's core is located here — in the Depths, not below the Black Lake. PE chose this location because BM concentration here is highest and oldest. The membrane between this world and The Stranger is thinnest here. PE built the door where the wall was already weakest.
+
+Finding the portal requires the correct coordinates (hidden in wall engravings, revealed by the Gloamvine Core) and the eclipse at midnight. Sleeping inside the deep portal during the eclipse sends Pofinho to The Stranger's core.
+
+→ See `creatures/bosses.md` for The Shadow  
+→ See `creatures/enemies.md` for Lurker and Shadow Wisp  
+→ See `areas/internull.md` for the deep portal and coordinate system
 
 ---
 
