@@ -13,7 +13,6 @@
 - **Who built the consciousness statues?** The island was not as unknown as the research team believed. Deciding this internally — even if the game never answers it — would help with world design.
 - **Pofinho's echo in The Stranger** — what does the frozen tableau of his consciousness transfer look like? A key lore delivery moment.
 - **The personal detail** — what does PE's final log say that confirms Pofinho's identity? Needs to be written before the ending can be fully designed.
-- **The Stranger growing** — the easter egg based on visible size increase during idle play is removed. A different easter egg may replace it. TBD.
 - **Scientists' off-island fate** — are any reachable or referenced? Do they matter to the story?
 
 ---
