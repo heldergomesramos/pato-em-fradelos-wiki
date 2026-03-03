@@ -11,6 +11,7 @@
   <style>
     /* ── RESET & BASE ── */
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { background: transparent !important; }
 
     :root {
       --nav-h: 56px;
@@ -24,7 +25,7 @@
     }
 
     body {
-      background: var(--bg);
+      background: transparent;
       font-family: 'Share Tech Mono', monospace;
       color: var(--text);
       overflow: hidden;
@@ -41,19 +42,20 @@
       z-index: 9999;
     }
 
-    /* ── NAVBAR ── */
+    /* ── NAVBAR — identical to global.css ── */
     .navbar {
       position: fixed;
       top: 0; left: 0; right: 0;
-      z-index: 1000;
       height: var(--nav-h);
-      background: rgba(6,10,15,0.97);
-      backdrop-filter: blur(12px);
+      background: rgba(6,10,15,0.95);
       border-bottom: 1px solid var(--border);
-      padding: 0 24px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 1000;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
     }
 
     .navbar__logo {
@@ -63,25 +65,27 @@
       letter-spacing: 0.25em;
       color: #fff;
       text-decoration: none;
+      white-space: nowrap;
     }
 
     .navbar__logo span { color: #00ccff; }
 
     .navbar__links {
       display: flex;
-      list-style: none;
+      align-items: center;
       gap: 2px;
+      list-style: none;
     }
 
     .navbar__links a {
-      font-size: 0.6rem;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: var(--dim);
-      text-decoration: none;
-      position: relative;
-      padding: 8px 14px;
       display: block;
+      padding: 8px 14px;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--dim);
+      position: relative;
       transition: color 0.2s ease;
       white-space: nowrap;
     }
@@ -101,8 +105,8 @@
     .navbar__links a:hover,
     .navbar__links a.active { color: #fff; }
 
-    .navbar__links a.active::after,
-    .navbar__links a:hover::after {
+    .navbar__links a:hover::after,
+    .navbar__links a.active::after {
       transform: scaleX(1);
       transform-origin: left;
     }
@@ -110,16 +114,19 @@
     .navbar__hamburger {
       display: none;
       flex-direction: column;
+      gap: 5px;
       background: none;
       border: none;
       cursor: pointer;
-      gap: 6px;
+      padding: 4px;
     }
 
     .navbar__hamburger span {
-      width: 25px; height: 2px;
-      background: #00ccff;
-      transition: all 0.3s;
+      display: block;
+      width: 22px; height: 2px;
+      background: var(--dim);
+      border-radius: 1px;
+      transition: all 0.3s ease;
     }
 
     .navbar__mobile-menu {
@@ -127,8 +134,9 @@
       position: fixed;
       top: var(--nav-h);
       left: 0; right: 0;
-      background: rgba(6,10,15,0.99);
+      background: rgba(6,10,15,0.98);
       border-bottom: 1px solid var(--border);
+      padding: 12px 0;
       z-index: 999;
       flex-direction: column;
     }
@@ -136,20 +144,29 @@
     .navbar__mobile-menu.open { display: flex; }
 
     .navbar__mobile-menu a {
-      padding: 14px 20px;
-      font-size: 0.72rem;
+      display: block;
+      padding: 14px 24px;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: var(--dim);
       text-decoration: none;
-      border-bottom: 1px solid var(--border);
-      transition: all 0.2s;
+      color: var(--dim);
+      border-left: 2px solid transparent;
+      transition: all 0.2s ease;
     }
 
     .navbar__mobile-menu a:hover,
     .navbar__mobile-menu a.active {
-      background: rgba(0,204,255,0.08);
-      color: #00ccff;
+      color: #fff;
+      border-left-color: #00ccff;
+      background: rgba(255,255,255,0.03);
+    }
+
+    @media (max-width: 768px) {
+      .navbar__links    { display: none; }
+      .navbar__hamburger { display: flex; }
+      .navbar { padding: 0 16px; }
+      .navbar__logo { font-size: 0.75rem; }
     }
 
     /* ── POKEDEX LAYOUT ── */
@@ -159,13 +176,15 @@
       height: calc(100vh - var(--nav-h));
       margin-top: var(--nav-h);
       overflow: hidden;
+      position: relative;
+      z-index: 1;
     }
 
     /* ── SIDEBAR ── */
     .pokedex__sidebar {
       border-right: 1px solid var(--border);
       overflow-y: auto;
-      background: rgba(6,8,12,0.95);
+      background: rgba(4,5,8,0.72);
       display: flex;
       flex-direction: column;
     }
@@ -277,7 +296,7 @@
     .pokedex__detail-wrapper {
       overflow-y: auto;
       height: 100%;
-      background: var(--bg);
+      background: rgba(4,6,10,0.65);
     }
 
     .pokedex__detail-wrapper::-webkit-scrollbar { width: 6px; }
@@ -504,7 +523,7 @@
       position: absolute;
       top: 0; left: 14px;
       transform: translateY(-50%);
-      background: var(--bg);
+      background: rgba(2,0,10,0.95);
       padding: 0 7px;
       font-size: 0.48rem;
       letter-spacing: 0.25em;
@@ -1369,6 +1388,581 @@
       if (row) showEntity(row.dataset.e);
     }
   });
+  </script>
+
+  <canvas id="bg" style="position:fixed;inset:0;z-index:0;pointer-events:none;"></canvas>
+  <script>
+  (function(){
+    'use strict';
+    const cv = document.getElementById('bg');
+    const cx = cv.getContext('2d');
+    const TAU = Math.PI * 2;
+    let W, H, T = 0;
+    const rnd = (a,b) => a + Math.random()*(b-a);
+    const rni = (a,b) => 0|rnd(a,b);
+    const clamp = (v,lo,hi) => v<lo?lo:v>hi?hi:v;
+
+    /* ═══════════════════════════════════════════════════
+       SCENERY OBJECTS
+       Each is a dark silhouette drawn on canvas with
+       a "hide spot" — the gap/opening where eyes appear.
+       Objects: broken lab bench, overturned cabinet,
+       dense bush cluster, cracked server rack, pile of
+       crates, broken vent cover, corpse locker.
+    ═══════════════════════════════════════════════════ */
+    /* ═══════════════════════════════════════════════════
+       EYE PAIR COLOURS — each creature has one colour
+       Eyes always come in LEFT+RIGHT pairs, drawn at the
+       same Y, separated by a fixed gap so they never
+       overlap and always look like a real face.
+    ═══════════════════════════════════════════════════ */
+    const EYE_COLOURS = [
+      { r:220, g:10,  b:10  },  // blood red
+      { r:255, g:0,   b:60  },  // crimson
+      { r:255, g:80,  b:0   },  // hellfire orange
+      { r:160, g:0,   b:255 },  // violet
+      { r:255, g:180, b:0   },  // burning amber
+      { r:0,   g:230, b:40  },  // toxic green
+    ];
+
+    /* ═══════════════════════════════════════════════════
+       EYE PAIR — a single creature with 2 eyes side by side
+       cx,cy = centre of the pair
+       gap   = distance between the two eyes (px)
+       size  = iris radius
+    ═══════════════════════════════════════════════════ */
+    function mkEyePair(cx2, cy2) {
+      const col  = EYE_COLOURS[rni(0, EYE_COLOURS.length)];
+      const gap  = rnd(18, 38);    // left-right distance between eyes
+      const size = rnd(6, 13);     // iris radius
+      return {
+        cx: cx2, cy: cy2,
+        gap, size, col,
+        // animation state
+        state: 'dormant',
+        openAmt: 0,
+        life: 0,
+        dormantFor:   rni(40, 300),
+        openDuration: rni(180, 550),
+        // slow drift
+        vx: rnd(-0.08, 0.08),
+        vy: rnd(-0.04, 0.04),
+      };
+    }
+
+    /* ═══════════════════════════════════════════════════
+       DRAW ONE EYE PAIR (always left + right together)
+    ═══════════════════════════════════════════════════ */
+    function drawPair(ep, glowOnly) {
+      const a = ep.openAmt;
+      if (a <= 0.01) return;
+      const {r,g,b} = ep.col;
+
+      // The two eye centres — same Y, separated by gap
+      const positions = [
+        [ep.cx - ep.gap * 0.5, ep.cy],
+        [ep.cx + ep.gap * 0.5, ep.cy],
+      ];
+
+      positions.forEach(([px, py]) => {
+        // ── GLOW — wide soft halo ──
+        const glowR = ep.size * 5 * a;
+        const grd = cx.createRadialGradient(px, py, 0, px, py, Math.max(0.1, glowR));
+        grd.addColorStop(0,   `rgba(${r},${g},${b},${0.55 * a})`);
+        grd.addColorStop(0.3, `rgba(${r},${g},${b},${0.22 * a})`);
+        grd.addColorStop(0.7, `rgba(${r},${g},${b},${0.06 * a})`);
+        grd.addColorStop(1,   `rgba(${r},${g},${b},0)`);
+        cx.fillStyle = grd;
+        cx.beginPath(); cx.arc(px, py, Math.max(0.1, glowR * 1.8), 0, TAU); cx.fill();
+
+        if (glowOnly) return;
+
+        // ── IRIS — vertical oval (predator shape) ──
+        const irx = ep.size * 0.6 * a;   // narrow width
+        const iry = ep.size * 1.0 * a;   // taller than wide
+        cx.fillStyle = `rgba(${r},${g},${b},0.97)`;
+        cx.beginPath(); cx.ellipse(px, py, Math.max(0.1, irx), Math.max(0.1, iry), 0, 0, TAU); cx.fill();
+
+        // ── INNER IRIS — darker ring ──
+        cx.fillStyle = `rgba(${Math.floor(r*0.35)},${Math.floor(g*0.35)},${Math.floor(b*0.35)},0.8)`;
+        cx.beginPath(); cx.ellipse(px, py, Math.max(0.1, irx*0.65), Math.max(0.1, iry*0.65), 0, 0, TAU); cx.fill();
+
+        // ── SLIT PUPIL — razor thin vertical black ──
+        const slitW = Math.max(0.3, irx * 0.18);
+        const slitH = Math.max(0.3, iry * 1.02);
+        cx.fillStyle = 'rgba(0,0,0,1)';
+        cx.beginPath(); cx.ellipse(px, py, slitW, slitH, 0, 0, TAU); cx.fill();
+
+        // ── SPECULAR — tiny white glint ──
+        cx.fillStyle = `rgba(255,255,255,${0.75 * a})`;
+        cx.beginPath(); cx.arc(px - irx*0.55, py - iry*0.38, Math.max(0.2, irx*0.28), 0, TAU); cx.fill();
+      });
+    }
+
+    /* ═══════════════════════════════════════════════════
+       EYE STATE MACHINE
+    ═══════════════════════════════════════════════════ */
+    function updatePair(ep) {
+      ep.life++;
+      const OPEN_SPD  = 0.03;
+      const CLOSE_SPD = 0.02;
+
+      if (ep.state === 'dormant') {
+        // Slowly drift while sleeping
+        ep.cx += ep.vx;
+        ep.cy += ep.vy;
+        if (ep.life >= ep.dormantFor) { ep.state = 'opening'; ep.life = 0; }
+
+      } else if (ep.state === 'opening') {
+        ep.openAmt += OPEN_SPD;
+        if (ep.openAmt >= 1) { ep.openAmt = 1; ep.state = 'open'; ep.life = 0; }
+
+      } else if (ep.state === 'open') {
+        // Slow pulse — alive feeling
+        ep.openAmt = 0.85 + Math.sin(ep.life * 0.035) * 0.15;
+        ep.cx += ep.vx * 0.3;
+        ep.cy += ep.vy * 0.3;
+        if (ep.life >= ep.openDuration) { ep.state = 'closing'; ep.life = 0; }
+
+      } else if (ep.state === 'closing') {
+        ep.openAmt -= CLOSE_SPD;
+        if (ep.openAmt <= 0) {
+          ep.openAmt = 0;
+          ep.state = 'dormant';
+          ep.dormantFor   = rni(60, 400);
+          ep.openDuration = rni(150, 500);
+          ep.life = 0;
+          // Re-randomise colour and size each time they re-open
+          ep.col  = EYE_COLOURS[rni(0, EYE_COLOURS.length)];
+          ep.size = rnd(6, 13);
+          ep.gap  = rnd(18, 38);
+        }
+      }
+
+      // Keep inside screen
+      ep.cx = clamp(ep.cx, 50, W - 50);
+      ep.cy = clamp(ep.cy, 50, H - 50);
+
+      // Soft repulsion — push away from other pairs that are too close
+      eyePairs.forEach(other => {
+        if (other === ep) return;
+        const dx = ep.cx - other.cx;
+        const dy = ep.cy - other.cy;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 90 && dist > 0.1) {
+          const push = (90 - dist) / 90 * 0.4;
+          ep.cx += (dx / dist) * push;
+          ep.cy += (dy / dist) * push;
+        }
+      });
+    }
+
+    /* ═══════════════════════════════════════════════════
+       SCENERY OBJECTS — dark silhouettes (kept from original)
+    ═══════════════════════════════════════════════════ */
+    const OBJ_TYPES = [
+      {
+        id: 'bench',
+        draw(cx, x, y, sc, a) {
+          cx.save(); cx.globalAlpha = a;
+          cx.fillStyle = '#0a0a10';
+          cx.fillRect(x - sc*2.8, y - sc*0.6, sc*5.6, sc*0.55);
+          cx.fillRect(x - sc*2.5, y - sc*0.05, sc*0.35, sc*1.2);
+          cx.fillRect(x + sc*2.15, y - sc*0.05, sc*0.35, sc*1.2);
+          cx.fillRect(x + sc*1.5, y + sc*0.5, sc*0.2, sc*0.8);
+          cx.fillRect(x + sc*1.2, y + sc*0.5, sc*0.6, sc*0.18);
+          cx.fillStyle = '#020204';
+          cx.fillRect(x - sc*2.3, y + sc*0.15, sc*4.6, sc*0.38);
+          cx.restore();
+        },
+      },
+      {
+        id: 'cabinet',
+        draw(cx, x, y, sc, a) {
+          cx.save(); cx.globalAlpha = a;
+          cx.fillStyle = '#080810';
+          cx.fillRect(x - sc*1.4, y - sc*0.3, sc*2.8, sc*1.5);
+          cx.fillStyle = '#050508';
+          cx.fillRect(x - sc*1.5, y - sc*0.3, sc*0.25, sc*1.5);
+          cx.fillStyle = '#010103';
+          cx.fillRect(x - sc*1.4, y + sc*0.2, sc*0.5, sc*0.9);
+          cx.restore();
+        },
+      },
+      {
+        id: 'bush',
+        draw(cx, x, y, sc, a) {
+          cx.save(); cx.globalAlpha = a;
+          [[x-sc*1.2,y+sc*0.1,sc*1.1,sc*0.9],[x+sc*0.3,y-sc*0.2,sc*1.3,sc*1.0],
+           [x-sc*0.2,y+sc*0.4,sc*1.5,sc*0.85],[x+sc*1.1,y+sc*0.3,sc*0.9,sc*0.8]].forEach(([bx,by,rx,ry])=>{
+            cx.fillStyle='#050508';
+            cx.beginPath(); cx.ellipse(bx,by,rx,ry,0,0,TAU); cx.fill();
+          });
+          cx.fillStyle='#010103';
+          cx.beginPath(); cx.ellipse(x,y+sc*0.3,sc*0.9,sc*0.55,0,0,TAU); cx.fill();
+          cx.restore();
+        },
+      },
+      {
+        id: 'server',
+        draw(cx, x, y, sc, a) {
+          cx.save(); cx.globalAlpha = a;
+          cx.fillStyle = '#07070f';
+          cx.fillRect(x - sc*0.9, y - sc*2.0, sc*1.8, sc*3.2);
+          cx.fillStyle = '#010104';
+          cx.fillRect(x - sc*0.82, y - sc*0.58, sc*0.55, sc*1.05);
+          cx.restore();
+        },
+      },
+      {
+        id: 'crates',
+        draw(cx, x, y, sc, a) {
+          cx.save(); cx.globalAlpha = a;
+          cx.fillStyle = '#060610';
+          cx.fillRect(x - sc*1.6, y + sc*0.2, sc*1.2, sc*1.1);
+          cx.fillRect(x - sc*0.3, y + sc*0.4, sc*1.0, sc*0.9);
+          cx.fillRect(x + sc*0.8, y + sc*0.1, sc*1.1, sc*1.2);
+          cx.fillStyle = '#020204';
+          cx.fillRect(x - sc*0.3, y + sc*0.4, sc*0.2, sc*0.9);
+          cx.restore();
+        },
+      },
+      {
+        id: 'vent',
+        draw(cx, x, y, sc, a) {
+          cx.save(); cx.globalAlpha = a;
+          cx.fillStyle = '#07080f';
+          cx.fillRect(x - sc*1.5, y - sc*0.5, sc*3.0, sc*1.2);
+          cx.fillStyle = '#010104';
+          cx.fillRect(x - sc*1.4, y - sc*0.4, sc*2.8, sc*0.95);
+          cx.restore();
+        },
+      },
+      {
+        id: 'locker',
+        draw(cx, x, y, sc, a) {
+          cx.save(); cx.globalAlpha = a;
+          for(let i=0;i<3;i++){
+            const lx = x - sc*1.45 + i*sc*0.95;
+            cx.fillStyle = i===1?'#060610':'#050510';
+            cx.fillRect(lx, y - sc*2.2, sc*0.87, sc*3.0);
+          }
+          cx.fillStyle = '#010103';
+          cx.fillRect(x - sc*0.3, y - sc*2.2, sc*0.55, sc*3.0);
+          cx.restore();
+        },
+      },
+    ];
+
+    let sceneObjects = [];
+    function mkSceneObj() {
+      const type = OBJ_TYPES[rni(0, OBJ_TYPES.length)];
+      return {
+        type,
+        x: rnd(0.04, 0.96) * W,
+        y: rnd(0.4, 0.92) * H,
+        sc: rnd(28, 52),
+        a: rnd(0.55, 0.82),
+      };
+    }
+
+    /* ═══════════════════════════════════════════════════
+       FOG — large slow volumetric wisps
+       Multiple layers at different speeds and opacities
+    ═══════════════════════════════════════════════════ */
+    let fogLayers = [];
+
+    function mkFogWisp(layer) {
+      // layer 0 = background big slow wisps
+      // layer 1 = mid drifting patches
+      // layer 2 = foreground thin tendrils
+      const isBg  = layer === 0;
+      const isMid = layer === 1;
+      return {
+        layer,
+        x:  rnd(-0.2, 1.2) * W,
+        y:  rnd(-0.1, 1.1) * H,
+        rx: isBg  ? rnd(200, 500) : isMid ? rnd(80, 220) : rnd(30, 100),
+        ry: isBg  ? rnd(80,  200) : isMid ? rnd(30, 100) : rnd(15, 50),
+        vx: (isBg ? rnd(0.04, 0.12) : isMid ? rnd(0.08, 0.22) : rnd(0.12, 0.35)) * (Math.random()<0.5?1:-1),
+        vy: rnd(-0.05, 0.05),
+        ph:  rnd(0, TAU),
+        phs: rnd(0.003, isBg ? 0.007 : 0.013),
+        // colour: purple / crimson / teal
+        hue: rni(0, 3),
+        // base alpha — layer 0 is thickest
+        baseA: isBg ? rnd(0.28, 0.45) : isMid ? rnd(0.18, 0.30) : rnd(0.10, 0.20),
+      };
+    }
+
+    function drawFogLayer() {
+      fogLayers.forEach(f => {
+        // advance
+        f.ph += f.phs;
+        f.x  += f.vx;
+        f.y  += f.vy + Math.sin(f.ph * 0.3) * 0.05;
+
+        // wrap
+        const pad = f.rx * 2;
+        if (f.vx > 0 && f.x > W + pad) f.x = -pad;
+        if (f.vx < 0 && f.x < -pad)    f.x = W + pad;
+        if (f.y > H + f.ry*2) f.y = -f.ry;
+        if (f.y < -f.ry*2)    f.y = H + f.ry;
+
+        // pulse alpha
+        const pulse = 0.5 + Math.sin(f.ph) * 0.5;
+        const alpha = f.baseA * (0.7 + pulse * 0.3);
+
+        let r, g, b;
+        if      (f.hue === 0) { r=50;  g=0;  b=90;  }  // deep purple
+        else if (f.hue === 1) { r=70;  g=0;  b=15;  }  // dark crimson
+        else                  { r=0;   g=22; b=45;  }  // dark teal
+
+        // Draw as stretched radial gradient ellipse
+        cx.save();
+        const scaleY = f.ry / Math.max(1, f.rx);
+        cx.scale(1, scaleY);
+        const fy = f.y / scaleY;
+        const grd = cx.createRadialGradient(f.x, fy, 0, f.x, fy, Math.max(1, f.rx));
+        grd.addColorStop(0,    `rgba(${r},${g},${b},${alpha})`);
+        grd.addColorStop(0.45, `rgba(${r},${g},${b},${alpha * 0.55})`);
+        grd.addColorStop(0.8,  `rgba(${r},${g},${b},${alpha * 0.15})`);
+        grd.addColorStop(1,    `rgba(${r},${g},${b},0)`);
+        cx.fillStyle = grd;
+        cx.beginPath(); cx.arc(f.x, fy, f.rx, 0, TAU); cx.fill();
+        cx.restore();
+      });
+    }
+
+    /* ═══════════════════════════════════════════════════
+       DUST MOTES — tiny floating particles
+    ═══════════════════════════════════════════════════ */
+    let motes = [];
+    function mkMote() {
+      return {
+        x: rnd(0,W), y: rnd(0,H),
+        vx: rnd(-0.05, 0.05), vy: rnd(-0.07, -0.01),
+        r: rnd(0.4, 1.8),
+        ph: rnd(0,TAU), phs: rnd(0.012, 0.035),
+        type: rni(0,3),
+      };
+    }
+    function drawMotes() {
+      motes.forEach(m => {
+        m.ph += m.phs; m.x += m.vx; m.y += m.vy;
+        if (m.y < -5) { m.y = H + 5; m.x = rnd(0, W); }
+        const pulse = 0.3 + Math.sin(m.ph) * 0.7;
+        let r,g,b;
+        if      (m.type===1) { r=0;  g=140; b=180; }
+        else if (m.type===2) { r=70; g=180; b=40;  }
+        else                 { r=50; g=50;  b=70;  }
+        cx.globalAlpha = 0.08 + pulse * 0.2;
+        cx.fillStyle = `rgb(${r},${g},${b})`;
+        cx.beginPath(); cx.arc(m.x, m.y, m.r, 0, TAU); cx.fill();
+        cx.globalAlpha = 1;
+      });
+    }
+
+    /* ═══════════════════════════════════════════════════
+       EYE PAIRS — scattered across the scene
+       Each pair has a fixed anchor so they stay grouped
+    ═══════════════════════════════════════════════════ */
+    let eyePairs = [];
+
+    function buildEyePairs() {
+      eyePairs = [];
+      const MIN_DIST = 110;   // minimum px between pair centres
+      const count    = Math.max(6, Math.round(W / 130));
+      const MAX_TRIES = 60;
+
+      for (let i = 0; i < count; i++) {
+        let x, y, tries = 0, ok = false;
+        while (tries < MAX_TRIES) {
+          x = rnd(0.06, 0.94) * W;
+          y = rnd(0.25, 0.88) * H;
+          // Check distance against all already-placed pairs
+          ok = eyePairs.every(ep => {
+            const dx = ep.cx - x, dy = ep.cy - y;
+            return Math.sqrt(dx*dx + dy*dy) >= MIN_DIST;
+          });
+          if (ok) break;
+          tries++;
+        }
+        // If we ran out of tries just skip — better fewer eyes than overlapping ones
+        if (ok || eyePairs.length === 0) {
+          const ep = mkEyePair(x, y);
+          ep.dormantFor = rni(i * 20, i * 20 + 220);  // staggered wake-up
+          eyePairs.push(ep);
+        }
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════
+       OBSERVER — rare apparition, centred, behind everything
+       Uses ObserverRedFront (iris ring) layered over
+       ObserverRedFrontPupil (slit), both drawn at same pos.
+       Appears only occasionally, very subtly.
+    ═══════════════════════════════════════════════════ */
+    // Observer images — embedded as base64 so they always load
+    const obsIris  = new Image();
+    const obsPupil = new Image();
+    obsIris.src  = 'data:image/png;base64,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';
+    obsPupil.src = 'data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAEAAQADASIAAhEBAxEB/8QAHAABAQADAAMBAAAAAAAAAAAAAAcEBQYBAgMI/8QAPBABAAEDAwICBgYHCQEAAAAAAAECAxEEBRIGIQcTCBQVMTJBIjM1N3a0JThxcnW18CMkNEJRYnSBsbP/xAAZAQEAAwEBAAAAAAAAAAAAAAAAAQQFAwL/xAAzEQEAAgEBBAcFCAMAAAAAAAAAAQIDBAURISJBUXGBkaHBEjEzYbEjMkJDUmKi0XKy4f/aAAwDAQACEQMRAD8A/GQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABHecDc9IbZXue82bNNOYiqPn8/l84Ra0VjfLrhw3zZK46RvmZ3Q1Fyiq3cqoqjE0ziXq6/xU6c1PTvVGr0Wpt+Xds3qrVynlE4qpnE94mf8AT5OQRS8XrFoetVp76bNbFf3xO4AenAAAAAAAAAAAAAAAAAAAAAAAAAAAV70d/wBG7vc6j+t9jabUbt5Hw+d6taqveXy78eXl8eWJxnOJxhIVe6Y+43rj+G6T+YaVX1HGsV65hr7G5c18vTStpjtiOHh7zxK/THhx0jvv1HrGyWbHk/Fx9VmrSZ5ds8vV+eMdueO+MzIVd6c/V4s/iPXfltEkdXxT+0wcJtXqn68TanPTBm6bUj+MzX0eAFhkAAAAAAAAAAAAAAAAAAAAAAAAAAPNPxR+1XOo/wBXi9+I9D+W1qUaKIq1dqJiJia4zEql4rTOn8IujrNiZtWtTuW4V36KPo03ardvSxbmqI+KaYu3Ipmfd5lePinNfLxyUj5z9GvoOXR6m37ax/Kv9HhF91HXP/P2v/561Ltd/jb378/+qT4BVVXbPW2juVTXpp2CNR5NU5o82jV6emi5x93Kmm7cpir3xFdUR8U5nu/U007tfimmKY5e6IKcM1o7JNTz7OwW6ptX6T6sEBYZAAAAAAAAAAAAAAAAAAAAAAAAAADN2O3Rc3WxRXGY5e5RPHi5Xptt6J2mzPHRRs1evi37/wC3u6m7auV5nv3o09mMZxHDMREzMzPen/tex+8oHpA/W9E/hmn87q3C3xq9k+jXw8Nl5ZjpvWO7dad3jEMX0ebtyrxBu7ZNX903HaNfa1dvH1lFvTV6iiM++MXbFqrtMZ44ntMxPJ9Y2rdrfLsW6eMT397qfR3+9XSfw3dP5fqHM9b/AG7d/r5o/P7vUnjsqP8AOf8AWGjAWGQAAAAAAAAAAAAAAAAAAAAAAAAAAz+n/tex+8oHpA/W9E/hmn87q062q7VZ3GxXTETPOI7qV412qdX0X0PvtyZjUza1m2cafg8qxXbvUVY9/KatXciZzjEU4iMTM8L8M1Z+U+jXwc2zM1Y6LVnu5o+sw1vo7/erpP4bun8v1Dmet/t27/Xzdd6PdiinqPfd5iavWNo2HU39PT/kqqu1W9LVFUe+Y4amuYxMfSime8RMTxPVN+u/vN6quKYmJx2RHx57PWS3DZVd/TefKtf7asBYZAAAAAAAAAAAAAAAAAAAAAAAAAAD6aevy79u5jPGqJwq3iBR7U8ENl3HPk+x95r0/D4vO9bs8s57ceHqeMd8+Z8uPeTROJiVdvx7X8AN5sab6FW26/Rbpem52iq1HmabjTjOaueqtzicRiKu+YiJr5uF6T8/Rr7O5tNqcf7YnwtE+Ub2J4IWvU+lut9/5c8aTTbV5OMfX3ZveZy/2+p8eOO/mZzHHEzfd7vnblfuceOapjGcqf4cUTtvgt1Fr7+KrW7bvYsWIo71U1aWzcquTVnGImNXb44znFecYjMq1VcXNTcrjOKqpmMmPjlvPZBq+TQaekdPtW892/wjyfIBYZAAAAAAAAAAAAAAAAAAAAAAAAAAAr3h9+lvC3rHZNN9DUX9mqvU1XO1EU6W7b1VyJmMzmaLFcR271TTE4jMxIVL8BN80W1dXaP2pzu6GbsU6qx2mm9Yq+jctzTVMRVTVTNVM0z2mJmJ7S4aj7ntdXFrbGmJ1E4p/HE18Y3R5tnYj2R4AbNY1P06ty1+t3SzNvvFNqfL03GrOMVc9LcnEZjE098zMRIpnMzKr+N+q0232du6Z0mos107ToNPoKvVK4nT13bdumL9y3j3013fMr5YiaprmqYzMpOjT8Ym/XP/ABO1/s7Y9P8AorET2zzTHdMyALDIAAAAAAAAAAAAAAAAAAAAAAAAAAGTtmqr0Wtt6iiqY4z3xPyYwTG9NbTWYmGz6k3G5uW63b9dc1RynEzOf+/fLWAiIiI3Q9ZMlst5vad8yAJeAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH//Z';
+
+    // State machine: cooldown → fading-in → visible → fading-out → cooldown
+    // Cooldown: 10–30s random. Size: 80–100% of smallest screen dimension.
+    const OBS = {
+      state:       'cooldown',
+      alpha:       0,          // 0..1 internal
+      life:        0,
+      cooldownFor: 0,          // set in resetObs()
+      visibleFor:  0,
+      size:        0,
+    };
+
+    function resetObs() {
+      // 10–30 seconds at 60fps = 600–1800 frames
+      OBS.cooldownFor = rni(600, 1800);
+      OBS.visibleFor  = rni(240, 480);   // 4–8s visible
+      // Large: 80%–100% of the smaller screen dimension
+      OBS.size        = Math.min(W, H) * rnd(0.80, 1.00);
+      OBS.life        = 0;
+    }
+    resetObs();  // initialise on load
+
+    function updateObserver() {
+      OBS.life++;
+      // Fade speed: reach alpha=1 in ~1.5s (90 frames)
+      const FADE_IN  = 1 / 90;
+      const FADE_OUT = 1 / 120;
+
+      if (OBS.state === 'cooldown') {
+        if (OBS.life >= OBS.cooldownFor) {
+          OBS.state = 'fading-in';
+          OBS.life  = 0;
+          OBS.size  = Math.min(W, H) * rnd(0.80, 1.00);
+        }
+
+      } else if (OBS.state === 'fading-in') {
+        OBS.alpha = Math.min(1, OBS.alpha + FADE_IN);
+        if (OBS.alpha >= 1) { OBS.state = 'visible'; OBS.life = 0; }
+
+      } else if (OBS.state === 'visible') {
+        // Gentle breathing pulse
+        OBS.alpha = 1 + Math.sin(OBS.life * 0.018) * 0.06;
+        if (OBS.life >= OBS.visibleFor) { OBS.state = 'fading-out'; OBS.life = 0; }
+
+      } else if (OBS.state === 'fading-out') {
+        OBS.alpha = Math.max(0, OBS.alpha - FADE_OUT);
+        if (OBS.alpha <= 0) {
+          OBS.state = 'cooldown';
+          resetObs();
+        }
+      }
+    }
+
+    function drawObserver() {
+      if (OBS.alpha <= 0.005) return;
+      // Visible alpha is subtle: max 0.30 so it never dominates
+      const drawA = clamp(OBS.alpha, 0, 1) * 0.30;
+      const s  = OBS.size;
+      const px = W * 0.5 - s * 0.5;
+      const py = H * 0.5 - s * 0.5;
+
+      cx.save();
+      cx.globalAlpha = drawA;
+      if (obsIris.complete  && obsIris.naturalWidth)  cx.drawImage(obsIris,  px, py, s, s);
+      if (obsPupil.complete && obsPupil.naturalWidth) cx.drawImage(obsPupil, px, py, s, s);
+      cx.restore();
+    }
+
+    /* ═══════════════════════════════════════════════════
+       BUILD / RESIZE
+    ═══════════════════════════════════════════════════ */
+    function build() {
+      // Scene objects
+      sceneObjects = OBJ_TYPES.map((_, i) => ({ ...mkSceneObj(), type: OBJ_TYPES[i] }));
+      while (sceneObjects.length < 14) sceneObjects.push(mkSceneObj());
+      sceneObjects.sort((a,b) => a.y - b.y);
+
+      // Fog — 3 layers
+      fogLayers = [];
+      for (let i=0; i<10; i++) fogLayers.push(mkFogWisp(0));  // big background wisps
+      for (let i=0; i<14; i++) fogLayers.push(mkFogWisp(1));  // mid patches
+      for (let i=0; i<10; i++) fogLayers.push(mkFogWisp(2));  // thin foreground
+
+      // Motes
+      motes = Array.from({length: 100}, mkMote);
+
+      // Eye pairs
+      buildEyePairs();
+    }
+
+    function resize() {
+      W = cv.width  = window.innerWidth;
+      H = cv.height = window.innerHeight;
+      build();
+    }
+    window.addEventListener('resize', resize);
+
+    /* ═══════════════════════════════════════════════════
+       MAIN LOOP
+    ═══════════════════════════════════════════════════ */
+    function loop() {
+      T++;
+
+      // ── BASE VOID ──
+      cx.fillStyle = '#01000a';
+      cx.fillRect(0, 0, W, H);
+
+      // ── OBSERVER — rare, centred, behind everything including fog ──
+      updateObserver();
+      drawObserver();
+
+      // Faint blue gradient at top
+      const topGrd = cx.createLinearGradient(0, 0, 0, H * 0.5);
+      topGrd.addColorStop(0, 'rgba(2,8,22,0.65)');
+      topGrd.addColorStop(1, 'rgba(0,0,0,0)');
+      cx.fillStyle = topGrd;
+      cx.fillRect(0, 0, W, H);
+
+      // ── FOG ──
+      drawFogLayer();
+
+      // ── MOTES ──
+      drawMotes();
+
+      // ── EYE GLOW (behind scenery) ──
+      eyePairs.forEach(ep => {
+        updatePair(ep);
+        drawPair(ep, true);
+      });
+
+      // ── SCENERY ──
+      sceneObjects.forEach(obj => {
+        obj.type.draw(cx, obj.x, obj.y, obj.sc, obj.a);
+      });
+
+      // ── EYE PUPILS (on top of scenery) ──
+      eyePairs.forEach(ep => {
+        drawPair(ep, false);
+      });
+
+      // ── VIGNETTE ──
+      const minD = Math.max(0.1, Math.min(W, H) * 0.12);
+      const maxD = Math.max(0.1, Math.max(W, H) * 0.75);
+      const vig  = cx.createRadialGradient(W*.5, H*.5, minD, W*.5, H*.5, maxD);
+      vig.addColorStop(0, 'rgba(0,0,0,0)');
+      vig.addColorStop(1, 'rgba(0,0,8,0.85)');
+      cx.fillStyle = vig;
+      cx.fillRect(0, 0, W, H);
+
+      requestAnimationFrame(loop);
+    }
+
+    resize();
+    loop();
+  })();
   </script>
 </body>
 </html>
