@@ -53,7 +53,7 @@ Each portal unlocks a new Stranger region. The eclipse lets you go deeper in *an
 
 ## The Hidden Deep Portal
 
-A portal exists deep underground — below the lab's deepest floor or beneath the Black Lake bed (pick one — TBD). Its coordinates are not in any scientist's published logs. Finding them requires:
+A portal exists deep underground — in The Depths, where BM concentration is highest and oldest. Its coordinates are not in any scientist's published logs. Finding them requires:
 
 1. Learning that custom coordinates are possible (from teleporter research logs)
 2. Finding partial coordinates in The Stranger itself — a frozen screen in a mid-game zone, meaning you had to already be inside to get the clue to go deeper

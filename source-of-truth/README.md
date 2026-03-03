@@ -39,7 +39,7 @@
 | `areas/island.md` | The Island surface, Black Lake, eclipse threshold |
 | `areas/laboratory.md` | All lab floors, Aquarium, Floor 3 quarantine |
 | `areas/energy_facility.md` | Energy Facility, Extraction Corridor, Mining Sites |
-| `areas/depths.md` | Depths Chamber, Last Abyss, deep portal location |
+| `areas/depths.md` | **The Depths** (PE's portal, Shadow boss) and **The Last Abyss** (BM Seed, Dark Duck upgrade) — two distinct areas |
 | `areas/internull.md` | The Other Dimension, Teleporter Spheres, two-axis destination system |
 | `areas/the_stranger.md` | The Stranger planet, eclipse, zone types, visual design, core ending |
 | `areas/observatory.md` | Observatory location, PE's fate, ending structure role |
@@ -74,6 +74,7 @@
 | `areas/internull.md` | `mechanics/black_matter.md`, `mechanics/sleep.md`, `upgrades.md`, `areas/the_stranger.md` |
 | `areas/the_stranger.md` | `areas/internull.md`, `duck_lore.md`, `areas/observatory.md` |
 | `areas/observatory.md` | `scientists.md`, `duck_lore.md`, `areas/the_stranger.md` |
+| `upgrades.md` | `areas/depths.md` (Dark Duck — BM Seed), `duck_lore.md` |
 
 ---
 

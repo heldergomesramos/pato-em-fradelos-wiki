@@ -26,7 +26,6 @@
 - **BM Spitter** — does it make the final design? Overlaps with Sleep mechanic's "sink through BM" function.
 - **Mid-game Stranger blocker** — what specifically prevents deeper progress before the player has the coordinates? Needs a concrete design.
 - **Black Lake interior** — what else is in there beyond the keycard room? What makes it worth returning to?
-- **Conceal / Turning Black mechanic** — the upgrade concept is set aside. Needs a dedicated design session to find a version that works: side effect, environmental interaction, or emergent from existing systems.
 - **Observation shadow puzzles** — BM vanishes when off-screen; design puzzles where controlling which part of a structure is observed sculpts geometry with camera position. No specific puzzle designed yet.
 - **Self-observation paradox room** — Pofinho's reflection counts as observation, locking his BM form in a specific state. Removing the reflection changes what he can do. Candidate mechanic, not yet designed.
 - **Eclipse timing chains** — set up a chain reaction before eclipse, watch it execute during the window. Predict rather than react. Candidate mechanic.
@@ -60,4 +59,5 @@ _Items resolved this session:_
 - **Intro sequence** → Not gameplay. ~30 seconds. BM gathering in darkness, shape forming, gold locking in. Player gains control at coalescence. The Stranger does not appear — discovered during the first eclipse on the surface. See `duck_lore.md` (respawn animation section).
 - **Eclipse as gameplay mechanic** → Yes, confirmed: BM vanishes during eclipse (traversal tool) AND The Stranger reaches zenith (depth key). Double function. See `areas/the_stranger.md`.
 - **The Stranger visibly growing during normal play** → No. Removed. Stable to the naked eye. PE's instruments detect the slow growth. See `areas/the_stranger.md`.
+- **Conceal / Turning Black mechanic** → Dark Duck. Confirmed. Acquired by touching the BM Seed at the bottom of the Last Abyss. Q key toggle, suppresses internal light, hard limitation: no Gloamvine Core while active. See `upgrades.md` and `areas/depths.md`.
 - **Hidden portal location** → The Depths. See `areas/depths.md`.

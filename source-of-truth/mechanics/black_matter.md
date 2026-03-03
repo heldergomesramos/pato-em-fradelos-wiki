@@ -4,6 +4,18 @@
 
 ---
 
+## BM Visual Rules
+
+> These rules define how BM looks — critical for consistent art direction.
+
+- BM is rendered as **pure solid black** (0 light value). No color, no gradient, no texture inside.
+- BM is identified by its **borders** — rough, spilly/liquid-looking edges where it meets the non-BM environment. Think ink spilling outward. These borders have remnants and drips of BM bleeding into the surrounding area.
+- In **lit environments**: borders are clearly visible, BM reads instantly as a solid material.
+- In **dark environments**: borders are still faintly present on walls/surfaces but unreliable. You genuinely can't always tell where BM ends. This ambiguity is intentional — it serves the vanishing principle.
+- The border treatment IS the visual identity of BM. Do not add color, glow, or gradient to BM itself.
+
+---
+
 ## Core Properties
 
 | Property | Detail |
@@ -20,15 +32,27 @@
 
 ## The Vanishing Principle
 
-BM only exists and is solid when being observed. When unobserved it disappears — not destroyed, but relocated to The Stranger (what the scientists called "Internull" before understanding what The Stranger was).
+**BM exists if and only if a conscious observer perceives it.** This is the complete rule. Not physics, not photons hitting retinas — conscious perception.
 
-**What counts as "observed":** What is visible on the player's screen. Not the duck's in-world line of sight. This distinction is intentional and central to puzzle design.
+The player's screen represents Pofinho's conscious perception. The 2D framing is a natural fit, not a workaround. “What is on screen” is a proxy for “what Pofinho consciously perceives.”
+
+**What counts as “observed”:** Conscious perception. The player's screen is the representation of this, not the mechanism itself.
 
 **Conditions that cause BM to vanish:**
-- Off-screen
-- In complete darkness
+- Off-screen (out of conscious perception range)
+- In complete darkness — **not because of darkness itself**, but because of **indistinguishability**: black BM against a black background cannot be perceived and distinguished from the background, so it vanishes. The mechanism is indistinguishability, not darkness.
 - Player looks away (camera pans)
+- A blind person with eyes open: cannot perceive BM → it vanishes for them
+- A person cognitively unable to process visual information: BM vanishes regardless of lighting
 - Certain angles where BM vanishes even under light (angle-based observation — TBD full rules)
+
+**Why two observers prevents vanishing:** BM exists if *any* conscious observer perceives it. Both must stop perceiving it for it to vanish.
+
+**Why Pofinho never vanishes:** His consciousness IS the observation. His self-awareness observes him into existence. Other BM has no consciousness and depends entirely on external observers. He is the only BM entity that observes itself.
+
+**Why deep ocean BM is the real threat:** Not just darkness — the complete absence of conscious observers. Nothing in the deep ocean has the cognitive complexity to truly perceive BM. It spreads freely because nothing down there is conscious enough to collapse it back. This reframes the ocean threat as a consciousness problem, not just a light problem.
+
+When unobserved, BM disappears — not destroyed, but relocated to The Stranger (what the scientists called “Internull” before understanding what The Stranger was).
 
 → See `mechanics/observation.md` for full camera and screen rules.
 → See `areas/internull.md` for Internull / The Stranger relationship.
@@ -70,10 +94,19 @@ This is why Pofinho matters — the only surviving entity with both the knowledg
 
 ## Light & BM Interaction
 
-- BM absorbs **all** external light — nothing penetrates from outside
-- Light generated **from within** BM is visible from the outside (fireflies, Gloamvine Core balls, creature bioluminescence)
-- BM **stores** absorbed light energy — this stored energy is what the Black Matter Generator harvests
-- The Gloamvine Core's light is strong enough to illuminate BM interiors and reveal hidden contents (roots, creatures)
+**The core rule:** BM absorbs all incoming external light. It does not reflect it — which is why BM appears black; no light bounces back to your eyes from its surface. The absorbed light is stored internally (this is what the BM Generator harvests).
+
+**Light from internal sources exits freely.** Fireflies, Gloamvine Core balls, creature bioluminescence — anything generating its own light from inside BM — is visible from outside. The absorption is inward only. This is why an entire ecosystem can exist inside BM and be perceived externally.
+
+**The Gloamvine Core reveals roots** by injecting a powerful light source into the BM. Once inside, it illuminates the roots, and the reflected light exits back outward to the player's eyes. Without the Core, roots are invisible — not because BM blocks the view, but because there is no light source inside to reflect off them. Ordinary ambient light enters BM but gets absorbed before reflecting off anything. The Core is powerful enough that secondary reflections escape.
+
+**This is NOT a contradiction.** Seeing a glow emanating from a black mass does not make the mass invisible or transparent. BM is still perceived, still solid, still present.
+
+Summary:
+- BM absorbs **all** external light — nothing reflects back from its surface
+- Light generated **from within** BM is visible from outside (fireflies, Gloamvine Core balls, creature bioluminescence)
+- BM **stores** absorbed light energy — harvested by the BM Generator
+- The Gloamvine Core is powerful enough to generate secondary reflections that escape outward
 
 ---
 

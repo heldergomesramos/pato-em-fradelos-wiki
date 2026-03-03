@@ -74,19 +74,20 @@ The observation mechanic is the philosophical spine. BM only exists when watched
 | Gloamvine Core | Shoots light from within — BM internal light is visible externally |
 | Three tongues | BM modification artifact — TBD |
 | Stranger access | Self-observing nature makes him compatible with Stranger environments |
+| Dark Duck (Q) | Touching the BM Seed at the bottom of the Last Abyss; the origin of all BM responds to the only conscious BM entity |
 
 ---
 
-## Turning Black — Unresolved Design
+## Dark Duck — Confirmed Upgrade
 
-The old Conceal upgrade (actively turn black, become undetectable) is set aside. Better directions to explore:
-- Turning black as a **side effect** of something else — spending too long inside BM zones, stabilizer ore degrading temporarily
-- Turning black as an **environmental interaction** — a specific substance or area causes it
-- Keeping the concept (Pofinho can revert to raw BM) but finding a mechanic that earns it through gameplay
+At the bottom of the **Last Abyss**, beneath all designed zones, lies the **BM Seed** — the origin point of all Black Matter on the island and on Earth. Touching it unlocks the **Dark Duck** toggle.
 
-**Status: unresolved. Needs a dedicated design session.**
+This is not a designed mechanism. It happens naturally: the only self-observing BM entity in existence makes contact with the source of all BM, and something in his nature responds. Full control of the matter inside him.
 
-→ See `upgrades.md`
+**Toggled with Q.** Suppresses his internal light entirely. Allows moving through BM that his light would otherwise make solid and visible to him. Hard limitation: cannot use Gloamvine Core while active — internal light is fully suppressed. Forces meaningful choice in puzzles.
+
+→ See `upgrades.md` for full Dark Duck mechanics  
+→ See `areas/depths.md` for the Last Abyss and BM Seed location
 
 ---
 
