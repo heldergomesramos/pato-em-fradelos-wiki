@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="en">
 <head>
   <link rel="icon" type="image/png" href="../favicon.ico">
   <link rel="shortcut icon" href="../favicon.ico">
   <meta charset="UTF-8">  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Skills — Pato em Fradelos</title>
+  <title>Skills — Duck in Fradelos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/global.css">
@@ -12,7 +12,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --nav-h: 61px;
+      --nav-h: 56px;
       --bg: #060a0f;
       --border: #1a2a3a;
       --text: #c8d8e8;
@@ -42,10 +42,11 @@
       top: 0; left: 0; right: 0;
       z-index: 1000;
       height: var(--nav-h);
-      background: rgba(6,10,15,0.97);
+      background: rgba(6,10,15,0.95);
       backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
-      padding: 0 40px;
+      padding: 0 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -54,44 +55,55 @@
     .navbar__logo {
       font-family: 'Orbitron', monospace;
       font-weight: 900;
-      font-size: 1.1rem;
-      letter-spacing: 0.3em;
+      font-size: 0.85rem;
+      letter-spacing: 0.25em;
       color: #fff;
       text-decoration: none;
+      white-space: nowrap;
     }
 
     .navbar__logo span { color: var(--accent); }
 
     .navbar__links {
       display: flex;
+      align-items: center;
+      gap: 2px;
       list-style: none;
-      gap: 36px;
     }
 
     .navbar__links a {
+      display: block;
+      padding: 8px 14px;
       font-size: 0.72rem;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: var(--dim);
       text-decoration: none;
+      color: var(--dim);
       position: relative;
-      transition: color 0.3s;
+      transition: color 0.2s ease;
+      white-space: nowrap;
     }
 
     .navbar__links a::after {
       content: '';
       position: absolute;
-      bottom: -4px; left: 0; right: 0;
-      height: 1px;
+      bottom: 0; left: 14px; right: 14px;
+      height: 2px;
       background: var(--accent);
       transform: scaleX(0);
-      transition: transform 0.3s;
+      transform-origin: right;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 1px;
     }
 
-    .navbar__links a:hover { color: #c8d8e8; }
+    .navbar__links a:hover,
+    .navbar__links a.active { color: #fff; }
+
     .navbar__links a:hover::after,
-    .navbar__links a.active::after { transform: scaleX(1); }
-    .navbar__links a.active { color: #c8d8e8; }
+    .navbar__links a.active::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
 
     .navbar__hamburger {
       display: none;
@@ -106,8 +118,10 @@
     .navbar__hamburger span {
       display: block;
       width: 22px;
-      height: 1px;
-      background: var(--text);
+      height: 2px;
+      background: var(--dim);
+      border-radius: 1px;
+      transition: all 0.3s ease;
     }
 
     .navbar__mobile-menu {
@@ -117,24 +131,35 @@
       left: 0; right: 0;
       background: rgba(6,10,15,0.98);
       border-bottom: 1px solid var(--border);
-      padding: 20px 40px;
+      padding: 12px 0;
       flex-direction: column;
-      gap: 20px;
       z-index: 999;
     }
 
+    .navbar__mobile-menu.open { display: flex; }
+
     .navbar__mobile-menu a {
-      font-size: 0.75rem;
+      display: block;
+      padding: 14px 24px;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: var(--dim);
       text-decoration: none;
+      color: var(--dim);
+      border-left: 2px solid transparent;
+      transition: all 0.2s ease;
     }
 
-    .navbar__mobile-menu a.active { color: var(--text); }
+    .navbar__mobile-menu a:hover,
+    .navbar__mobile-menu a.active {
+      color: #fff;
+      border-left-color: var(--accent);
+      background: rgba(255,255,255,0.03);
+    }
 
     @media (max-width: 768px) {
-      .navbar { padding: 0 20px; }
+      .navbar { padding: 0 16px; }
+      .navbar__logo { font-size: 0.75rem; }
       .navbar__links { display: none; }
       .navbar__hamburger { display: flex; }
     }
@@ -276,7 +301,7 @@
     }
 
     .skill-demo::before {
-      content: 'DEMONSTRAÇÃO';
+      content: 'DEMO';
       position: absolute;
       top: 12px; left: 14px;
       font-size: 0.5rem;
@@ -883,34 +908,34 @@
   <nav class="navbar">
     <a href="../index.html" class="navbar__logo">PATO <span>//</span> FRADELOS</a>
     <ul class="navbar__links">
-      <li><a href="../index.html">Início</a></li>
-      <li><a href="maps.html">Mapas</a></li>
-      <li><a href="entities.html">Entidades</a></li>
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="maps.html">Maps</a></li>
+      <li><a href="entities.html">Entities</a></li>
       <li><a href="skills.html" class="active">Skills</a></li>
       <li><a href="lore.html">Lore</a></li>
-      <li><a href="video.html">Vídeo</a></li>
-      <li><a href="team.html">Equipa</a></li>
+      <li><a href="video.html">Video</a></li>
+      <li><a href="team.html">Team</a></li>
     </ul>
-    <button class="navbar__hamburger" aria-label="Abrir menu">
+    <button class="navbar__hamburger" aria-label="Open menu">
       <span></span><span></span><span></span>
     </button>
   </nav>
   <div class="navbar__mobile-menu">
-    <a href="../index.html">Início</a>
-    <a href="maps.html">Mapas</a>
-    <a href="entities.html">Entidades</a>
+    <a href="../index.html">Home</a>
+    <a href="maps.html">Maps</a>
+    <a href="entities.html">Entities</a>
     <a href="skills.html" class="active">Skills</a>
     <a href="lore.html">Lore</a>
-    <a href="video.html">Vídeo</a>
-    <a href="team.html">Equipa</a>
+    <a href="video.html">Video</a>
+    <a href="team.html">Team</a>
   </div>
 
   <!-- ── HEADER ── -->
   <header class="page-header">
-    <div class="page-header__tag">// Sistema de Movimentação //</div>
+    <div class="page-header__tag">// Movement System //</div>
     <h1 class="page-header__title">Skills</h1>
     <p class="page-header__desc">
-      O Pato dispõe de um conjunto de habilidades únicas que definem o seu estilo de jogo. Cada skill abre novas possibilidades de exploração e combate.
+      The Duck has a unique set of abilities that define its playstyle. Each skill opens new possibilities for exploration and combat.
     </p>
   </header>
 
@@ -922,14 +947,14 @@
       <div class="skill-info">
         <div class="skill-number">SKILL_01</div>
         <div class="skill-name">Dash</div>
-        <div class="skill-subtitle">Impulso Rápido Horizontal</div>
+        <div class="skill-subtitle">Quick Horizontal Burst</div>
         <p class="skill-desc">
-          Um disparo de energia que propulsa o Pato numa direcção em fracção de segundo. Enquanto em dash, o Pato torna-se brevemente intangível — projécteis e ataques atravessam-no sem causar dano. Essencial para esquivar, reposicionar e alcançar plataformas distantes.
+          An energy burst that propels the Duck in a direction in a fraction of a second. While dashing, the Duck briefly becomes intangible — projectiles and attacks pass through without dealing damage. Essential for dodging, repositioning, and reaching distant platforms.
         </p>
         <div class="skill-tags">
-          <span class="skill-tag">Movimento</span>
-          <span class="skill-tag">Invencível</span>
-          <span class="skill-tag">Recarrega no Chão</span>
+          <span class="skill-tag">Movement</span>
+          <span class="skill-tag">Invincible</span>
+          <span class="skill-tag">Recharges on Ground</span>
         </div>
       </div>
       <div class="skill-demo" id="demo-dash">
@@ -950,7 +975,7 @@
         <!-- Input hint -->
         <div class="input-indicator">
           <div class="key-btn">SHIFT</div>
-          <div class="key-label">+ direcção</div>
+          <div class="key-label">+ direction</div>
         </div>
       </div>
     </div>
@@ -959,14 +984,14 @@
     <div class="skill-card" id="skill-wall">
       <div class="skill-info">
         <div class="skill-number">SKILL_02</div>
-        <div class="skill-name">Slide na Parede</div>
+        <div class="skill-name">Wall Slide</div>
         <div class="skill-subtitle">Wall Slide + Wall Jump</div>
         <p class="skill-desc">
-          Ao aproximar-se de uma parede em queda, o Pato agarra automaticamente e desliza lentamente para baixo em vez de cair. A partir desta posição, é possível saltar com impulso total na direcção contrária, ganhando altitude para alcançar plataformas superiores ou encadear movimentos.
+          When approaching a wall while falling, the Duck automatically grabs it and slides slowly downward instead of dropping. From this position, you can jump with full momentum in the opposite direction, gaining altitude to reach higher platforms or chain movements.
         </p>
         <div class="skill-tags">
-          <span class="skill-tag">Plataformas</span>
-          <span class="skill-tag">Escalar</span>
+          <span class="skill-tag">Platforming</span>
+          <span class="skill-tag">Climbing</span>
           <span class="skill-tag">Wall Jump</span>
         </div>
       </div>
@@ -989,7 +1014,7 @@
 
         <div class="input-indicator">
           <div class="key-btn">↑</div>
-          <div class="key-label">ao tocar a parede</div>
+          <div class="key-label">when touching the wall</div>
         </div>
       </div>
     </div>
@@ -998,16 +1023,16 @@
     <div class="skill-card" id="skill-plant">
       <div class="skill-info">
         <div class="skill-number">SKILL_03</div>
-        <div class="skill-name">Planta Roxa</div>
-        <div class="skill-subtitle">Projéctil de Gloamvine</div>
+        <div class="skill-name">Purple Plant</div>
+        <div class="skill-subtitle">Gloamvine Projectile</div>
         <p class="skill-desc">
-          O Pato lança uma semente concentrada de Gloamvine carregada com Black Matter. Ao atingir uma superfície ou inimigo, a semente explode em vinhas que enredam e imobilizam temporariamente. Criaturas presas ficam vulneráveis a ataques adicionais com dano aumentado.
+          The Duck launches a concentrated Gloamvine seed charged with Black Matter. Upon hitting a surface or enemy, the seed explodes into vines that entangle and temporarily immobilise targets. Trapped creatures become vulnerable to follow-up attacks with increased damage.
         </p>
         <div class="skill-tags">
-          <span class="skill-tag">Projéctil</span>
-          <span class="skill-tag">Enreda Inimigos</span>
+          <span class="skill-tag">Projectile</span>
+          <span class="skill-tag">Entangles Enemies</span>
           <span class="skill-tag">Black Matter</span>
-          <span class="skill-tag">Dano Aumentado</span>
+          <span class="skill-tag">Increased Damage</span>
         </div>
       </div>
       <div class="skill-demo" id="demo-plant">
@@ -1032,7 +1057,7 @@
 
         <div class="input-indicator">
           <div class="key-btn">E</div>
-          <div class="key-label">lançar planta</div>
+          <div class="key-label">throw plant</div>
         </div>
       </div>
     </div>
@@ -1041,15 +1066,15 @@
     <div class="skill-card" id="skill-shadow">
       <div class="skill-info">
         <div class="skill-number">SKILL_04</div>
-        <div class="skill-name">Regresso à Sombra</div>
-        <div class="skill-subtitle">Shadow Recall — Teleporte</div>
+        <div class="skill-name">Shadow Recall</div>
+        <div class="skill-subtitle">Shadow Recall — Teleport</div>
         <p class="skill-desc">
-          O Pato pode marcar um ponto de sombra no mapa. A qualquer momento, com um toque, regressa instantaneamente a esse ponto — atravessando paredes, inimigos e perigos sem interacção. A sombra fica visível no chão como marcador roxo. Ideal para escapar de situações críticas ou reposicionar estrategicamente.
+          The Duck can mark a shadow point on the map. At any moment, with a single press, it instantly returns to that point — phasing through walls, enemies, and hazards without interaction. The shadow appears on the ground as a purple marker. Ideal for escaping critical situations or repositioning strategically.
         </p>
         <div class="skill-tags">
-          <span class="skill-tag">Teleporte</span>
-          <span class="skill-tag">Atravessa Paredes</span>
-          <span class="skill-tag">Marcador</span>
+          <span class="skill-tag">Teleport</span>
+          <span class="skill-tag">Phases Through Walls</span>
+          <span class="skill-tag">Marker</span>
           <span class="skill-tag">Escape</span>
         </div>
       </div>
@@ -1077,7 +1102,7 @@
 
         <div class="input-indicator">
           <div class="key-btn">Q</div>
-          <div class="key-label">marcar / teleportar</div>
+          <div class="key-label">mark / teleport</div>
         </div>
       </div>
     </div>
@@ -1086,16 +1111,16 @@
     <div class="skill-card" id="skill-glide">
       <div class="skill-info">
         <div class="skill-number">SKILL_05</div>
-        <div class="skill-name">Planar</div>
-        <div class="skill-subtitle">Glide Aéreo</div>
+        <div class="skill-name">Glide</div>
+        <div class="skill-subtitle">Aerial Glide</div>
         <p class="skill-desc">
-          O Pato desdobra as asas e plana pelo ar, mantendo altitude e controlando a descida com precisão. Enquanto planando, a queda é extremamente lenta e o Pato pode atravessar grandes distâncias horizontais. Permite alcançar plataformas que seriam impossíveis com salto normal e encadear com dash no ar.
+          The Duck spreads its wings and glides through the air, maintaining altitude and controlling the descent with precision. While gliding, the fall is extremely slow and the Duck can travel great horizontal distances. Allows reaching platforms that would be impossible with a normal jump, and can be chained with an aerial dash.
         </p>
         <div class="skill-tags">
-          <span class="skill-tag">Aéreo</span>
-          <span class="skill-tag">Controlo de Queda</span>
-          <span class="skill-tag">Distância</span>
-          <span class="skill-tag">Combo com Dash</span>
+          <span class="skill-tag">Aerial</span>
+          <span class="skill-tag">Fall Control</span>
+          <span class="skill-tag">Distance</span>
+          <span class="skill-tag">Combo with Dash</span>
         </div>
       </div>
       <div class="skill-demo" id="demo-glide">
@@ -1117,7 +1142,7 @@
 
         <div class="input-indicator">
           <div class="key-btn">ESPAÇO</div>
-          <div class="key-label">segurar no ar</div>
+          <div class="key-label">hold in the air</div>
         </div>
       </div>
     </div>
@@ -1131,8 +1156,7 @@
   const mobileMenu = document.querySelector('.navbar__mobile-menu');
   if (hamburger && mobileMenu) {
     hamburger.addEventListener('click', () => {
-      const open = mobileMenu.style.display === 'flex';
-      mobileMenu.style.display = open ? 'none' : 'flex';
+      mobileMenu.classList.toggle('open');
     });
   }
 

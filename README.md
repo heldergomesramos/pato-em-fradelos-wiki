@@ -1,103 +1,103 @@
-# Pato em Fradelos 🐤
+# Duck in Fradelos 🐤
 
-Um jogo de plataformas 2D + website oficial do Projecto ORBIS.
+A 2D platformer + official website of the ORBIS Project.
 
-## 📋 Sobre
+## 📋 About
 
-**Pato em Fradelos** é um jogo experimental onde o que observas determina o que existe. A matéria negra desaparece quando não é observada — e algo lá dentro está a observar de volta.
+**Duck in Fradelos** is an experimental game where what you observe determines what exists. Dark matter disappears when not observed — and something inside is watching back.
 
 ### Website Features
-- 🎮 Página principal com hero section
-- 🗺️ Galeria de mapas (6 zonas do jogo)
-- 👾 Catálogo de entidades (criaturas classificadas por perigo)
-- 📖 Lore completa do universo
-- 🎬 Página de trailer
-- 👥 Equipa e créditos
+- 🎮 Main page with hero section
+- 🗺️ Map gallery (6 game zones)
+- 👾 Entity catalog (creatures classified by danger)
+- 📖 Complete story lore
+- 🎬 Trailer page
+- 👥 Team and credits
 
-## 🏗️ Estrutura do Projeto
+## 🏗️ Project Structure
 
 ```
 ├── css/
-│   ├── global.css        # Estilos globais, variáveis, tipografia
-│   └── index.css         # Estilos da página principal
+│   ├── global.css        # Global styles, variables, typography
+│   └── index.css         # Main page styles
 ├── js/
-│   └── main.js           # Funcionalidades (navegação, animações)
+│   └── main.js           # Features (navigation, animations)
 ├── pages/
-│   ├── maps.html         # Página de mapas
-│   ├── entities.html     # Catálogo de entidades
-│   ├── lore.html         # Narrativa
+│   ├── maps.html         # Maps page
+│   ├── entities.html     # Entity catalog
+│   ├── lore.html         # Narrative
 │   ├── video.html        # Trailer
-│   └── team.html         # Equipa
-├── index.html            # Página principal
+│   └── team.html         # Team
+├── index.html            # Main page
 └── README.md
 ```
 
 ## 🎨 Design
 
-- **Tema**: Cyberpunk/Sci-Fi escuro
-- **Cores Principais**: Cyan (#00ccff), Roxo (#ce93d8), Vermelho (#ff1a4a)
-- **Fontes**: Orbitron (títulos), Share Tech Mono (corpo)
-- **Efeitos**: Scanlines, animações suaves, grid background
+- **Theme**: Dark Cyberpunk/Sci-Fi
+- **Main Colors**: Cyan (#00ccff), Purple (#ce93d8), Red (#ff1a4a)
+- **Fonts**: Orbitron (titles), Share Tech Mono (body)
+- **Effects**: Scanlines, smooth animations, grid background
 
-## 🚀 Como Usar
+## 🚀 How to Use
 
-1. **Abrir localmente**: Abre `index.html` no teu browser
-2. **Navegar**: Usa a navbar para explorar as diferentes páginas
-3. **Menu Mobile**: Em dispositivos pequenos, clica no ≡ para abrir o menu
+1. **Open locally**: Open `index.html` in your browser
+2. **Navigate**: Use the navbar to explore the different pages
+3. **Mobile Menu**: On small devices, click the ≡ to open the menu
 
-## 📱 Responsivo
+## 📱 Responsive
 
-O site adapta-se perfeitamente a:
+The site adapts perfectly to:
 - 💻 Desktop (1920px+)
 - 📱 Tablet (768px - 1024px)
 - 📲 Mobile (< 768px)
 
-## 🔧 Tecnologia
+## 🔧 Technology
 
-- HTML5 Semântico
-- CSS3 (Grid, Flexbox, Animações)
-- JavaScript Vanilla (sem dependências)
-- Fonts do Google: Orbitron, Share Tech Mono
+- Semantic HTML5
+- CSS3 (Grid, Flexbox, Animations)
+- Vanilla JavaScript (no dependencies)
+- Google Fonts: Orbitron, Share Tech Mono
 
-## 📚 Mapas do Jogo
+## 📚 Game Maps
 
-1. 🌳 **Floresta Verde** - Zona inicial segura
-2. ⛏️ **Minas Profundas** - Primeiros sinais de Black Matter
-3. 🤖 **Research Facility** - Estrutura robótica abandonada
-4. 🔬 **Laboratório ORBIS** - Base de operações
-5. 🌊 **The Aquarium** - Câmara de observação
-6. 🌑 **Depths Chamber** - Zona não documentada
+1. 🌳 **Green Forest** - Safe starting zone
+2. ⛏️ **Deep Mines** - First signs of Black Matter
+3. 🤖 **Research Facility** - Abandoned robotic structure
+4. 🔬 **ORBIS Laboratory** - Operations base
+5. 🌊 **The Aquarium** - Observation chamber
+6. 🌑 **Depths Chamber** - Undocumented zone
 
-## 👾 Entidades Catalogadas
+## 👾 Catalogued Entities
 
-- 🕷️ **Lurker** - Criatura predadora (Perigo: 3/5)
-- 🌫️ **Shadow Wisp** - Forma nebulosa (Perigo: 2/5)
-- 👁️ **Observer** - Entidade observadora (Perigo: 2/5)
-- 🐟 **Anglerfish** - Criatura aquática (Perigo: 1/5)
-- 🌑 **The Shadow** - Entidade suprema (Perigo: 5/5)
-- 🌿 **Gloamvine** - Flora luminescente (Perigo: 0/5)
+- 🕷️ **Lurker** - Predatory creature (Danger: 3/5)
+- 🌫️ **Shadow Wisp** - Nebulous form (Danger: 2/5)
+- 👁️ **Observer** - Observing entity (Danger: 2/5)
+- 🐟 **Anglerfish** - Aquatic creature (Danger: 1/5)
+- 🌑 **The Shadow** - Supreme entity (Danger: 5/5)
+- 🌿 **Gloamvine** - Luminescent flora (Danger: 0/5)
 
 ## 📝 Lore
 
-O Projecto ORBIS foi criado para estudar a Black Matter — uma substância antiga desconhecida. Mas algo correu mal. A Black Matter não era apenas um material, era viva, consciente, e acordou.
+The ORBIS Project was created to study Black Matter — an ancient unknown substance. But something went wrong. Black Matter was not just a material, it was alive, conscious, and it awoke.
 
-Tu és o **Pato** — corajoso mas pequeno, deixado para trás durante uma evacuação. Agora tens que sobreviver e descobrir a verdade.
+You are the **Duck** — brave but small, left behind during an evacuation. Now you must survive and discover the truth.
 
-## 🎮 Gameplay Mecânicas
+## 🎮 Gameplay Mechanics
 
-- 👁️ **Observação** - O que ves existe fisicamente
-- 🌑 **Matéria Negra** - Desaparece fora do campo de visão
-- 💜 **Núcleo de Glowvine** - Ilumina e revela criaturas
-- 🌀 **Teleporter** - Deixa sombra e teletransporta de volta
+- 👁️ **Observation** - What you see exists physically
+- 🌑 **Dark Matter** - Disappears outside field of vision
+- 💜 **Gloamvine Core** - Illuminates and reveals creatures
+- 🌀 **Teleporter** - Leaves shadow and teleports back
 
-## 📄 Licença
+## 📄 License
 
-Projecto ORBIS © 2026 — Todos os direitos reservados.
+ORBIS Project © 2026 — All rights reserved.
 
-## 👤 Autor
+## 👤 Author
 
-**Diogo** e Equipa ORBIS
+**Diogo** and ORBIS Team
 
 ---
 
-**"A verdade nas profundezas aguarda os corajosos."** 🔍
+**"The truth in the depths awaits the brave."** 🔍
