@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="en">
 <head>
   <link rel="icon" type="image/png" sizes="80x80" href="favicon.ico">
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
@@ -32,7 +32,7 @@
 
     html { scroll-behavior: smooth; font-size: 16px; }
 
-    /* Body com fundo base — o canvas fixed vai por cima */
+    /* Body with base background — the fixed canvas goes on top */
     body {
       background: var(--bg);
       color: var(--text);
@@ -42,7 +42,7 @@
       cursor: crosshair;
     }
 
-    /* Scanlines CRT */
+    /* CRT Scanlines */
     body::after {
       content: '';
       position: fixed; inset: 0;
@@ -55,9 +55,9 @@
     ::-webkit-scrollbar-thumb { background:var(--cyan); border-radius:3px; }
 
     /* ══════════════════════════════════════════
-       FUNDO — canvas único fixo que cobre tudo
-       Todas as secções TÊM de ser transparentes
-       para este canvas aparecer atrás de tudo
+       BACKGROUND — single fixed canvas covering all
+       All sections MUST be transparent
+       for this canvas to appear behind everything
     ══════════════════════════════════════════ */
     #bg-canvas {
       position: fixed; top:0; left:0;
@@ -65,7 +65,7 @@
       pointer-events:none; z-index:0;
     }
 
-    /* Holofote + feixe vertical */
+    /* Spotlight + vertical beam */
     #spotlight-canvas {
       position: fixed; top:0; left:0;
       width:100%; height:100%;
@@ -101,14 +101,14 @@
     .ds::after { content:''; position:absolute; top:-100px; left:0; width:1px; height:90px; background:linear-gradient(to bottom,transparent,var(--cyan),transparent); animation:dsFlow var(--d,4s) linear infinite; animation-delay:var(--dl,0s); }
     @keyframes dsFlow { from{top:-100px} to{top:100%} }
 
-    /* Vinheta */
+    /* Vignette */
     #vignette {
       position:fixed; inset:0; pointer-events:none; z-index:1;
       background: radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(0,0,0,0.35) 100%);
     }
 
     /* ══════════════════════════════════════════
-       OVERLAY SCROLL PRETO (para o observer)
+       BLACK OVERLAY (for observer)
     ══════════════════════════════════════════ */
     #dark-overlay {
       position:fixed; inset:0; background:#000;
@@ -662,26 +662,26 @@
   <nav class="navbar" id="main-navbar">
     <a href="index.html" class="navbar__logo">PATO <span>//</span> FRADELOS</a>
     <ul class="navbar__links">
-      <li><a href="index.html" class="active">Início</a></li>
-      <li><a href="pages/maps.html">Mapas</a></li>
-      <li><a href="pages/entities.html">Entidades</a></li>
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="pages/maps.html">Maps</a></li>
+      <li><a href="pages/entities.html">Entities</a></li>
       <li><a href="pages/skills.html">Skills</a></li>
       <li><a href="pages/lore.html">Lore</a></li>
-      <li><a href="pages/video.html">Vídeo</a></li>
-      <li><a href="pages/team.html">Equipa</a></li>
+      <li><a href="pages/video.html">Video</a></li>
+      <li><a href="pages/team.html">Team</a></li>
     </ul>
     <button class="navbar__hamburger" aria-label="Menu" id="burger">
       <span></span><span></span><span></span>
     </button>
   </nav>
   <div class="navbar__mobile-menu" id="mobile-menu">
-    <a href="index.html">Início</a>
-    <a href="pages/maps.html">Mapas</a>
-    <a href="pages/entities.html">Entidades</a>
+    <a href="index.html">Home</a>
+    <a href="pages/maps.html">Maps</a>
+    <a href="pages/entities.html">Entities</a>
     <a href="pages/skills.html">Skills</a>
     <a href="pages/lore.html">Lore</a>
-    <a href="pages/video.html">Vídeo</a>
-    <a href="pages/team.html">Equipa</a>
+    <a href="pages/video.html">Video</a>
+    <a href="pages/team.html">Team</a>
   </div>
 
   <!-- ── FUNDO: canvas estrelas + nebulosas ── -->
@@ -706,20 +706,20 @@
   <section class="hero" style="padding-top:calc(var(--nav-height) + 40px)">
     <div class="hero__grid"></div>
     <div class="hero__content">
-      <div class="hero__eyebrow">Projecto ORBIS // 2D Platformer</div>
+      <div class="hero__eyebrow">ORBIS Project // 2D Platformer</div>
       <h1 class="hero__title">Pato em<br><span>Fradelos</span></h1>
-      <p class="hero__subtitle">Observe. Descubra. Sobreviva.</p>
+      <p class="hero__subtitle">Observe. Discover. Survive.</p>
       <p class="hero__desc">
-        Um jogo de plataformas 2D onde o que vês determina o que existe.
-        A matéria negra desaparece quando não é observada — e algo lá dentro
-        está a observar de volta.
+        A 2D platformer where what you see determines what exists.
+        Dark matter disappears when not observed — and something inside
+        is watching back.
       </p>
       <div class="hero__cta">
-        <a href="pages/video.html" class="btn btn--primary">▶ Ver Trailer</a>
-        <a href="pages/lore.html" class="btn btn--outline">Ler a Lore</a>
+        <a href="pages/video.html" class="btn btn--primary">▶ Watch Trailer</a>
+        <a href="pages/lore.html" class="btn btn--outline">Read Lore</a>
       </div>
     </div>
-    <div class="hero__scroll">↓ explorar</div>
+    <div class="hero__scroll">↓ explore</div>
   </section>
 
   <!-- ── DIVISÓRIA: Hero → Galeria ── -->
@@ -738,8 +738,8 @@
   ══════════════════════════════════════ -->
   <section class="gallery-section">
     <div class="section-header">
-      <div class="section-eyebrow">Sistema de Monitorização // ORBIS-CC</div>
-      <h2 class="section-title">Câmeras de Vigilância</h2>
+      <div class="section-eyebrow">Monitoring System // ORBIS-CC</div>
+      <h2 class="section-title">Surveillance Cameras</h2>
     </div>
 
     <div class="metal-room">
@@ -853,7 +853,7 @@
                     <div class="tv__hud">
                       <div class="tv__hud-tl" style="color:rgba(220,30,30,0.85)">CAM-01 // LAB SECTOR B</div>
                       <div class="tv__hud-tr" style="color:rgba(220,30,30,0.9)"><div class="tv__rec-dot" style="background:rgba(220,30,30,0.95)"></div>REC</div>
-                      <div class="tv__hud-bl">FEED ESTÁVEL // 00:14:32</div>
+                      <div class="tv__hud-bl">STABLE FEED // 00:14:32</div>
                       <div class="tv__hud-br">ORBIS-CC</div>
                     </div>
                     <div class="tv__corner tv__corner--tl" style="border-color:rgba(220,30,30,0.5)"></div>
@@ -882,10 +882,10 @@
                     <div class="tv__scanlines"></div>
                     <div class="tv__off-overlay"><canvas></canvas></div>
                     <div class="tv__hud">
-                      <div class="tv__hud-tl" style="color:rgba(0,220,100,0.8)">CAM-03<br>AQUÁRIO</div>
+                      <div class="tv__hud-tl" style="color:rgba(0,220,100,0.8)">CAM-03<br>AQUARIUM</div>
                       <div class="tv__hud-tr" style="color:rgba(0,220,100,0.9)"><div class="tv__rec-dot" style="background:rgba(0,220,100,0.9);animation-delay:0.7s"></div>REC</div>
-                      <div class="tv__hud-bl">ENTIDADE DETECTADA</div>
-                      <div class="tv__hud-br">⚠ MOVIMENTO</div>
+                      <div class="tv__hud-bl">ENTITY DETECTED</div>
+                      <div class="tv__hud-br">⚠ MOVEMENT</div>
                     </div>
                     <div class="tv__corner tv__corner--tl" style="border-color:rgba(0,220,100,0.45)"></div>
                     <div class="tv__corner tv__corner--tr" style="border-color:rgba(0,220,100,0.45)"></div>
@@ -909,10 +909,10 @@
                     <div class="tv__scanlines"></div>
                     <div class="tv__off-overlay"><canvas></canvas></div>
                     <div class="tv__hud">
-                      <div class="tv__hud-tl" style="color:rgba(0,180,255,0.8)">CAM-02 // PROFUNDEZAS</div>
+                      <div class="tv__hud-tl" style="color:rgba(0,180,255,0.8)">CAM-02 // DEPTHS</div>
                       <div class="tv__hud-tr" style="color:rgba(0,180,255,0.9)"><div class="tv__rec-dot" style="background:rgba(0,180,255,0.95);animation-delay:0.5s"></div>REC</div>
-                      <div class="tv__hud-bl">MATÉRIA INSTÁVEL</div>
-                      <div class="tv__hud-br">ZONA-04</div>
+                      <div class="tv__hud-bl">UNSTABLE MATTER</div>
+                      <div class="tv__hud-br">ZONE-04</div>
                     </div>
                     <div class="tv__corner tv__corner--tl" style="border-color:rgba(0,180,255,0.5)"></div>
                     <div class="tv__corner tv__corner--tr" style="border-color:rgba(0,180,255,0.5)"></div>
@@ -940,10 +940,10 @@
                     <div class="tv__scanlines"></div>
                     <div class="tv__off-overlay"><canvas></canvas></div>
                     <div class="tv__hud">
-                      <div class="tv__hud-tl" style="color:rgba(255,200,0,0.8)">CAM-04 // CORREDOR NORTE</div>
+                      <div class="tv__hud-tl" style="color:rgba(255,200,0,0.8)">CAM-04 // NORTH CORRIDOR</div>
                       <div class="tv__hud-tr" style="color:rgba(255,200,0,0.9)"><div class="tv__rec-dot" style="background:rgba(255,200,0,0.9);animation-delay:0.3s"></div>REC</div>
-                      <div class="tv__hud-bl">SINAL DEGRADADO</div>
-                      <div class="tv__hud-br">ZONA-02</div>
+                      <div class="tv__hud-bl">DEGRADED SIGNAL</div>
+                      <div class="tv__hud-br">ZONE-02</div>
                     </div>
                     <div class="tv__corner tv__corner--tl" style="border-color:rgba(255,200,0,0.45)"></div>
                     <div class="tv__corner tv__corner--tr" style="border-color:rgba(255,200,0,0.45)"></div>
@@ -970,7 +970,7 @@
                     <div class="tv__hud">
                       <div class="tv__hud-tl" style="color:rgba(180,60,255,0.75)">CAM-05<br>SECTOR X</div>
                       <div class="tv__hud-tr" style="color:rgba(180,60,255,0.8)"><div class="tv__rec-dot" style="background:rgba(180,60,255,0.85);animation-delay:1.1s"></div>REC</div>
-                      <div class="tv__hud-bl" style="color:rgba(255,80,80,0.6)">⚠ SINAL CORROMPIDO</div>
+                      <div class="tv__hud-bl" style="color:rgba(255,80,80,0.6)">⚠ CORRUPTED SIGNAL</div>
                     </div>
                     <div class="tv__corner tv__corner--tl" style="border-color:rgba(180,60,255,0.4)"></div>
                     <div class="tv__corner tv__corner--tr" style="border-color:rgba(180,60,255,0.4)"></div>
@@ -1021,29 +1021,29 @@
   ══════════════════════════════════════ -->
   <section class="features-section">
     <div class="section-header">
-      <div class="section-eyebrow">Mecânicas</div>
-      <h2 class="section-title">Como Funciona</h2>
+      <div class="section-eyebrow">Mechanics</div>
+      <h2 class="section-title">How It Works</h2>
     </div>
     <div class="features-grid">
       <div class="feature-card">
         <span class="feature-card__icon">👁️</span>
-        <div class="feature-card__title">Observação</div>
-        <p class="feature-card__desc">O que o jogador vê no ecrã determina o que existe fisicamente. A matéria negra desaparece quando sai do campo de visão.</p>
+        <div class="feature-card__title">Observation</div>
+        <p class="feature-card__desc">What the player sees on screen determines what physically exists. Dark matter disappears when it leaves the field of vision.</p>
       </div>
       <div class="feature-card">
         <span class="feature-card__icon">🌑</span>
-        <div class="feature-card__title">Matéria Negra</div>
-        <p class="feature-card__desc">Absorve toda a luz, não emite som, e esconde criaturas no seu interior. Sólida quando observada, inexistente quando ignorada.</p>
+        <div class="feature-card__title">Dark Matter</div>
+        <p class="feature-card__desc">Absorbs all light, emits no sound, and hides creatures inside. Solid when observed, non-existent when ignored.</p>
       </div>
       <div class="feature-card">
         <span class="feature-card__icon">💜</span>
-        <div class="feature-card__title">Núcleo de Glowvine</div>
-        <p class="feature-card__desc">Bola de luz roxa e pegajosa. Ilumina a matéria negra, revela criaturas ocultas e activa mecanismos.</p>
+        <div class="feature-card__title">Gloamvine Core</div>
+        <p class="feature-card__desc">A purple, sticky ball of light. Illuminates dark matter, reveals hidden creatures, and activates mechanisms.</p>
       </div>
       <div class="feature-card">
         <span class="feature-card__icon">🌀</span>
         <div class="feature-card__title">Teleporter</div>
-        <p class="feature-card__desc">Deixa uma sombra no ar e teletransporta de volta a ela, conservando o momentum do ponto de origem.</p>
+        <p class="feature-card__desc">Leaves a shadow in the air and teleports back to it, preserving momentum from the point of origin.</p>
       </div>
     </div>
   </section>
@@ -1069,10 +1069,10 @@
       <div id="obs-pupil-wrap"><img src="assets/Observer/ObserverRedFrontPupil.png" alt=""></div>
     </div>
     <div id="obs-text">
-      <div class="lore-tag">Entidade Classificada // ORBIS-07</div>
-      <div class="lore-name">O OBSERVER</div>
-      <p class="lore-desc">Ele não persegue. Ele observa.<br>E enquanto observa — você existe.</p>
-      <a href="pages/observer.html" class="lore-btn">→ Ficheiro da Entidade</a>
+      <div class="lore-tag">Classified Entity // ORBIS-07</div>
+      <div class="lore-name">THE OBSERVER</div>
+      <p class="lore-desc">It does not chase. It observes.<br>And while it observes — you exist.</p>
+      <a href="pages/observer.html" class="lore-btn">→ Entity File</a>
     </div>
     <div class="obs-ticker">
       <span>THREAT LEVEL: ABSOLUTE</span>

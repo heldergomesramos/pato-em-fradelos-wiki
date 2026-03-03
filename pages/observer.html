@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -190,7 +190,7 @@
   <div id="exposure-bar-wrap">
     <div id="exposure-bar"></div>
   </div>
-  <div id="shrink-warn">⚠ SOMBRAS A DESAPARECER</div>
+  <div id="shrink-warn">⚠ SHADOWS DISAPPEARING</div>
 </div>
 
 <!-- ─── DEATH ─── -->
@@ -208,16 +208,16 @@
 
 <script>
 /* ============================================================
-   THE OBSERVER — VERSÃO DIFÍCIL
-   Mesma mecânica: esconde o rato nas sombras.
-   Novidades:
-   - Observer 3× maior (480px)
-   - Raios de scan rotativos que te apanham mesmo nas sombras
-   - Sombras encolhem com o tempo (aviso visual antes)
-   - 2º observer aparece aos 20s
-   - Exposição sobe muito mais depressa quanto mais perto estás
-   - Modo CAÇA: quando te vê, acelera a fundo + spin frenético
-   - Modo PATRULHA: quando estás escondido, faz padrão circular
+   THE OBSERVER — HARD MODE
+   Same mechanic: hides the cursor in shadows.
+   New features:
+   - Observer 3× larger (480px)
+   - Rotating scan rays that catch you even in shadows
+   - Shadows shrink over time (visual warning before)
+   - 2nd observer appears at 20s
+   - Exposure increases much faster the closer you are
+   - HUNT MODE: when it sees you, accelerates at full speed + frantic spin
+   - PATROL MODE: when you're hidden, does circular pattern
    ============================================================ */
 
 // ── DOM ──
@@ -288,7 +288,7 @@ function transitionToGame() {
 }
 
 // ── SHELTERS ──
-// life: 1.0→0, encolhe com o tempo; shrinkStartMs = quando começa a encolher
+// life: 1.0’0, shrinks over time; shrinkStartMs = when it starts shrinking
 function makeShelters() {
   return [
     { type:'cave', x:0.05, y:0.70, w:0.13, h:0.21, life:1, shrinkStart:18000 },
