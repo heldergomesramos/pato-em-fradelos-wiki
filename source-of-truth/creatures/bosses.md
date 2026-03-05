@@ -17,9 +17,9 @@ Artificially created to observe BM creatures — keeping them "locked in existen
 May contain a human consciousness inside it. Unconfirmed — held as one interpretation.
 
 ### Reward
-Passing The Observer grants **coordinates to a new location** and possibly the **Conceal upgrade**.
+Passing The Observer grants **coordinates to a new location**. The Conceal upgrade previously associated with this reward is now unresolved — the reward may be decoupled from any turning-black mechanic.
 
-→ See `upgrades.md` for Conceal
+→ See `upgrades.md` for Conceal status  
 → See `mechanics/observation.md` for the observation mechanic it exploits
 
 ---
@@ -37,7 +37,7 @@ A creature that only moves through darkness and dies when hit by light. Encounte
 
 The "darkness = defeat" resolution is only possible because the Depths Chamber first trains the player that darkness = safety via Shadow Wisps. The boss fight inverts the instinct — you must trust darkness at the critical moment.
 
-→ See `creatures/enemies.md` for Shadow Wisps
+→ See `creatures/enemies.md` for Shadow Wisps  
 → See `areas/depths.md`
 
 ---
@@ -49,10 +49,12 @@ The "darkness = defeat" resolution is only possible because the Depths Chamber f
 Highly intelligent black reptile. Can camouflage **perfectly inside Black Matter** — effectively invisible in any BM zone. Detectable only with Gloamvine Core light.
 
 ### What Happened
-Escaped from its research containment on Floor 3. Attacked multiple team members, causing wounds. BM entered their bloodstreams through those wounds, triggering the BM modification/corruption process. This caused the quarantine declaration and sealing of Floor 3. Dead scientists and blood remain inside. The Chameleon is still in there.
+Escaped from its research containment on Floor 3. Floor 3 is sealed. Dead scientists and blood remain inside. The Chameleon is still in there.
+
+**⚠️ CONFLICT NOTE — infection cause:** The previous version of this file stated that the Chameleon's attacks caused wounds that let BM enter team members' bloodstreams, triggering the infection outbreak and quarantine. The session notes discard the Chameleon as the direct infection cause. Current working theory: BM infection spread through physical contact between open wounds and Black Matter — a hazard of fieldwork on a BM-covered island, no creature attack required. The Chameleon may still have attacked people (consistent with it escaping containment), but it is no longer attributed as the origin of the infection. Quarantine timeline and Floor 3 sealing remain unchanged. See `scientists.md` for full note.
 
 Floor 3 is accessible only via a Black Gloamvine's physical distortion zone — no normal entrance.
 
-→ See `areas/laboratory.md` for Floor 3
-→ See `scientists.md` for quarantine timeline
-→ See `mechanics/black_matter.md` for BM + water/blood corruption
+→ See `areas/laboratory.md` for Floor 3  
+→ See `scientists.md` for infection vector working theory  
+→ See `mechanics/black_matter.md` for BM + blood infection mechanics

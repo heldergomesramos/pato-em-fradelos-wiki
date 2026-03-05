@@ -20,7 +20,7 @@ Large chamber simulating a natural habitat for observing creatures. Contains **T
 
 The Aquarium floor has a **thick glass panel** showing total darkness below. The player can see it early but cannot interact with it — it foreshadows the Depths Chamber. Access is gained later via the Teleporter.
 
-→ See `creatures/bosses.md` for The Observer
+→ See `creatures/bosses.md` for The Observer  
 → See `areas/depths.md` for the Depths Chamber
 
 ### Gloamvine Research Room
@@ -29,9 +29,10 @@ Dedicated to studying black gloamvines. **Warning: 3 are growing uncontrollably.
 → See `creatures/plants.md`
 
 ### The Stranger Floor
-A floor dedicated entirely to researching The Stranger planet. PE's primary workspace for the Stranger theory logs.
+A floor dedicated entirely to researching The Stranger planet. PE's primary workspace for the Stranger theory logs. Contains PE's coordinate research — half of the information needed to find the hidden deep portal coordinates (readable only with enough context to know what you're looking at).
 
-→ See `areas/the_stranger.md`
+→ See `areas/the_stranger.md`  
+→ See `areas/internull.md` for the coordinate puzzle
 
 ### Kinetic Energy Room
 Contains the machine that gives the duck the **Dash upgrade**.
@@ -42,7 +43,9 @@ Permanently sealed. Accessible only from Floor 2 via a black gloamvine's physica
 - Blood
 - The Chameleon (still present, uncontained)
 
-Sealed after the Chameleon incident. The Chameleon escaped here, attacked team members, and caused BM contamination through wounds entering the bloodstream. The quarantine that followed shut down parts of the facility and led to some team members evacuating.
+Sealed after the Chameleon escaped containment. The quarantine was caused by BM infection spreading among team members.
 
-→ See `creatures/bosses.md` for The Chameleon
-→ See `scientists.md` for the quarantine timeline
+**⚠️ CONFLICT NOTE — infection cause:** The session notes discard the Chameleon as the direct cause of the BM infection outbreak. Current working theory: wound contact with Black Matter is the infection vector, not Chameleon attacks. The Chameleon escaped and may have attacked people, but is no longer attributed as causing the infection. See `scientists.md` and `creatures/bosses.md`.
+
+→ See `creatures/bosses.md` for The Chameleon  
+→ See `scientists.md` for the quarantine timeline and infection vector
