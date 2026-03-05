@@ -6,31 +6,44 @@
 
 A large black planet orbiting between Earth and the Moon, roughly moon-sized. Detected by the research team's instruments — catalogued by humanity as a permanent astronomical feature, strange and studied, but not obviously dangerous. From Earth's surface it looks like it always has. Its size increase is detectable only with the precision instruments PE built at the observatory.
 
-The Stranger is an ancient planet entirely consumed by Black Matter. It has been floating here for thousands of years, slowly dispersing itself. The surface is Black Matter — a scout camera sent to it phased straight through, consistent with a BM surface.
+The Stranger is an ancient planet entirely consumed by Black Matter. It has been floating through space for thousands of years — **without existing in any stable form**, because in the void of deep space there are no conscious observers to perceive it. It flickered in and out of existence, drifting, until it entered Earth's orbit.
+
+**When it reached Earth's orbit, the reflected light of the Sun via the Moon gave it its first stable observer.** Humans on Earth looking at the sky perceived it. It became real. It has been here ever since, slowly trying to regenerate.
 
 **The Stranger is where unobserved BM goes.** What the scientists called "Internull" is The Stranger's interior. They named it before they understood what they were describing.
 
-→ See `areas/internull.md` for how teleporters and sleep access The Stranger's interior
+→ See `areas/internull.md` for how teleporters and sleep access The Stranger's interior  
 → See `mechanics/black_matter.md` for BM origin and the ocean threat
+
+---
+
+## Why The Stranger Is Here — The Fragment
+
+Long ago, a fragment of The Stranger broke off and fell to Earth, burying itself deep in the Last Abyss beneath the island. This fragment is the source of the **stabilizer ore** — material from The Stranger itself, with properties unique to its origin.
+
+The Stranger has been trying to regenerate — to pull itself back together. The fragment in the island is part of what it is trying to recover. It was drawn here by that fragment, caught in Earth's gravitational pull, and has been in orbit ever since. Unable to retrieve what it lost. Unable to leave.
+
+The BM spreading on the island is not random — it is the fragment responding to the proximity of its origin. The island is where the wound is.
 
 ---
 
 ## Known Properties
 
-- Causes a **total eclipse every 3 days at midnight** — complete darkness on the island
+- Causes a **total eclipse every 3 days at midnight** — the eclipse is the orbital cycle, not a coincidence
 - A scout camera sent to its surface **phased through it** — surface is BM
 - No light reflects off it — absorbs everything, same as BM
-- **Growing slowly** — detectable only with PE's precision instruments at the observatory. Not visibly growing to the naked eye. The threat from The Stranger is internal: its interior is destabilizing slowly. From Earth's surface it looks like it always has.
+- **Growing slowly** — detectable only with PE's precision instruments at the observatory. Not visibly growing to the naked eye. The threat is internal: its attempt to regenerate is destabilizing slowly. From Earth's surface it looks like it always has.
+- **Existed without existing** in deep space — stable only since entering Earth's orbit and becoming observed
 
 ---
 
 ## Eclipse Mechanic
 
-Every 3 days at midnight, the island experiences total darkness. During this window:
+Every 3 days at midnight, the island experiences total darkness — The Stranger passes between the island and available light sources. During this window:
 - All BM on the surface vanishes (unobserved in total darkness) — opens normally-blocked paths
 - The Stranger reaches zenith — deepest penetration available for any Stranger zone accessed via sleep + teleporter
 
-The eclipse is one of the two keys to reaching The Stranger's core (the other being the correct coordinates). Eclipse double function: traversal tool mid-game and required for the optional ending.
+The eclipse is one of the two keys to reaching The Stranger's core (the other being the correct coordinates). Eclipse double function: traversal tool mid-game and required for the ending.
 
 ---
 
@@ -83,13 +96,15 @@ The key image: duck silhouette — small, warm, moving — against the vast ambe
 
 ## The Core
 
-The original BM mass. Ancient, inert, vast. Evidence this process happened to another world long ago and ended. The Stranger *is* that world. It has been floating here the whole game, slowly dispersing itself.
+The original BM mass. Ancient, inert, vast. The Stranger *is* a world that was consumed — it has been floating here the whole game, slowly trying to put itself back together, drawn to the fragment buried in the island below.
 
-**The ending:** Pofinho — a self-observing BM entity — merges with the core. He expands his self-observing consciousness outward to encompass the mass, stabilizing it. Not a sacrifice cutscene. Quiet. Natural. He walks into the mass and the camera stays outside, watching. The Stranger's growth slows and halts.
+**The ending:** Pofinho — a self-observing BM entity — merges with the core. He expands his self-observing consciousness outward to encompass the mass, stabilizing it. The Stranger's attempt to regenerate halts. Not a sacrifice cutscene. Quiet. Natural. He walks into the mass and the camera stays outside, watching.
 
 One line of text: *The Stranger holds still. For now.*
 
-Then: the island surface, seen from above for the first time. Morning light on the water. Life continuing, unaware. The implication — that someone might still find a better solution someday — is never stated. The player carries it out.
+The weight of "for now": The Stranger isn't destroyed. It isn't healed. It simply stopped — held in place by the consciousness of one scientist who became part of it. Whether that holds forever is not a question the game answers.
+
+Then: the island surface, seen from above for the first time. Morning light on the water. Life continuing, unaware. Somewhere in the world, the scientists who were silenced are going about their lives, not knowing. The implication is never stated. The player carries it out.
 
 **A third hidden layer** exists beyond this ending — something that reframes what the player understood. Deferred to future session.
 
